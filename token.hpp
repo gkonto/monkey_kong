@@ -34,4 +34,10 @@ const char *const tok_names[] = {
 #undef X
 
 
+struct Token
+{
+     std::string literal_;
+     TokenType type_;
+};
+
 #endif
