@@ -12,10 +12,10 @@
     X(T_PLUS, "+")\
     X(T_COMMA, "T_COMMA")\
     X(T_SEMICOLON, "T_SEMICOLON")\
-    X(T_LPAREN, "T_LPAREN")\
-    X(T_RPAREN, "T_RPAREN")\
-    X(T_LBRACE, "T_LBRACE")\
-    X(T_RBRACE, "T_RBRACE")\
+    X(T_LPAREN, "(")\
+    X(T_RPAREN, ")")\
+    X(T_LBRACE, "{")\
+    X(T_RBRACE, "}")\
     X(T_FUNCTION, "T_FUNCTION")\
     X(T_LET, "T_LET")\
     X(T_MAX, "T_MAX")
@@ -34,10 +34,13 @@ const char *const tok_names[] = {
 #undef X
 
 
-struct Token
+class Token
 {
-     std::string literal_;
-     TokenType type_;
+    public:
+        explicit Token(TokenType type, const char *ch);
+    private:
+        const char *literal_;
+        TokenType type_;
 };
 
 #endif
