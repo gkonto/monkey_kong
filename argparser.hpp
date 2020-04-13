@@ -10,6 +10,7 @@
 // Forward Declarations
 class ReplOptions;
 class CmdArg;
+class Optional;
 
 #define OPT_NOT_ACTIVE "OPT_NOT_ACTIVE"
 #define OPT_ACTIVE "OPT_ACTIVE"
@@ -37,6 +38,30 @@ class ArgParser
         std::string name_; //ArgParser's displaying label when --help is selected
 };
 //~ArgParser
+
+
+class CmdArg
+{
+    public:
+        explicit CmdArg(const char *option, const char *desc, CmdArgCb cb);
+        explicit CmdArg(const char *option, const char *desc, const char *default_v, const std::set<std::string> &accepted, CmdArgCb cb);
+
+        std::string decorate() const;
+        bool hasOptions() const;
+        const std::string &option() const;
+        const std::string &description() const;
+        const std::set<std::string> &accepted_vals() const;
+        const std::string &default_val() const;
+        bool hasCallback() const;
+        void exec_cb(const std::vector<std::string> &arg_opts, void *returned) const;
+    private:
+        std::string option_; // 
+        std::string desc_;   // 
+        Optional *optional_ = nullptr;
+
+        CmdArgCb cb_;
+};
+
 
 
 #endif

@@ -17,31 +17,51 @@ struct Optional
 //~Optional
 
 
-class CmdArg
+CmdArg::CmdArg(const char *option, const char *desc, CmdArgCb cb)
+             : option_(option), desc_(desc), cb_(cb) 
+{}
+
+CmdArg::CmdArg(const char *option, const char *desc, const char *default_v, const set<string> &accepted, CmdArgCb cb)
+                    : option_(option), desc_(desc), optional_(new Optional(default_v, accepted)), cb_(cb)
 {
-    public:
-        explicit CmdArg(const char *option, const char *desc, CmdArgCb cb) 
-            : option_(option), desc_(desc), cb_(cb) {}
+}
 
-        explicit CmdArg(const char *option, const char *desc, const char *default_v, const set<string> &accepted, CmdArgCb cb)
-                    : option_(option), desc_(desc), optional_(new Optional(default_v, accepted)), cb_(cb) {}
+bool CmdArg::hasOptions() const 
+{
+    return optional_ != nullptr; 
+}
 
-        string decorate() const;
-        bool hasOptions() const { return optional_ != nullptr; }
-        const string &option() const { return option_; }
-        const string &description() const { return desc_; }
-        const set<string> &accepted_vals() const { return optional_->accepted_vals_; }
-        const string &default_val() const { return optional_->default_val_; }
-        bool hasCallback() const { return cb_ != nullptr; }
-        void exec_cb(const vector<string> &arg_opts, void *returned) const
-                    { cb_(*this, arg_opts, returned); };
-    private:
-        string option_; // 
-        string desc_;   // 
-        Optional *optional_ = nullptr;
+const string &CmdArg::option() const 
+{ 
+    return option_; 
+}
 
-        CmdArgCb cb_;
-};
+const string &CmdArg::description() const 
+{ 
+    return desc_; 
+}
+
+const set<string> &CmdArg::accepted_vals() const 
+{
+    return optional_->accepted_vals_; 
+}
+
+const string &CmdArg::default_val() const 
+{
+    return optional_->default_val_; 
+}
+
+
+bool CmdArg::hasCallback() const 
+{
+    return cb_ != nullptr; 
+}
+
+
+void CmdArg::exec_cb(const vector<string> &arg_opts, void *returned) const
+{
+    cb_(*this, arg_opts, returned); 
+}
 
 
 ArgParser::ArgParser(string name, int argc, char **argv)
@@ -103,7 +123,8 @@ void ArgParser::parse(void *returned)
 
         if (arg->hasOptions()) {
             vector<string> arg_opts;
-            while (args_.find(user_args_[++i]) != args_.end()) {
+            const set<string> &accepted_opts = arg->accepted_vals();
+            while (++i < user_args_.size() && accepted_opts.find(user_args_[i]) != accepted_opts.end()) {
                 arg_opts.emplace_back(user_args_[i]);
             }
             if (arg->hasCallback()) {
