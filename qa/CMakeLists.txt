@@ -9,8 +9,10 @@
 
  INCLUDE_DIRECTORIES(..)
  set(HEADERS
+     ../argparser.hpp
     )
  set(SOURCES
+     ../argparser.cpp
      main.cpp
      )
  ADD_EXECUTABLE(qa_monkey ${HEADERS} ${SOURCES})

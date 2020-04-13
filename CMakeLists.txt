@@ -8,9 +8,11 @@
  set(CMAKE_CXX_STANDARD 14)
  set(HEADERS
      token.hpp
+     argparser.hpp
     )
  set(SOURCES
      repl.cpp
+     argparser.cpp
      )
  ADD_EXECUTABLE(monkey ${HEADERS} ${SOURCES})
 
