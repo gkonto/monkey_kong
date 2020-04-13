@@ -10,7 +10,7 @@
     X(T_INT, "T_INT")\
     X(T_ASSIGN, "=")\
     X(T_PLUS, "+")\
-    X(T_COMMA, "T_COMMA")\
+    X(T_COMMA, ",")\
     X(T_SEMICOLON, "T_SEMICOLON")\
     X(T_LPAREN, "(")\
     X(T_RPAREN, ")")\
@@ -18,7 +18,25 @@
     X(T_RBRACE, "}")\
     X(T_FUNCTION, "T_FUNCTION")\
     X(T_LET, "T_LET")\
+    X(T_MINUS, "-")\
+    X(T_BANG, "!")\
+    X(T_ASTERISK, "*")\
+    X(T_SLASH, "/")\
+    X(T_LT, "<")\
+    X(T_GT, ">")\
+    X(T_TRUE, "true")\
+    X(T_FALSE, "false")\
+    X(T_IF, "T_IF")\
+    X(T_ELSE, "T_ELSE")\
+    X(T_RETURN, "T_RETURN")\
+    X(T_EQ, "==")\
+    X(T_NOT_EQ, "!=")\
+    X(T_STRING, "T_STRING")\
+    X(T_LBRACKET, "[")\  
+    X(T_RBRACKET, "]")\
+    X(T_COLON, ":")\
     X(T_MAX, "T_MAX")
+
 
 #define X(a, b) a,
 enum TokenType
@@ -26,6 +44,7 @@ enum TokenType
     TOKEN_TYPES
 };
 #undef X
+
 
 #define X(a, b) b,
 const char *const tok_names[] = {
