@@ -8,7 +8,6 @@
 
 using namespace std;
 
-map<string, Test *> tests;
 
 string Test::report_errors() const
 {
@@ -29,8 +28,17 @@ void Test::errorf(std::string input_case, const char *fmt, ...)
      va_start(args, fmt);
      vsnprintf(buffer, sizeof(buffer), fmt, args);
      va_end(args);
-     string msg(buffer);
-     is_failed_ = true;
+     string msg;
+     if (input_case.compare("")) {
+         if (input_case.length() > 10) {
+            msg.append("Case -> " + input_case.substr(0, 40) + " ... \n");
+         } else {
+             msg.append("Case -> " + input_case + "\n");
+         }
+     }
+    msg.append(buffer);
+    errors_.emplace_back(msg);
+    is_failed_ = true;
 }
 
 
@@ -108,7 +116,7 @@ void TestNextToken::execute()
 
 void TestNextToken::run_core(std::string input, std::vector<Token> expec)
 {
-    errorf(input, "Missing function %s", "lala");
+    errorf(input, "Missing function %s\n", "lala");
     /*
     Lexer lex(input);
 

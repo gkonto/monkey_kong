@@ -1,20 +1,94 @@
 #include <iostream>
+#include <map>
 #include "../argparser.hpp"
 #include "../auxiliaries.hpp"
 #include "test.hpp"
 
-struct QAUserArgs
+using namespace std;
+
+
+
+struct Tests
 {
+    Tests()
+    {
+        tests_.emplace("TestNextToken", new TestNextToken);
+    }
+
+    ~Tests()
+    {
+        for (auto &t : tests_) {
+            delete t.second;
+        }
+    }
+
+    std::string list()
+    {
+        std::string ret("Select specific tests. Available tests:\n");
+        for (auto &t : tests_) {
+            ret.append("\t\t\t\t\t" + t.first + "\n");
+        }
+        return ret;
+    }
+
+    set<string> test_names()
+    {
+        set<string> names;
+        for (auto &t : tests_) {
+            names.emplace(t.first);
+        }
+
+        return names;
+    }
+
+    map<string, Test *> tests_;
 };
+
+struct QAArgs
+{
+    QAArgs(const Tests &tests)
+        : all_tests_(tests) {}
+
+    const Tests  &all_tests_;
+    map<string, Test *> test_to_run_;
+};
+
+
+static void gatherTests(const class CmdArg &ard, const std::vector<std::string> &options, void *data)
+{
+    QAArgs *qa_opts = static_cast<QAArgs *>(data);
+    for (auto &opt : options) {
+        const auto &it = qa_opts->all_tests_.tests_.find(opt);
+        if (it != qa_opts->all_tests_.tests_.end()) {
+            qa_opts->test_to_run_.emplace(it->first, it->second);
+        }
+        if (!opt.compare("all")) {
+            qa_opts->test_to_run_.clear();
+            for (auto &t : qa_opts->all_tests_.tests_) {
+                qa_opts->test_to_run_.emplace(t.first, t.second);
+            }
+            break;
+        }
+    }
+
+    if (qa_opts->test_to_run_.empty()) {
+        for (auto &t : qa_opts->all_tests_.tests_) {
+            qa_opts->test_to_run_.emplace(t.first, t.second);
+        }
+    }
+}
 
 int main(int argc, char **argv)
 {
-    QAUserArgs u_args;
+    Tests tt;
+    QAArgs data(tt);
     ArgParser a_parser("Interpreter QA mechanism", argc, argv);
+    a_parser.addArgument("-run", tt.list().c_str(), "all", tt.test_names(),  gatherTests);
     a_parser.addArgument("--help", "Display this information", nullptr);
-    a_parser.parse(nullptr);
+    a_parser.parse(&data);
 
-    for (auto &t : tests) {
+
+    for (auto &t : data.test_to_run_) {
         std::cout << "[+] " << t.first << ": ";
         t.second->execute();
         if (t.second->is_failed_) {

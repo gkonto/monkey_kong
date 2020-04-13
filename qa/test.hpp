@@ -8,11 +8,10 @@
 class Token;
 struct Test;
 
-extern std::map<std::string, Test *> tests;
-
 struct Test
 {
     Test(std::string name) : name_(name) {}
+    virtual ~Test() {};
     std::string report_errors() const;
     virtual void execute() = 0;
     void errorf(std::string input_case, const char *fmt, ...);
