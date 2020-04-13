@@ -11,12 +11,13 @@
  set(HEADERS
      ../argparser.hpp
      ../auxiliaries.hpp
+     ../token.hpp
      test.hpp
     )
  set(SOURCES
      ../argparser.cpp
+     ../token.cpp
      test.cpp
-
      main.cpp
      )
  ADD_EXECUTABLE(qa_monkey ${HEADERS} ${SOURCES})

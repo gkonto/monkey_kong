@@ -32,7 +32,7 @@
     X(T_EQ, "==")\
     X(T_NOT_EQ, "!=")\
     X(T_STRING, "T_STRING")\
-    X(T_LBRACKET, "[")\  
+    X(T_LBRACKET, "[")\
     X(T_RBRACKET, "]")\
     X(T_COLON, ":")\
     X(T_MAX, "T_MAX")

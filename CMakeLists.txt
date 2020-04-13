@@ -13,6 +13,7 @@
  set(SOURCES
      repl.cpp
      argparser.cpp
+     token.cpp
      )
  ADD_EXECUTABLE(monkey ${HEADERS} ${SOURCES})
 
