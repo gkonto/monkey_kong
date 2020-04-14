@@ -9,6 +9,7 @@
  set(HEADERS
      token.hpp
      lexer.hpp
+     repl.hpp
      argparser.hpp
      symbols.hpp
     )
@@ -18,6 +19,7 @@
      symbols.cpp
      argparser.cpp
      token.cpp
+     repl.cpp
      )
  ADD_EXECUTABLE(monkey ${HEADERS} ${SOURCES})
 
