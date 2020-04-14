@@ -41,10 +41,10 @@ void Test::errorf(std::string input_case, const char *fmt, ...)
      va_end(args);
      string msg;
      if (input_case.compare("")) {
-         if (input_case.length() > 10) {
-            msg.append("Case -> " + input_case.substr(0, 40) + " ... \n");
+         if (input_case.length() > 40) {
+            msg.append("[!] Case -> " + input_case.substr(0, 40) + " ... \n");
          } else {
-             msg.append("Case -> " + input_case + "\n");
+             msg.append("[!] Case -> " + input_case + "\n");
          }
      }
     msg.append(buffer);
@@ -286,6 +286,11 @@ template<typename T>
 void TestLetStatements::run_core(LetStatementCase<T> c)
 {
     std::unique_ptr<Program> program(parse(c.input_));
+
+    if (!program) {
+        errorf(c.input_, "parseProgram returned nullptr\n");
+        return;
+    }
 
     if (program->size() != 1) {
         errorf(c.input_, "program.Statements does not contain 1 statements. got %d\n", program->size());
