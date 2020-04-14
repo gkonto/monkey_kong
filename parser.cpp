@@ -8,6 +8,11 @@ Parser::Parser(Lexer *l) : lexer_(l)
     nextToken();
 }
 
+Program *Parser::parseProgram()
+{
+    return nullptr;
+}
+
 void Parser::nextToken()
 {
     cur_token_ = next_token_;

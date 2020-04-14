@@ -4,6 +4,7 @@
 
 class Lexer;
 class Token;
+class Program;
 
 // A Pratt parser. The main idea is the association of parsing functions, 
 // which Pratt calls "semantic code" with token types.
@@ -17,6 +18,7 @@ class Parser
          * token is found in a prefix or an infix position.
          */
         explicit Parser(Lexer *l);
+        Program *parseProgram();
     private:
         void nextToken();
         Lexer *lexer_      = nullptr;
