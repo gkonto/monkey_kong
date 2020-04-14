@@ -5,10 +5,19 @@
 #include <stdarg.h>
 #include <memory>
 #include "test.hpp"
-#include "token.hpp"
-#include "lexer.hpp"
+#include "../token.hpp"
+#include "../lexer.hpp"
+#include "../ast.hpp"
+#include "../parser.hpp"
 
 using namespace std;
+
+std::unique_ptr<Program> Test::parse(const std::string &input)
+{
+    Lexer lex(input);
+    Parser parser(&lex);
+    return std::unique_ptr<Program>(parser.parseProgram());
+}
 
 
 string Test::report_errors() const
@@ -136,9 +145,163 @@ void TestNextToken::run_core(std::string input, std::vector<Token> expec)
 
         if (got && !(expected == *got)) {
             errorf(input, "[-] Expected: Type '%s' - Value: '%s'\n\t\tGot     : Type '%s' -  Value: '%s'",
-                    tok_names[expected.type()], expected.literal(), tok_names[got->type()], got->literal());
+                    tok_names[expected.type()], expected.literal().c_str(), tok_names[got->type()], got->literal().c_str());
             break;
         }
+    }
+}
+
+
+TestLetStatements::TestLetStatements()
+    : Test("TestLetStatements") {}
+
+
+void TestLetStatements::execute()
+{
+    LetStatementCase<int> a("let x = 5;", "x", 5);
+    run_core(a);
+    LetStatementCase<bool> b("let y = true;", "y", true);
+    run_core(b);
+    LetStatementCase<std::string> c("let foobar = y;", "foobar", "y");
+    run_core(c);
+}
+
+
+bool TestLetStatements::testLetStatement(const std::string &input, Node *statement, const std::string &name)
+{
+    if (statement->tokenLiteral().compare("let")) {
+        errorf(input, "tokenLiteral not 'let'. got = '%s'\n", name.c_str(), statement->tokenLiteral().c_str());
+        return false;
+    }
+
+    Let *p_let = dynamic_cast<Let *>(statement);
+    if (!p_let) {
+        errorf("", "not a Let statement!");
+        return false;
+    }
+
+    if (name.compare(p_let->identName())) {
+        errorf("", "Let::name_::value_ not %s. Got %s", 
+                name.c_str(), p_let->identName().c_str());
+        return false;
+    }
+
+    if (name.compare(p_let->name()->tokenLiteral())) {
+        errorf("", "name not '%s'. got '%s'", p_let->name()->tokenLiteral().c_str(), name.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+
+bool Test::testIdentifier(const std::string &input, Node *exp, const std::string &value)
+{
+    Identifier *ident = dynamic_cast<Identifier *>(exp);
+    if (!ident) {
+        errorf(input, "exp not Identifier");
+        return false;
+    }
+
+    if (value.compare(ident->value())) {
+        errorf(input, "exp->value_ not %s. got %s", value.c_str(), ident->value().c_str());
+        return false;
+    }
+    
+    if (value.compare(ident->tokenLiteral())) {
+        errorf(input, "ident->tokenLiteral not %s. got %s", value.c_str(), ident->tokenLiteral().c_str());
+        return false;
+    }
+
+    return true;
+}
+
+bool Test::testBooleanLiteral(const std::string &input, Node *il, bool value)
+{
+    errorf(input, "Boolean");
+    /*
+    Boolean *integ = dynamic_cast<Boolean *>(il);
+
+    if (!il) {
+        errorf(input, "il not Boolean. got = %s", integ->asString().c_str());
+        return false;
+    }
+
+    if (integ->value() != value) {
+        errorf(input, "value not %d. got = %d\n", value, integ->value());
+        return false;
+    }
+
+    if (integ->tokenLiteral() != integ->asString()) {
+        errorf(input, "TokenLiteral not %s. got = %s", value, integ->tokenLiteral().c_str());
+        return false;
+    }
+    */
+
+    return true;
+}
+
+
+bool Test::testIntegerLiteral(const std::string &input, Node *il, int value) 
+{
+    errorf(input, "Missing");
+    /*
+    IntegerLiteral *integ = dynamic_cast<IntegerLiteral *>(il);
+    if (!il) {
+        errorf(input, "il not IntegerLiteral. got = %s", integ->asString().c_str());
+        return false;
+    }
+
+    if (integ->value() != value) {
+        errorf(input, "value not %d. got = %d\n", value, integ->value());
+        return false;
+    }
+
+    if (integ->tokenLiteral() != integ->asString()) {
+        errorf(input, "TokenLiteral not %s. got = %s", value, integ->tokenLiteral().c_str());
+        return false;
+    }
+    */
+
+    return true;
+}
+
+
+bool Test::testLiteralExpression(const std::string &input, Node *exp, bool expected)
+{
+    return testBooleanLiteral(input, exp, expected);
+}
+
+bool Test::testLiteralExpression(const std::string &input, Node *exp, int expected)
+{
+    return testIntegerLiteral(input, exp, expected);
+}
+
+bool Test::testLiteralExpression(const std::string &input, Node *exp, std::string &expected)
+{
+    return testIdentifier(input, exp, expected);
+}
+
+template<typename T>
+void TestLetStatements::run_core(LetStatementCase<T> c)
+{
+    std::unique_ptr<Program> program(parse(c.input_));
+
+    if (program->size() != 1) {
+        errorf(c.input_, "program.Statements does not contain 1 statements. got %d\n", program->size());
+        return;
+    }
+
+    Node *stmt = (*program)[0];
+    if (!testLetStatement(c.input_, stmt, c.expectedIdentifier_)) {
+        return;
+    }
+
+    Let *l_s = dynamic_cast<Let *>(stmt);
+    Node *val = l_s->value();
+    
+    if (!testLiteralExpression(c.input_, val, c.expectedValue_)) {
+        return;
     }
 }
 

@@ -14,6 +14,8 @@
      ../token.hpp
      ../lexer.hpp
      ../symbols.hpp
+     ../ast.hpp
+     ../parser.hpp
      test.hpp
     )
  set(SOURCES
@@ -21,6 +23,8 @@
      ../token.cpp
      ../lexer.cpp
      ../symbols.cpp
+     ../ast.cpp
+     ../parser.cpp
      test.cpp
      main.cpp
      )

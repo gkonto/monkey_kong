@@ -13,6 +13,7 @@ struct Tests
     Tests()
     {
         tests_.emplace("TestNextToken", new TestNextToken);
+        tests_.emplace("TestLetStatements", new TestLetStatements);
     }
 
     ~Tests()
