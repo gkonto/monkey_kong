@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     Tests tt;
     QAArgs data(tt);
     ArgParser a_parser("Interpreter QA mechanism", argc, argv);
-    a_parser.addArgument("-run", tt.list().c_str(), "all", tt.test_names(),  gatherTests);
+    a_parser.addArgument("-run", tt.list().c_str(), tt.test_names(),  gatherTests);
     a_parser.addArgument("--help", "Display this information", nullptr);
     a_parser.parse(&data);
 

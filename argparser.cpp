@@ -8,10 +8,9 @@ using namespace std;
 
 struct Optional
 {
-    explicit Optional(string default_v, const set<string> &accepted)
-        : default_val_(default_v), accepted_vals_(accepted) {}
+    explicit Optional(const set<string> &accepted)
+        : accepted_vals_(accepted) {}
 
-    string default_val_;
     set<string> accepted_vals_;
 }; 
 //~Optional
@@ -21,8 +20,8 @@ CmdArg::CmdArg(const char *option, const char *desc, CmdArgCb cb)
              : arg_name_(option), arg_desc_(desc), cb_(cb) 
 {}
 
-CmdArg::CmdArg(const char *option, const char *desc, const char *default_v, const set<string> &accepted, CmdArgCb cb)
-                    : arg_name_(option), arg_desc_(desc), optional_(new Optional(default_v, accepted)), cb_(cb)
+CmdArg::CmdArg(const char *option, const char *desc, const set<string> &accepted, CmdArgCb cb)
+                    : arg_name_(option), arg_desc_(desc), optional_(new Optional(accepted)), cb_(cb)
 {
 }
 
@@ -44,11 +43,6 @@ const string &CmdArg::description() const
 const set<string> &CmdArg::accepted_vals() const 
 {
     return optional_->accepted_vals_; 
-}
-
-const string &CmdArg::default_val() const 
-{
-    return optional_->default_val_; 
 }
 
 
@@ -85,10 +79,10 @@ ArgParser::~ArgParser()
 }
 
 
-void ArgParser::addArgument(const char *option, const char *desc, const char *default_val, 
+void ArgParser::addArgument(const char *option, const char *desc, 
         const set<string> &opt_vals, CmdArgCb cb)
 {
-    accepted_args_.emplace(option, new CmdArg(option, desc, default_val, opt_vals, cb));
+    accepted_args_.emplace(option, new CmdArg(option, desc, opt_vals, cb));
 }
 
 
@@ -157,8 +151,6 @@ string CmdArg::decorate() const
 
     string second(description());
     second.append(" ");
-    second.append("Default value: ");
-    second.append(optional_->default_val_);
 
     ss << left << setw(30) << first << second;
 

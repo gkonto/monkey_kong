@@ -23,7 +23,6 @@ class ArgParser
         ~ArgParser();
         void addArgument(const char *option, 
                 const char *description,
-                const char *default_val,
                 const std::set<std::string> &opt_vals, 
                 CmdArgCb cb);
 
@@ -43,7 +42,7 @@ class CmdArg
 {
     public:
         explicit CmdArg(const char *option, const char *desc, CmdArgCb cb);
-        explicit CmdArg(const char *option, const char *desc, const char *default_v, const std::set<std::string> &accepted, CmdArgCb cb);
+        explicit CmdArg(const char *option, const char *desc, const std::set<std::string> &accepted, CmdArgCb cb);
 
         std::string decorate() const;
         bool hasOptions() const;
