@@ -125,8 +125,9 @@ void ArgParser::parse(void *returned)
 
         const CmdArg *arg = it->second;
 
+        vector<string> arg_opts;
+
         if (arg->hasOptions()) {
-            vector<string> arg_opts;
             const set<string> &accepted_opts = arg->accepted_vals();
             while (++i < input_args_.size() && accepted_opts.find(input_args_[i]) != accepted_opts.end()) {
                 arg_opts.emplace_back(input_args_[i]);
@@ -134,6 +135,8 @@ void ArgParser::parse(void *returned)
             if (arg->hasCallback()) {
                 arg->exec_cb(arg_opts, returned);
             }
+        } else {
+            arg->exec_cb(arg_opts, returned);
         }
     }
 }
