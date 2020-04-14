@@ -88,12 +88,6 @@ static void gatherTests(const class CmdArg &ard, const std::vector<std::string> 
             break;
         }
     }
-
-    if (qa_opts->test_to_run_.empty()) {
-        for (auto &t : qa_opts->all_tests_.tests_) {
-            qa_opts->test_to_run_.emplace(t.first, t.second);
-        }
-    }
 }
 
 int main(int argc, char **argv)
@@ -104,7 +98,6 @@ int main(int argc, char **argv)
     a_parser.addArgument("-run", tt.list().c_str(), tt.test_names(),  gatherTests);
     a_parser.addArgument("--help", "Display this information", nullptr);
     a_parser.parse(&data);
-
 
     for (auto &t : data.test_to_run_) {
         std::cout << "[+] " << t.first << ": ";

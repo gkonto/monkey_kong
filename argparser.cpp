@@ -151,14 +151,6 @@ string CmdArg::decorate() const
     }
 
     string first(option());
-    first.append(" {");
-    for (auto &o : optional_->accepted_vals_) {
-        first.append(o);
-        first.append("|");
-    }
-    first.pop_back();
-    first.append("}");
-
     string second(description());
     second.append(" ");
 
