@@ -19,14 +19,14 @@ struct Node
 class Program : public Node
 {
     public:
-        ~Program();
+        ~Program() {}
         const std::string &tokenLiteral() const { return literal_; };
         size_t size() const { return statements_.size(); }
         void emplace_back(Node *stmt) { statements_.emplace_back(); };
         Node *operator[](std::size_t idx) const { return statements_[idx]; }
         const std::vector<Node *> &statements() const { return statements_; }
     private:
-        std::string literal_ = "Program node";
+        std::string literal_;
         std::vector<Node *> statements_;
 };
 
@@ -34,7 +34,9 @@ class Program : public Node
 class Identifier : public Node
 {
     public:
-        explicit Identifier(Token *tok, const std::string &value);
+        explicit Identifier(Token *tok, const std::string &value)
+            : tok_(tok), value_(value) {}
+
         ~Identifier();
         const std::string &tokenLiteral() const { return tok_->literal(); }
         const std::string &value() const { return value_; }
@@ -47,7 +49,7 @@ class Identifier : public Node
 class Let : public Node
 {
     public:
-        explicit Let(Token *tok, Identifier *p_name, Node *p_value)
+        explicit Let(Token *tok, Identifier *p_name = nullptr, Node *p_value = nullptr)
             : tok_(tok), name_(p_name), value_(p_value) {}
 
         ~Let();

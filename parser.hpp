@@ -1,10 +1,15 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
+#include <memory>
+
+#include "token.hpp"
 
 class Lexer;
 class Token;
 class Program;
+class Node;
+class Let;
 
 // A Pratt parser. The main idea is the association of parsing functions, 
 // which Pratt calls "semantic code" with token types.
@@ -18,8 +23,14 @@ class Parser
          * token is found in a prefix or an infix position.
          */
         explicit Parser(Lexer *l);
-        Program *parseProgram();
+        std::unique_ptr<Program> parseProgram();
     private:
+        Let *parseLetStatement();
+        Node *parseStatement();
+        bool curTokenIs(TokenType type) const;
+        bool peekTokenIs(TokenType type) const;
+        bool expectPeek(TokenType type);
+
         void nextToken();
         Lexer *lexer_      = nullptr;
         Token *cur_token_  = nullptr;
