@@ -25,6 +25,13 @@ CmdArg::CmdArg(const char *option, const char *desc, const set<string> &accepted
 {
 }
 
+CmdArg::~CmdArg()
+{
+    if (hasOptions()) {
+        delete optional_;
+    }
+}
+
 bool CmdArg::hasOptions() const 
 {
     return optional_ != nullptr; 

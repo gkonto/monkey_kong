@@ -44,6 +44,7 @@ class CmdArg
         explicit CmdArg(const char *option, const char *desc, CmdArgCb cb);
         explicit CmdArg(const char *option, const char *desc, const std::set<std::string> &accepted, CmdArgCb cb);
 
+        ~CmdArg();
         std::string decorate() const;
         bool hasOptions() const;
         const std::string &option() const;
