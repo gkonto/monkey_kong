@@ -11,7 +11,7 @@ class Token;
 struct Node
 {
     virtual ~Node() {}
-    virtual const char *tokenLiteral() const = 0; // Only for debugging and testing
+    virtual const std::string &tokenLiteral() const = 0; // Only for debugging and testing
 };
 
 // Program is the root node of every AST
@@ -20,12 +20,13 @@ class Program : public Node
 {
     public:
         ~Program();
-        const char *tokenLiteral() const { return "Program node"; };
+        const std::string &tokenLiteral() const { return literal_; };
         size_t size() const { return statements_.size(); }
         void emplace_back(Node *stmt) { statements_.emplace_back(); };
         Node *operator[](std::size_t idx) const { return statements_[idx]; }
         const std::vector<Node *> &statements() const { return statements_; }
     private:
+        std::string literal_ = "Program node";
         std::vector<Node *> statements_;
 };
 
@@ -35,7 +36,7 @@ class Identifier : public Node
     public:
         explicit Identifier(Token *tok, const std::string &value);
         ~Identifier();
-        const char *tokenLiteral() const { return tok_->literal(); }
+        const std::string &tokenLiteral() const { return tok_->literal(); }
         const std::string &value() const { return value_; }
     private:
         Token *tok_;
@@ -50,9 +51,10 @@ class Let : public Node
             : tok_(tok), name_(p_name), value_(p_value) {}
 
         ~Let();
-        const char *tokenLiteral() const { return tok_->literal(); }
+        const std::string &tokenLiteral() const { return tok_->literal(); }
         void setName(Identifier *name) { name_ = name; }
         Identifier *name() const { return name_; }
+        const std::string &identName() const { return name_->value(); }
         Node *value() const { return value_; }
         void setValue(Node *exp) { value_ = exp; }
     private:
