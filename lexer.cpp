@@ -101,6 +101,9 @@ Token *Lexer::nextToken()
                 tok = new Token(T_ASSIGN, ch_);
             }
             break;
+        case ':':
+            tok = new Token(T_COLON, ch_);
+            break;
         case ';':
             tok = new Token(T_SEMICOLON, ch_);
             break;
@@ -119,7 +122,7 @@ Token *Lexer::nextToken()
             tok = new Token(T_LBRACKET, ch_);
             break;
         case ']':
-            tok = new Token(T_LBRACKET, ch_);
+            tok = new Token(T_RBRACKET, ch_);
             break;
         case '/':
             tok = new Token(T_SLASH, ch_);
