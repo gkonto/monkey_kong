@@ -3,7 +3,7 @@
 
 #include "lexer.hpp"
 #include "token.hpp"
-//#include "symbols.hpp"
+#include "symbols.hpp"
 
 
 Lexer::Lexer(const std::string &input) :
@@ -163,7 +163,7 @@ Token *Lexer::nextToken()
         default:
             if (currentIsLetter()) {
                 std::string val(readIdentifier());
-                //tok = new Token(SymbolTable::LookupIdent(val), val); //TODO enable
+                tok = new Token(SymbolTable::LookupIdent(val), val); 
             } else if (isdigit(ch_)) {
                 tok = new Token(T_INT, readNumber());
             } else {
