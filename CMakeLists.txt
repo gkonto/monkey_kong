@@ -8,10 +8,12 @@
  set(CMAKE_CXX_STANDARD 14)
  set(HEADERS
      token.hpp
+     lexer.hpp
      argparser.hpp
     )
  set(SOURCES
      repl.cpp
+     lexer.cpp
      argparser.cpp
      token.cpp
      )

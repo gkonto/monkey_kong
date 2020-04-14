@@ -12,11 +12,13 @@
      ../argparser.hpp
      ../auxiliaries.hpp
      ../token.hpp
+     ../lexer.hpp
      test.hpp
     )
  set(SOURCES
      ../argparser.cpp
      ../token.cpp
+     ../lexer.cpp
      test.cpp
      main.cpp
      )
