@@ -169,10 +169,15 @@ void TestLetStatements::execute()
 
 bool TestLetStatements::testLetStatement(const std::string &input, Node *statement, const std::string &name)
 {
+    if (!statement) {
+        errorf(input, "parseProgram produced nullptr\n");
+        return false;
+    }
     if (statement->tokenLiteral().compare("let")) {
         errorf(input, "tokenLiteral not 'let'. got = '%s'\n", name.c_str(), statement->tokenLiteral().c_str());
         return false;
     }
+
 
     Let *p_let = dynamic_cast<Let *>(statement);
     if (!p_let) {
