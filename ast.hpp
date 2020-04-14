@@ -22,7 +22,7 @@ class Program : public Node
         ~Program() {}
         const std::string &tokenLiteral() const { return literal_; };
         size_t size() const { return statements_.size(); }
-        void emplace_back(Node *stmt) { statements_.emplace_back(); };
+        void emplace_back(Node *stmt) { statements_.emplace_back(stmt); };
         Node *operator[](std::size_t idx) const { return statements_[idx]; }
         const std::vector<Node *> &statements() const { return statements_; }
     private:

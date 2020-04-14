@@ -173,6 +173,7 @@ bool TestLetStatements::testLetStatement(const std::string &input, Node *stateme
         errorf(input, "parseProgram produced nullptr\n");
         return false;
     }
+
     if (statement->tokenLiteral().compare("let")) {
         errorf(input, "tokenLiteral not 'let'. got = '%s'\n", name.c_str(), statement->tokenLiteral().c_str());
         return false;
@@ -181,18 +182,18 @@ bool TestLetStatements::testLetStatement(const std::string &input, Node *stateme
 
     Let *p_let = dynamic_cast<Let *>(statement);
     if (!p_let) {
-        errorf("", "not a Let statement!");
+        errorf("", "not a Let statement!\n");
         return false;
     }
 
     if (name.compare(p_let->identName())) {
-        errorf("", "Let::name_::value_ not %s. Got %s", 
+        errorf("", "Let::name_::value_ not %s. Got %s\n", 
                 name.c_str(), p_let->identName().c_str());
         return false;
     }
 
     if (name.compare(p_let->name()->tokenLiteral())) {
-        errorf("", "name not '%s'. got '%s'", p_let->name()->tokenLiteral().c_str(), name.c_str());
+        errorf("", "name not '%s'. got '%s'\n", p_let->name()->tokenLiteral().c_str(), name.c_str());
         return false;
     }
 
@@ -223,8 +224,9 @@ bool Test::testIdentifier(const std::string &input, Node *exp, const std::string
 
 bool Test::testBooleanLiteral(const std::string &input, Node *il, bool value)
 {
-    errorf(input, "Boolean");
-    /*
+    errorf(input, "missing testIntegerLiteral\n");
+    return false;
+    /*)
     Boolean *integ = dynamic_cast<Boolean *>(il);
 
     if (!il) {
@@ -249,7 +251,8 @@ bool Test::testBooleanLiteral(const std::string &input, Node *il, bool value)
 
 bool Test::testIntegerLiteral(const std::string &input, Node *il, int value) 
 {
-    errorf(input, "Missing");
+    errorf(input, "missing testIntegerLiteral\n");
+    return false;
     /*
     IntegerLiteral *integ = dynamic_cast<IntegerLiteral *>(il);
     if (!il) {
@@ -307,12 +310,15 @@ void TestLetStatements::run_core(LetStatementCase<T> c)
         return;
     }
 
+    /*
+     TODO
     Let *l_s = dynamic_cast<Let *>(stmt);
     Node *val = l_s->value();
     
     if (!testLiteralExpression(c.input_, val, c.expectedValue_)) {
         return;
     }
+    */
 }
 
 
