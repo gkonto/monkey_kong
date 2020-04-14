@@ -12,6 +12,7 @@ struct Tests
 {
     Tests()
     {
+        tests_.emplace("TestPoolArena", new TestPoolArena);
         tests_.emplace("TestNextToken", new TestNextToken);
         tests_.emplace("TestLetStatements", new TestLetStatements);
     }
@@ -75,6 +76,9 @@ struct QAArgs
 static void gatherTests(const class CmdArg &ard, const std::vector<std::string> &input_options, void *data)
 {
     QAArgs *qa_opts = static_cast<QAArgs *>(data);
+    if (!input_options.empty()) {
+        qa_opts->test_to_run_.clear();
+    }
     for (auto &opt : input_options) {
         const auto &it = qa_opts->all_tests_.tests_.find(opt);
         if (it != qa_opts->all_tests_.tests_.end()) {
