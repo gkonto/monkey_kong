@@ -3,6 +3,7 @@
 #include <string>
 #include <numeric>
 #include <stdarg.h>
+#include <memory>
 #include "test.hpp"
 #include "token.hpp"
 #include "lexer.hpp"
@@ -131,7 +132,7 @@ void TestNextToken::run_core(std::string input, std::vector<Token> expec)
             appendLiterals);
 
     for (auto &expected : expec) {
-        Token *got = lex.nextToken();
+        std::unique_ptr<Token> got(lex.nextToken());
 
         if (got && !(expected == *got)) {
             errorf(input, "[-] Expected: Type '%s' - Value: '%s'\n\t\tGot     : Type '%s' -  Value: '%s'",
