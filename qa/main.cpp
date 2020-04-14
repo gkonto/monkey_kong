@@ -113,7 +113,7 @@ int main(int argc, char **argv)
             std::cout << t.second->report_errors() << std::endl;
             break;
         } else {
-            std::cout << GREEN << "FAILED" << RESET << std::endl;
+            std::cout << GREEN << "PASSED" << RESET << std::endl;
         }
     }
 }
