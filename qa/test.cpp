@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include "test.hpp"
 #include "token.hpp"
+#include "lexer.hpp"
 
 using namespace std;
 
@@ -114,10 +115,13 @@ void TestNextToken::execute()
     run_core(txt_test2, vec2);
 }
 
+static std::string appendLiterals(std::string &tok, const Token &tok1)
+{
+    return tok.append(tok1.literal());
+}
+
 void TestNextToken::run_core(std::string input, std::vector<Token> expec)
 {
-    errorf(input, "Missing function %s\n", "lala");
-    /*
     Lexer lex(input);
 
     std::string expected = std::accumulate(
@@ -130,12 +134,11 @@ void TestNextToken::run_core(std::string input, std::vector<Token> expec)
         Token *got = lex.nextToken();
 
         if (got && !(expected == *got)) {
-            ErrorHandler::setErrorMsg("[-] Expected: Type '%s' - Value: '%s'\n\t\tGot     : Type '%s' -  Value: '%s'",
-                    tokens_name[expected.type_], expected.literal_.c_str(), tokens_name[got->type_], got->literal_.c_str());
+            errorf(input, "[-] Expected: Type '%s' - Value: '%s'\n\t\tGot     : Type '%s' -  Value: '%s'",
+                    tok_names[expected.type()], expected.literal(), tok_names[got->type()], got->literal());
             break;
         }
     }
-    */
 }
 
 

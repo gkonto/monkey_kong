@@ -28,6 +28,7 @@ class TestNextToken : public Test
         TestNextToken() : Test("TestNextToken")
         {}
         void execute();
+        //void run_core(std::string input, std::vector<Token> expec);
 
     private:
         void run_core(std::string input, std::vector<Token> expec);
