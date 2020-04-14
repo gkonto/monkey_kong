@@ -22,6 +22,8 @@ struct Tests
         }
     }
 
+
+
     std::string list()
     {
         std::string ret("Select specific tests. Available tests:\n");
@@ -41,23 +43,38 @@ struct Tests
         return names;
     }
 
+    map<string, Test *>::const_iterator begin() const
+    {
+        return tests_.cbegin();
+    }
+
+    map<string, Test *>::const_iterator end() const
+    {
+        return tests_.cend();
+    }
+
     map<string, Test *> tests_;
 };
 
 struct QAArgs
 {
     QAArgs(const Tests &tests)
-        : all_tests_(tests) {}
+        : all_tests_(tests)
+    {
+        for (const auto &t : all_tests_) {
+            test_to_run_.emplace(t);
+        }
+    }
 
     const Tests  &all_tests_;
     map<string, Test *> test_to_run_;
 };
 
 
-static void gatherTests(const class CmdArg &ard, const std::vector<std::string> &options, void *data)
+static void gatherTests(const class CmdArg &ard, const std::vector<std::string> &input_options, void *data)
 {
     QAArgs *qa_opts = static_cast<QAArgs *>(data);
-    for (auto &opt : options) {
+    for (auto &opt : input_options) {
         const auto &it = qa_opts->all_tests_.tests_.find(opt);
         if (it != qa_opts->all_tests_.tests_.end()) {
             qa_opts->test_to_run_.emplace(it->first, it->second);

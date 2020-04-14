@@ -18,11 +18,11 @@ struct Optional
 
 
 CmdArg::CmdArg(const char *option, const char *desc, CmdArgCb cb)
-             : option_(option), desc_(desc), cb_(cb) 
+             : arg_name_(option), arg_desc_(desc), cb_(cb) 
 {}
 
 CmdArg::CmdArg(const char *option, const char *desc, const char *default_v, const set<string> &accepted, CmdArgCb cb)
-                    : option_(option), desc_(desc), optional_(new Optional(default_v, accepted)), cb_(cb)
+                    : arg_name_(option), arg_desc_(desc), optional_(new Optional(default_v, accepted)), cb_(cb)
 {
 }
 
@@ -33,12 +33,12 @@ bool CmdArg::hasOptions() const
 
 const string &CmdArg::option() const 
 { 
-    return option_; 
+    return arg_name_; 
 }
 
 const string &CmdArg::description() const 
 { 
-    return desc_; 
+    return arg_desc_; 
 }
 
 const set<string> &CmdArg::accepted_vals() const 
@@ -60,23 +60,26 @@ bool CmdArg::hasCallback() const
 
 void CmdArg::exec_cb(const vector<string> &arg_opts, void *returned) const
 {
+    if (!cb_) {
+        std::cout << "Argument: " << description() << "Missing callback!" << std::endl;
+    }
     cb_(*this, arg_opts, returned); 
 }
 
 
 ArgParser::ArgParser(string name, int argc, char **argv)
-    : name_(name)
+    : parser_desc_(name)
 {
-    user_args_.reserve(argc);
+    input_args_.reserve(argc);
     for (int i = 0; i < argc; i++) {
-        user_args_.emplace_back(argv[i]);
+        input_args_.emplace_back(argv[i]);
     }
 }
 
 
 ArgParser::~ArgParser()
 {
-    for (auto &a : args_) {
+    for (auto &a : accepted_args_) {
         delete a.second;
     }
 }
@@ -85,21 +88,21 @@ ArgParser::~ArgParser()
 void ArgParser::addArgument(const char *option, const char *desc, const char *default_val, 
         const set<string> &opt_vals, CmdArgCb cb)
 {
-    args_.emplace(option, new CmdArg(option, desc, default_val, opt_vals, cb));
+    accepted_args_.emplace(option, new CmdArg(option, desc, default_val, opt_vals, cb));
 }
 
 
 void ArgParser::addArgument(const char *option, const char *desc, CmdArgCb cb)
 {
-    args_.emplace(option, new CmdArg(option, desc, cb));
+    accepted_args_.emplace(option, new CmdArg(option, desc, cb));
 }
 
 
 void ArgParser::displayHelpMessage() const
 {
-    cout << name_ << endl;
+    cout << parser_desc_ << endl;
     cout << "Options: " << endl;
-    for (auto &opt : args_) {
+    for (auto &opt : accepted_args_) {
         cout << " " << opt.second->decorate() << endl;
     }
 }
@@ -107,25 +110,25 @@ void ArgParser::displayHelpMessage() const
 
 void ArgParser::parse(void *returned)
 {
-    auto it = find(user_args_.begin(), user_args_.end(), "--help");
+    auto it = find(input_args_.begin(), input_args_.end(), "--help");
 
-    if (it != user_args_.end()) {
+    if (it != input_args_.end()) {
         displayHelpMessage();
         exit(1);        
     }
+    
+    for (size_t i = 0; i < input_args_.size(); i++) {
+        auto it = accepted_args_.find(input_args_[i]);
 
-    for (size_t i = 0; i < user_args_.size(); i++) {
-        auto it = args_.find(user_args_[i]);
-
-        if (it == args_.end()) continue;
+        if (it == accepted_args_.end()) continue;
 
         const CmdArg *arg = it->second;
 
         if (arg->hasOptions()) {
             vector<string> arg_opts;
             const set<string> &accepted_opts = arg->accepted_vals();
-            while (++i < user_args_.size() && accepted_opts.find(user_args_[i]) != accepted_opts.end()) {
-                arg_opts.emplace_back(user_args_[i]);
+            while (++i < input_args_.size() && accepted_opts.find(input_args_[i]) != accepted_opts.end()) {
+                arg_opts.emplace_back(input_args_[i]);
             }
             if (arg->hasCallback()) {
                 arg->exec_cb(arg_opts, returned);
@@ -139,7 +142,7 @@ string CmdArg::decorate() const
 {
     stringstream ss;
     if (!hasOptions()) {
-        ss << left << setw(30) << option_ << desc_;
+        ss << left << setw(30) << arg_name_ << arg_desc_;
         return ss.str();
     }
 

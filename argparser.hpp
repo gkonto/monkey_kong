@@ -8,7 +8,6 @@
 #include <unordered_map>
 
 // Forward Declarations
-class ReplOptions;
 class CmdArg;
 class Optional;
 
@@ -33,9 +32,9 @@ class ArgParser
     private:
         void displayHelpMessage() const;
 
-        std::unordered_map<std::string, class CmdArg *> args_; // accepted arguments
-        std::vector<std::string> user_args_; // user's input arguments
-        std::string name_; //ArgParser's displaying label when --help is selected
+        std::unordered_map<std::string, class CmdArg *> accepted_args_; // accepted arguments
+        std::vector<std::string> input_args_; // user's input arguments
+        std::string parser_desc_; //ArgParser's displaying label when --help is selected
 };
 //~ArgParser
 
@@ -55,8 +54,8 @@ class CmdArg
         bool hasCallback() const;
         void exec_cb(const std::vector<std::string> &arg_opts, void *returned) const;
     private:
-        std::string option_; // 
-        std::string desc_;   // 
+        std::string arg_name_; // 
+        std::string arg_desc_;   // 
         Optional *optional_ = nullptr;
 
         CmdArgCb cb_;
