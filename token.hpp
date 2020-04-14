@@ -59,7 +59,7 @@ class Token
         explicit Token(TokenType type, const char *ch);
         explicit Token(TokenType type, int ch);
         explicit Token(TokenType type, std::string lit);
-        const char *literal() const { return literal_.c_str(); }
+        const std::string &literal() const { return literal_; }
         TokenType type() const { return type_; }
         bool operator==(const Token &b) const;
     private:
