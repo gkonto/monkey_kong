@@ -12,9 +12,13 @@
      repl.hpp
      argparser.hpp
      symbols.hpp
+     ast.hpp
+     parser.hpp
     )
  set(SOURCES
      repl.cpp
+     parser.cpp
+     ast.cpp
      lexer.cpp
      symbols.cpp
      argparser.cpp
