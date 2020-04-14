@@ -10,10 +10,12 @@
      token.hpp
      lexer.hpp
      argparser.hpp
+     symbols.hpp
     )
  set(SOURCES
      repl.cpp
      lexer.cpp
+     symbols.cpp
      argparser.cpp
      token.cpp
      )
