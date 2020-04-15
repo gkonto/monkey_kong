@@ -408,18 +408,19 @@ void TestIntegerLiteralExpression::execute()
 
      ExpressionStatement *p_exp_state = dynamic_cast<ExpressionStatement *>((*program)[0]);
      if (!p_exp_state) {
-         errorf(input, "exp not ExpressionStatement!");
+         errorf(input, "exp not ExpressionStatement!\n");
          return;
      }
 
      IntegerLiteral *p_literal = dynamic_cast<IntegerLiteral *>(p_exp_state->expression());
      if (!p_literal) {
-         errorf(input, "exp not IntegerLiteral!");
+         errorf(input, "exp not IntegerLiteral!\n");
          return;
      }
 
      if (p_literal->value() != 5) {
-         errorf("literal.Value not %d. got = %d", 5, p_literal->value());
+         errorf(input, "literal.Value not %d. got = %d\n", 5, p_literal->value());
+         return;
      }
 
      if (p_literal->tokenLiteral() != "5") {
