@@ -114,6 +114,30 @@ class TestIntegerLiteralExpression : public Test
 
 
 
+ template <typename T>
+ struct PrefixTest
+ {
+     PrefixTest(const std::string &input, const std::string &operat, T value)
+         : input_(input), operator_(operat), value_(value)
+     {}
+
+     std::string input_;
+     std::string operator_;
+     T value_;
+ };
+
+ class TestParsingPrefixExpression : public Test
+ {
+     public:
+         TestParsingPrefixExpression();
+         void run();
+     private:
+         template<typename T>
+         void run_core(PrefixTest<T> a);
+ 
+ };
+
+
 
 
 

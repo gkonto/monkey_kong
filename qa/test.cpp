@@ -469,4 +469,44 @@ void TestIntegerLiteralExpression::execute()
  
 
 
+ void TestParsingPrefixExpression::run()
+ {
+     run_core(PrefixTest<int>("!5;", "!", 5));
+     run_core(PrefixTest<int>("-15;", "-", 15));
+     run_core(PrefixTest<bool>("!true;", "!", true));
+     run_core(PrefixTest<bool>("!false;", "!", false));
+ }
+ 
+ template<typename T>
+ void TestParsingPrefixExpression::run_core(PrefixTest<T> a)
+ {
+     std::unique_ptr<Program> program = parse(a.input_);
+ 
+     if (program->size() != 1) {
+        errorf(a.input_, "program does not contain %d statements. got %d\n", 1, program->size());
+        return;
+     }
+ 
+     ExpressionStatement *p_stmt = dynamic_cast<ExpressionStatement *>((*program)[0]);
+     if (!p_stmt) {
+        errorf(a.input_, "program[0] not ExpressionStatement");
+        return;
+     }
+ 
+     PrefixExpression *p_prExp = dynamic_cast<PrefixExpression *>(p_stmt->expression());
+     if (!p_prExp) {
+        errorf(a.input_, "smtm not PrefixExpression");
+        return;
+     }
+ 
+     if (p_prExp->operat().compare(a.operator_)) {
+        errorf(a.input_, "Operator is not %s. got %s\n",
+                a.operator_.c_str(), p_prExp->operat().c_str());
+        return;
+     }
+ 
+     if (!testLiteralExpression(p_prExp->right(), a.value_)) {
+        return;
+     }
+ }
 
