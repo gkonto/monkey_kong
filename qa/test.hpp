@@ -6,6 +6,8 @@
 #include <vector>
 #include <memory>
 
+#include "../ast.hpp"
+
 class Token;
 class Node;
 class Program;
@@ -27,6 +29,8 @@ struct Test
     bool testIntegerLiteral(const std::string &input, Node *exp, int expected);
     bool testBooleanLiteral(const std::string &input, Node *exp, bool expected);
     bool testIdentifier(const std::string &input, Node *exp, const std::string &expected);
+    template<typename T>
+    bool testInfixExpression(const std::string &input, Node *exp, T lhs, const std::string &op, T rhs);
   //
     std::vector<std::string> errors_;
     std::string name_;
@@ -178,7 +182,42 @@ class TestParsingInfixExpressions : public Test
      private:
          std::vector<OperatorPrecedence> tests_;
  };  
+
+
+ class TestIfExpression : public Test
+ {
+     public:
+         TestIfExpression() : Test("TestIfExpression") {}
+         void execute();
+     private:
+ };
+
+
      
+ template<typename T>
+bool Test::testInfixExpression(const std::string &input, Node *exp, T lhs, const std::string &op, T rhs)
+ {
+     InfixExpression *opExp = dynamic_cast<InfixExpression *>(exp);
+     if (!opExp) {
+         errorf(input, "exp is not InfixExpression\n");
+         return false;
+     }
+ 
+     if (!testLiteralExpression(input, opExp->lhs(), lhs)) {
+         return false;
+     }
+ 
+     if (opExp->op() != op) {
+         errorf(input, "Operator is not %s. got = %s\n", op.c_str(), opExp->op().c_str());
+         return false;
+     }
+ 
+     if (!testLiteralExpression(input, opExp->rhs(), rhs)) {
+         return false;
+     }
+ 
+     return true;
+ }
 
 
 

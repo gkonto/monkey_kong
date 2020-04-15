@@ -602,3 +602,55 @@ void TestIntegerLiteralExpression::execute()
 
 
 
+
+ void TestIfExpression::execute()
+ {
+     std::string input("if (x < y) { x }");
+     std::unique_ptr<Program> program = parse(input);
+
+     if (program->size() != 1) {
+         errorf(input, "program does not contain %d statements. got %d\n", 1, program->size());
+     }
+
+     ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>((*program)[0]);
+     if (!stmt) {
+        errorf(input, "program[0] not ExpressionStatement\n");
+        return;
+     }
+
+     If *exp = dynamic_cast<If *>(stmt->expression());
+
+     if (!exp) {
+         errorf(input, "stmt not If expression\n");
+         return;
+     }
+
+     if (!testInfixExpression<std::string>(input, exp->condition(), "x", "<", "y")) {
+         return;
+     }
+
+     if (!exp->consequence()) {
+         errorf(input, "Consequence cannot be null\n");
+         return;
+     }
+
+     if (exp->consequence()->size() != 1) {
+         errorf(input, "Consequence is not 1 statements. got = %d\n", exp->consequence()->size());
+         return ;
+     }
+
+     BlockStatement * bl_statement = exp->consequence();
+     ExpressionStatement *consequence = dynamic_cast<ExpressionStatement *>((*bl_statement)[0]);
+
+     if (!testIdentifier(input, consequence->expression(), "x")) {
+         return;
+     }
+
+     if (exp->alternative() != nullptr) {
+         errorf(input, "exp.AlternativeStatements was not nullptr. got = %s\n", exp->alternative()->asString().c_str());
+         return;
+     }
+
+ }
+
+

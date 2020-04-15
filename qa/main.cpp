@@ -22,6 +22,7 @@ struct Tests
         tests_.emplace("TestParsingPrefixExpression", new TestParsingPrefixExpression);
         tests_.emplace("TestParsingInfixExpressions", new TestParsingInfixExpressions);
         tests_.emplace("TestOperatorPrecedenceParsing", new TestOperatorPrecedenceParsing);
+        tests_.emplace("TestIfExpression", new TestIfExpression);
     }
 
     ~Tests()
