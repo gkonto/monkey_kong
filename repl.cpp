@@ -37,8 +37,6 @@ void Repl::start(bool calc_t)
             auto time_elapsed = duration_cast<milliseconds>(end - start);
             cout << BOLD << endl << "time elapsed: " << time_elapsed.count() << " millisec" << RESET << std::endl;
         }
-
-
     }
 }
 

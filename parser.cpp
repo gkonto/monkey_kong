@@ -3,6 +3,7 @@
 #include "token.hpp"
 #include "lexer.hpp"
 #include "ast.hpp"
+#include <iostream>
 
 Parser::Parser(Lexer *l) : lexer_(l)
 {
