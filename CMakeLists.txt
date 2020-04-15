@@ -11,6 +11,7 @@
      lexer.hpp
      repl.hpp
      argparser.hpp
+     pool.hpp
      symbols.hpp
      ast.hpp
      parser.hpp

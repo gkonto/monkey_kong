@@ -14,6 +14,7 @@
      ../symbols.hpp
      ../ast.hpp
      ../parser.hpp
+     ../pool.hpp
      test.hpp
     )
  set(SOURCES
