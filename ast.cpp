@@ -19,5 +19,65 @@ Return::~Return()
     if (returnValue_) delete returnValue_;
 }
 
+std::string Identifier::asString() const
+ {
+     return value_;
+ }
+
+std::string Let::asString() const
+ {
+     std::string ret;
+     ret.append(tokenLiteral());
+     ret.append(" ");
+     ret.append(name_->asString());
+     ret.append(" = ");
+
+     if (value_) { // TODO remove condition in the future
+         ret.append(value_->asString());
+     }
+
+     ret.append(";");
+
+     return ret;
+ }
+
+
+std::string Return::asString() const
+ {
+     std::string ret;
+     ret.append(tokenLiteral() + " ");
+
+     if (returnValue_) { // TODO remove condition in the future
+         ret.append(returnValue_->asString());
+     }
+
+     ret.append(";");
+
+     return ret;
+ }
+
+std::string ExpressionStatement::asString() const
+ {
+     if (expression_) { //TODO remove condition in the future
+         return expression_->asString();
+     }
+ 
+     return "";
+ }
+
+std::string Program::asString() const
+ {
+     std::string ret;
+ 
+     for (auto &a : statements_)
+     {
+         ret.append(a->asString());
+     }
+ 
+     return ret;
+ }
+
+
+
 
 

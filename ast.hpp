@@ -11,7 +11,9 @@ class Token;
 struct Node
 {
     virtual ~Node() {}
-    virtual const std::string &tokenLiteral() const = 0; // Only for debugging and testing
+    virtual const std::string &tokenLiteral() const { return literal; }; // Only for debugging and testing
+    virtual std::string asString() const = 0;
+    std::string literal = "No token node";
 };
 
 // Program is the root node of every AST
@@ -25,7 +27,7 @@ class Program : public Node
                 delete stmt;
             }
         }
-        const std::string &tokenLiteral() const { return literal_; };
+        std::string asString() const;
         size_t size() const { return statements_.size(); }
         void emplace_back(Node *stmt) { statements_.emplace_back(stmt); };
         Node *operator[](std::size_t idx) const { return statements_[idx]; }
@@ -33,7 +35,6 @@ class Program : public Node
         std::vector<Node *>::iterator begin() { return statements_.begin(); }
         std::vector<Node *>::iterator end() { return statements_.end(); }
     private:
-        std::string literal_;
         std::vector<Node *> statements_;
 };
 
@@ -45,6 +46,7 @@ class Identifier : public Node
             : tok_(tok), value_(value) {}
 
         ~Identifier();
+        std::string asString() const;
         const std::string &tokenLiteral() const { return tok_->literal(); }
         const std::string &value() const { return value_; }
     private:
@@ -60,6 +62,7 @@ class Let : public Node
             : tok_(tok), name_(p_name), value_(p_value) {}
 
         ~Let();
+        std::string asString() const;
         const std::string &tokenLiteral() const { return tok_->literal(); }
         void setName(Identifier *name) { name_ = name; }
         Identifier *name() const { return name_; }
@@ -80,6 +83,7 @@ class Return : public Node
             token_(tok), returnValue_(exp) {}
         ~Return();
 
+        std::string asString() const;
         const std::string &tokenLiteral() const { return token_->literal(); }
         void setReturnVal(Node *exp) { returnValue_ = exp; }
         Node *value() const { return returnValue_; }
@@ -87,6 +91,23 @@ class Return : public Node
         Token *token_; // The return statement
         Node *returnValue_;
 };
+
+
+class ExpressionStatement : public Node
+ {
+     public:
+         ~ExpressionStatement()
+         {
+             if (expression_) delete expression_;
+         };
+
+        std::string asString() const;
+         Node *expression() const { return expression_; }
+         void setExpression(Node *exp) { expression_ = exp; }
+     private:
+         Node *expression_;
+ };
+
 
 
 
