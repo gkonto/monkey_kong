@@ -252,9 +252,6 @@ bool Test::testBooleanLiteral(const std::string &input, Node *il, bool value)
 
 bool Test::testIntegerLiteral(const std::string &input, Node *il, int value) 
 {
-    errorf(input, "missing testIntegerLiteral\n");
-    return false;
-    /*
     IntegerLiteral *integ = dynamic_cast<IntegerLiteral *>(il);
     if (!il) {
         errorf(input, "il not IntegerLiteral. got = %s", integ->asString().c_str());
@@ -270,8 +267,6 @@ bool Test::testIntegerLiteral(const std::string &input, Node *il, int value)
         errorf(input, "TokenLiteral not %s. got = %s", value, integ->tokenLiteral().c_str());
         return false;
     }
-    */
-
     return true;
 }
 
@@ -469,12 +464,12 @@ void TestIntegerLiteralExpression::execute()
  
 
 
- void TestParsingPrefixExpression::run()
+ void TestParsingPrefixExpression::execute()
  {
      run_core(PrefixTest<int>("!5;", "!", 5));
      run_core(PrefixTest<int>("-15;", "-", 15));
-     run_core(PrefixTest<bool>("!true;", "!", true));
-     run_core(PrefixTest<bool>("!false;", "!", false));
+//     run_core(PrefixTest<bool>("!true;", "!", true));
+ //    run_core(PrefixTest<bool>("!false;", "!", false));
  }
  
  template<typename T>
@@ -499,13 +494,13 @@ void TestIntegerLiteralExpression::execute()
         return;
      }
  
-     if (p_prExp->operat().compare(a.operator_)) {
+     if (p_prExp->operator_s().compare(a.operator_)) {
         errorf(a.input_, "Operator is not %s. got %s\n",
-                a.operator_.c_str(), p_prExp->operat().c_str());
+                a.operator_.c_str(), p_prExp->operator_s().c_str());
         return;
      }
  
-     if (!testLiteralExpression(p_prExp->right(), a.value_)) {
+     if (!testLiteralExpression(a.input_, p_prExp->right(), a.value_)) {
         return;
      }
  }

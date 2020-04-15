@@ -129,8 +129,8 @@ class TestIntegerLiteralExpression : public Test
  class TestParsingPrefixExpression : public Test
  {
      public:
-         TestParsingPrefixExpression();
-         void run();
+         TestParsingPrefixExpression() : Test("TestParsingPrefixExpression") {}
+         void execute();
      private:
          template<typename T>
          void run_core(PrefixTest<T> a);
