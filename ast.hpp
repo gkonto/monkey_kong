@@ -109,6 +109,20 @@ class ExpressionStatement : public Node
  };
 
 
+ class IntegerLiteral : public Node
+ {
+     public:
+         IntegerLiteral(Token *tok, int value) 
+             : token_(tok), value_(value) {}
+
+         const std::string &tokenLiteral() const { return token_->literal(); }
+         int value() const { return value_; }
+         std::string asString() const;
+     private:
+         Token *token_ = nullptr;
+         int value_ = 0;
+ };
+
 
 
 #endif

@@ -1,5 +1,5 @@
+#include <sstream>
 #include "ast.hpp"
-
 
 Let::~Let()
 {
@@ -40,6 +40,14 @@ std::string Let::asString() const
 
      return ret;
  }
+
+
+std::string IntegerLiteral::asString() const
+{
+    std::stringstream ss;
+    ss << value_;
+    return ss.str();
+}
 
 
 std::string Return::asString() const

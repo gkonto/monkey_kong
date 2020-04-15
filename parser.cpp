@@ -15,10 +15,30 @@ Parser::Parser(Lexer *l) : lexer_(l)
     nextToken();
     nextToken();
 
-         registerPrefix(T_IDENT, std::bind(&Parser::parseIdentifier, this));
+    registerPrefix(T_IDENT, std::bind(&Parser::parseIdentifier, this));
+    registerPrefix(T_INT,   std::bind(&Parser::parseIntegerLiteral, this));
 
     initializePrecedence();
 }
+
+
+ int Parser::parseInt(const std::string &input) const
+ {
+     int value = 0;
+     std::stringstream ss(input);
+     ss >> value;
+ 
+     return value;
+ }
+
+Node *Parser::parseIntegerLiteral()
+ {
+     int value = parseInt(cur_token_->literal());
+     IntegerLiteral *p_lit = new IntegerLiteral(cur_token_, value);
+
+     return p_lit;
+ }
+
 
 
  Node *Parser::parseIdentifier()

@@ -58,6 +58,8 @@ class Parser
         Node *parseIdentifier();
         ExpressionStatement *parseExpressionStatement();
         Node *parseExpression(PrecedenceLevel prec);
+        Node *parseIntegerLiteral();
+        int parseInt(const std::string &input) const;
 
          prefixParseFn findPrefix(TokenType);
          infixParseFn findInfix(TokenType);
