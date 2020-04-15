@@ -282,6 +282,12 @@ bool Test::testLiteralExpression(const std::string &input, Node *exp, std::strin
     return testIdentifier(input, exp, expected);
 }
 
+bool Test::testLiteralExpression(const std::string &input, Node *exp, const char *expected)
+{
+    std::string v(expected);
+    return testIdentifier(input, exp, v);
+}
+
 template<typename T>
 void TestLetStatements::run_core(LetStatementCase<T> c)
 {
@@ -302,15 +308,12 @@ void TestLetStatements::run_core(LetStatementCase<T> c)
         return;
     }
 
-    /*
-     TODO
     Let *l_s = dynamic_cast<Let *>(stmt);
     Node *val = l_s->value();
     
     if (!testLiteralExpression(c.input_, val, c.expectedValue_)) {
         return;
     }
-    */
 }
 
 
@@ -579,10 +582,10 @@ void TestIntegerLiteralExpression::execute()
      tests_.emplace_back(OP("2 / (5 + 5)", "(2 / (5 + 5))"));
      tests_.emplace_back(OP("-(5 + 5)", "(-(5 + 5))"));
      tests_.emplace_back(OP("!(true == true)", "(!(true == true))"));
-     /*
      tests_.emplace_back(OP("a + add(b * c) + d", "((a + add((b * c))) + d)"));
      tests_.emplace_back(OP("add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"));
      tests_.emplace_back(OP("add(a + b + c * d / f + g)","add((((a + b) + ((c * d) / f)) + g))"));
+     /*
      tests_.emplace_back(OP("a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"));
      tests_.emplace_back(OP("add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"));
      */
@@ -652,5 +655,124 @@ void TestIntegerLiteralExpression::execute()
      }
 
  }
+
+ void TestFunctionLiteralParsing::execute()
+ {
+     std::string input("fn(x, y) { x + y;}");
+ 
+     std::unique_ptr<Program>  program = parse(input);
+ 
+     if (program->size() != 1) {
+         errorf(input, "program does not contain %d statements. got %d\n", 1, program->size());
+     }
+ 
+     ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>((*program)[0]);
+     if (!stmt) {
+        errorf(input, "program[0] not ExpressionStatement\n");
+        return;
+     }
+ 
+     FunctionLiteral *function = dynamic_cast<FunctionLiteral *>(stmt->expression());
+     if (!function) {
+         errorf(input, "Expression is not FunctionLiteral\n");
+         return;
+     }
+ 
+     if (function->paramSize() != 2) {
+         errorf(input, "Function Literal wrong. want 2 parameters. got %d\n", function->paramSize());
+         return;
+     }
+ 
+     testLiteralExpression(input, function->param(0), "x");
+     testLiteralExpression(input, function->param(1), "y");
+ 
+     BlockStatement * body = function->body();
+     if (body->size() != 1) {
+         errorf(input, "function.Body.Statements has not 1 statements. got %d\n", body->size());
+         return;
+     }
+ 
+     ExpressionStatement *bodyStmt = dynamic_cast<ExpressionStatement *>((*body)[0]);
+     if (!bodyStmt) {
+         errorf(input, "function body stmt is not ExpressionStatement. got = %d\n");
+         return;
+     }
+ 
+     testInfixExpression(input, bodyStmt->expression(), "x", "+", "y");
+ }
+ 
+ void TestFunctionParametersParsing::execute()
+ {
+     std::vector<std::string> case1;
+     run_case("fn() {};", case1);
+ 
+     std::vector<std::string> case2;
+     case2.emplace_back("x");
+     run_case("fn(x) {};", case2);
+ 
+     std::vector<std::string> case3;
+     case3.emplace_back("x");
+     case3.emplace_back("y");
+     case3.emplace_back("z");
+     run_case("fn(x, y, z) {};", case3);
+ }
+ 
+ 
+ void TestFunctionParametersParsing::run_case(const std::string input, const std::vector<std::string> &expectedParams)
+ {
+     std::unique_ptr<Program>  program = parse(input);
+ 
+     ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>((*program)[0]);
+     FunctionLiteral *function = dynamic_cast<FunctionLiteral *>(stmt->expression());
+  
+     if (function->paramSize() != expectedParams.size()) {
+         errorf(input, "length parameters wrong. want %d, got %d\n", expectedParams.size(), function->paramSize());
+         return;
+     }
+ 
+     int i = 0;
+     for (auto a : expectedParams) {
+         testLiteralExpression(input, function->param(i++), a);
+     }
+ }
+
+
+ void TestCallExpressionParsing::execute()
+ {
+     std::string input("add(1, 2 * 3, 4 + 5);");
+
+     std::unique_ptr<Program>  program = parse(input);
+
+     if (program->size() != 1) {
+         errorf(input, "program.Statements does not contain %d statements. got %d\n", 1, program->size());
+         return;
+     }
+
+     ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>((*program)[0]);
+     if (!stmt) {
+         errorf(input, "stmt is not ExpressionStatement\n");
+         return;
+     }
+
+     CallExpression *exp = dynamic_cast<CallExpression *>(stmt->expression());
+     if (!exp) {
+         errorf(input, "stmt.Expression is not CallExpression\n");
+         return;
+     }
+
+     if (!testIdentifier(input, exp->function(), "add")) {
+         return;
+     }
+
+     if (exp->size() != 3) {
+         errorf(input, "wrong length of arguments. got %d\n", exp->size());
+         return;
+     }
+
+     testLiteralExpression(input, exp->argNum(0), 1);
+     testInfixExpression(input, exp->argNum(1), 2, "*", 3);
+     testInfixExpression(input, exp->argNum(2), 4, "+", 5);
+ }
+
 
 

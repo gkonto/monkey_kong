@@ -23,6 +23,9 @@ struct Tests
         tests_.emplace("TestParsingInfixExpressions", new TestParsingInfixExpressions);
         tests_.emplace("TestOperatorPrecedenceParsing", new TestOperatorPrecedenceParsing);
         tests_.emplace("TestIfExpression", new TestIfExpression);
+        tests_.emplace("TestFunctionLiteralParsing", new TestFunctionLiteralParsing);
+        tests_.emplace("TestFunctionParametersParsing", new TestFunctionParametersParsing);
+        tests_.emplace("TestCallExpressionParsing", new TestCallExpressionParsing);
     }
 
     ~Tests()

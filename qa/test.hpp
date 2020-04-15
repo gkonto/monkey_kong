@@ -25,6 +25,7 @@ struct Test
     bool testLiteralExpression(const std::string &input, Node *exp, bool expected);
     bool testLiteralExpression(const std::string &input, Node *exp, int expected);
     bool testLiteralExpression(const std::string &input, Node *exp, std::string &expected);
+    bool testLiteralExpression(const std::string &input, Node *exp, const char *expected);
 
     bool testIntegerLiteral(const std::string &input, Node *exp, int expected);
     bool testBooleanLiteral(const std::string &input, Node *exp, bool expected);
@@ -218,6 +219,34 @@ bool Test::testInfixExpression(const std::string &input, Node *exp, T lhs, const
  
      return true;
  }
+
+
+class TestFunctionLiteralParsing : public Test
+ {
+     public:
+         TestFunctionLiteralParsing() : Test("TestFunctionLiteralParsing") {}
+         void execute();
+     private:
+ };
+
+ class TestFunctionParametersParsing : public Test
+ {
+     public:
+         TestFunctionParametersParsing() : Test("TestFunctionParametersParsing") {}
+         void execute();
+     private:
+         void run_case(const std::string input, const std::vector<std::string> &expectedParams_);
+ };
+
+
+ class TestCallExpressionParsing : public Test
+ {
+     public:
+         //TODO maybe I dont need the name in Test constructor in ANY test
+         TestCallExpressionParsing() : Test("TestCallExpressionParsing") {}
+         void execute();
+     private:
+ };
 
 
 
