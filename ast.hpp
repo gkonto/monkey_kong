@@ -200,6 +200,7 @@ class ExpressionStatement : public Node
          ~If() {
              if (consequence_) delete consequence_;
              if (alternative_) delete alternative_;
+             if (condition_) delete condition_;
          }
  
          const std::string &tokenLiteral() const { return tok_->literal(); }
