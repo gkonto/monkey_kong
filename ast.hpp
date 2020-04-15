@@ -216,8 +216,45 @@ class ExpressionStatement : public Node
          BlockStatement *consequence_ = nullptr;
          BlockStatement *alternative_ = nullptr;
  };
+
+ 
+ class FunctionLiteral : public Node
+ {
+     public:
+         explicit FunctionLiteral(Token *tok) : tok_(tok) {}
+         ~FunctionLiteral();
+         std::string asString() const;
+         const std::string &tokenLiteral() const { return tok_->literal(); }
+         Identifier *param(std::size_t idx) const { return parameters_[idx]; }
+         void setBody(BlockStatement *body) { body_ = body; }
+         BlockStatement *body() const { return body_; }
+         void setParameters(const std::vector<Identifier *> &parameters) { parameters_ = parameters; }
+         const std::vector<Identifier *> &parameters() const { return parameters_; }
+         size_t paramSize() const { return parameters_.size(); }
+     private:
+         Token *tok_;
+         std::vector<Identifier *> parameters_;
+         BlockStatement *body_ = nullptr;
+ };
  
 
+ class CallExpression : public Node
+ {
+     public:
+         explicit CallExpression(Token *tok, Node *fun) : tok_(tok), function_(fun) {}
+         ~CallExpression();
+         std::string asString() const;
+         const std::string &tokenLiteral() const { return tok_->literal(); }
+         size_t size() const { return arguments_.size(); }
+         Node *function() const { return function_; }
+         Node *argNum(std::size_t idx) const { return arguments_[idx]; }
+         void setArguments(std::vector<Node *> args) { arguments_ = args; }
+     private:
+         Token *tok_;
+         Node *function_;
+         std::vector<Node *> arguments_;
+ };
+ 
 
 
 #endif

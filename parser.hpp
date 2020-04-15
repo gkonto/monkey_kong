@@ -16,6 +16,7 @@ class Let;
 class Return;
 class ExpressionStatement;
 class BlockStatement;
+class Identifier;
 
 
  enum PrecedenceLevel
@@ -60,9 +61,12 @@ class Parser
         Node *parseIdentifier();
         ExpressionStatement *parseExpressionStatement();
         Node *parseExpression(PrecedenceLevel prec);
+         std::vector<Identifier *> parseFunctionParameters();
         Node *parseIntegerLiteral();
+        std::vector<Node *> parseExpressionList(TokenType end);
         Node *parsePrefixExpression();
         Node *parseInfixExpression(Node *left);
+        Node *parseFunctionLiteral();
         Node *parseBoolean();
          BlockStatement *parseBlockStatement();
         Node *parseGroupedExpression();

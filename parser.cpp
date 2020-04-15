@@ -23,8 +23,8 @@ Parser::Parser(Lexer *l) : lexer_(l)
      registerPrefix(T_TRUE, std::bind(&Parser::parseBoolean, this));
      registerPrefix(T_LPAREN, std::bind(&Parser::parseGroupedExpression, this));
      registerPrefix(T_IF,     std::bind(&Parser::parseIfExpression, this));
-     /*
      registerPrefix(T_FUNCTION, std::bind(&Parser::parseFunctionLiteral, this));
+     /*
      registerPrefix(T_STRING, std::bind(&Parser::parseStringLiteral, this));
      registerPrefix(T_LBRACKET, std::bind(&Parser::parseArrayLiteral, this));
      registerPrefix(T_LBRACE,   std::bind(&Parser::parseHashLiteral, this));
@@ -40,11 +40,61 @@ Parser::Parser(Lexer *l) : lexer_(l)
      registerInfix(T_NOT_EQ, std::bind(&Parser::parseInfixExpression, this, _1));
      registerInfix(T_LT, std::bind(&Parser::parseInfixExpression, this, _1));
      registerInfix(T_GT, std::bind(&Parser::parseInfixExpression, this, _1));
-     //registerInfix(T_LPAREN, std::bind(&Parser::parseCallExpression, this, _1));
+     registerInfix(T_LPAREN, std::bind(&Parser::parseCallExpression, this, _1));
    //  registerInfix(T_LBRACKET, std::bind(&Parser::parseIndexExpression, this, _1));
 
     initializePrecedence();
 }
+
+ std::vector<Identifier *> Parser::parseFunctionParameters()
+ {
+     std::vector<Identifier *> identifiers;
+
+     if (peekTokenIs(T_RPAREN)) {
+         nextToken();
+         return identifiers;
+     }
+
+     nextToken();
+
+     Identifier *ident = new Identifier(cur_token_, cur_token_->literal());
+     identifiers.emplace_back(ident);
+
+     while (peekTokenIs(T_COMMA)) {
+         nextToken();
+         nextToken();
+         Identifier *ident = new Identifier(cur_token_, cur_token_->literal());
+         identifiers.emplace_back(ident);
+     }
+
+     if (!expectPeek(T_RPAREN)) {
+         std::cout << "FATAL parseFunctionParameters" << std::endl;
+         return identifiers;
+     }
+
+     return identifiers;
+ }
+
+
+Node *Parser::parseFunctionLiteral()
+ {
+     FunctionLiteral *lit = new FunctionLiteral(cur_token_);
+
+     if (!expectPeek(T_LPAREN)) {
+         return nullptr;
+     }
+
+     lit->setParameters(parseFunctionParameters());
+
+     if (!expectPeek(T_LBRACE)) {
+         return nullptr;
+     }
+
+     lit->setBody(parseBlockStatement());
+
+     return lit;
+ }
+
 
  BlockStatement *Parser::parseBlockStatement()
  {
@@ -97,16 +147,39 @@ Node *Parser::parseIfExpression()
      return p_if;
  }
 
+ std::vector<Node *> Parser::parseExpressionList(TokenType end)
+ {
+     std::vector<Node *> list;
+ 
+     if (peekTokenIs(end)) {
+         nextToken();
+         return list;
+     }
+ 
+     nextToken();
+     list.emplace_back(parseExpression(PL_LOWEST));
+ 
+     while (peekTokenIs(T_COMMA)) {
+         nextToken();
+         nextToken();
+         list.emplace_back(parseExpression(PL_LOWEST));
+     }
+ 
+     if (!expectPeek(end)) {
+         // FIXME This should return nullptr!!!
+         return list;
+     }
+ 
+     return list;
+ }
 
 
-/*
 Node *Parser::parseCallExpression(Node *function)
  {
      CallExpression *exp = new CallExpression(cur_token_, function);
      exp->setArguments(parseExpressionList(T_RPAREN));
      return exp;
  }
- */
  
  Node *Parser::parseGroupedExpression()
  {

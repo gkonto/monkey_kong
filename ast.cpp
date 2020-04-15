@@ -149,6 +149,14 @@ BlockStatement::~BlockStatement()
 }
 
 
+FunctionLiteral::~FunctionLiteral()
+{
+     for (auto &param : parameters_) {
+         delete param;
+     }
+     delete body_;
+}
+
 std::string If::asString() const
  {
      std::string ret;
@@ -165,6 +173,29 @@ std::string If::asString() const
      return ret;
  }
 
+
+std::string FunctionLiteral::asString() const
+ {
+     std::string ret;
+     ret.append(tokenLiteral());
+     ret.append("(");
+
+     size_t i = 1;
+     for (auto &a : parameters_) {
+         ret.append(a->asString());
+         if (i != parameters_.size()) {
+             ret.append(", ");
+         }
+         i++;
+     }
+     ret.append(") ");
+     ret.append(body_->asString());
+
+     return ret;
+ }
+
+
+
  
 std::string BlockStatement::asString() const
  {
@@ -179,5 +210,35 @@ std::string BlockStatement::asString() const
 
 
 
+
+ 
+ CallExpression::~CallExpression()
+ {
+     for (auto &arg : arguments_) {
+         delete arg;
+     }
+     delete function_;
+ }
+
+std::string CallExpression::asString() const
+ {
+     std::string ret;
+     std::vector<std::string> args;
+
+     ret.append(function_->asString());
+     ret.append("(");
+
+     size_t i = 1;
+     for (auto &a : arguments_) {
+         ret.append(a->asString());
+         if (i != arguments_.size()) {
+             ret.append(", ");
+         }
+         i++;
+     }
+     ret.append(")");
+
+     return ret;
+ }
 
 
