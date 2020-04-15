@@ -147,7 +147,7 @@ private:
 
             ~Arena() {
 #ifdef DBG
-                std::cout << "Destructing arena id " << id_ << std::endl;
+                std::cout << "[DBG_MSG] Destructing arena id " << id_ << std::endl;
 #endif
             }
 
