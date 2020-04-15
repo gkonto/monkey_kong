@@ -5,13 +5,37 @@ Let::~Let()
 {
     if (name_) delete name_;
     if (value_) delete value_;
-//    delete tok_;
+    //if ()  delete tok_;
 }
 
 Identifier::~Identifier()
 {
 //    delete tok_;
 }
+
+
+PrefixExpression::~PrefixExpression()
+{
+    if (right_) delete right_;
+    //TODO dealloc tok!
+    //delete tok_;
+}
+
+std::string PrefixExpression::asString() const
+ {
+     std::string ret;
+
+     ret.append("(");
+     ret.append(operat_);
+     if (right_) {
+         ret.append(right_->asString());
+     }
+     ret.append(")");
+
+     return ret;
+ }
+
+
 
 
 Return::~Return()

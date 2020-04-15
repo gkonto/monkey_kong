@@ -125,4 +125,25 @@ class ExpressionStatement : public Node
 
 
 
+ class PrefixExpression : public Node
+ {
+     public:
+         PrefixExpression(Token *tok) :
+             operat_(tok->literal()), tok_(tok) {}
+         ~PrefixExpression();
+
+         const std::string &tokenLiteral() const { return tok_->literal(); }
+         std::string asString() const;
+         const std::string &operator_s() const { return operat_; }
+         Node *right() const { return right_; }
+         void setRight(Node *exp) { right_ = exp; }
+     private:
+         std::string operat_;
+         Token *tok_; // The prefix token (eg !)
+         Node *right_;
+ };
+
+
+
+
 #endif

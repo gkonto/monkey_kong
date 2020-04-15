@@ -17,9 +17,24 @@ Parser::Parser(Lexer *l) : lexer_(l)
 
     registerPrefix(T_IDENT, std::bind(&Parser::parseIdentifier, this));
     registerPrefix(T_INT,   std::bind(&Parser::parseIntegerLiteral, this));
+    registerPrefix(T_BANG, std::bind(&Parser::parsePrefixExpression, this));
+    registerPrefix(T_MINUS, std::bind(&Parser::parsePrefixExpression, this));
+
 
     initializePrecedence();
 }
+
+
+Node *Parser::parsePrefixExpression()
+ {
+     PrefixExpression *expression = new PrefixExpression(cur_token_);
+     nextToken();
+
+     expression->setRight(parseExpression(PL_PREFIX));
+     return expression;
+ }
+
+
 
 
  int Parser::parseInt(const std::string &input) const
@@ -30,6 +45,7 @@ Parser::Parser(Lexer *l) : lexer_(l)
  
      return value;
  }
+
 
 Node *Parser::parseIntegerLiteral()
  {
@@ -92,6 +108,7 @@ Node *Parser::parseExpression(PrecedenceLevel prec)
 
      if (!prefix_fun) {
          //noPrefixParseFnError(cur_token_->type_);
+         std::cout << "NO PREFIX EXPRESSION" << std::endl;
          return nullptr;
      }
 
