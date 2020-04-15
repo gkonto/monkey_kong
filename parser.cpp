@@ -296,7 +296,9 @@ Node *Parser::parseExpression(PrecedenceLevel prec)
 
      if (!prefix_fun) {
          //noPrefixParseFnError(cur_token_->type_);
+#ifdef DBG
          std::cout << "NO PREFIX EXPRESSION" << std::endl;
+#endif
          return nullptr;
      }
 
