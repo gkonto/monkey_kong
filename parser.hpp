@@ -55,6 +55,7 @@ class Parser
         Let *parseLetStatement();
         Return *parseReturnStatement();
         Node *parseStatement();
+        Node *parseIdentifier();
         ExpressionStatement *parseExpressionStatement();
         Node *parseExpression(PrecedenceLevel prec);
 

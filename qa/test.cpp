@@ -387,8 +387,7 @@ void TestReturnStatements::run_core(std::string input, int expected)
      for (auto &stmt : *program) {
         Return *ret = dynamic_cast<Return *>(stmt);        
         if (!ret) {
-            errorf(input, "stmt not Return *.\n");
-            return;
+            continue;
         }
 
         if (ret->tokenLiteral() != "return") {

@@ -1,6 +1,7 @@
 #include <memory>
 #include <iostream>
 #include <unordered_map>
+#include <functional>
 #include "parser.hpp"
 #include "token.hpp"
 #include "lexer.hpp"
@@ -13,8 +14,18 @@ Parser::Parser(Lexer *l) : lexer_(l)
 {
     nextToken();
     nextToken();
+
+         registerPrefix(T_IDENT, std::bind(&Parser::parseIdentifier, this));
+
     initializePrecedence();
 }
+
+
+ Node *Parser::parseIdentifier()
+ {
+     return new Identifier(cur_token_, cur_token_->literal());
+ }
+
 
  void Parser::initializePrecedence()
  {
@@ -99,7 +110,7 @@ Node *Parser::parseExpression(PrecedenceLevel prec)
      Return *statement = new Return(cur_token_, nullptr);
      nextToken();
 
-     //statement->setReturnVal(parseExpression(PL_LOWEST));
+     statement->setReturnVal(parseExpression(PL_LOWEST));
 
      if (peekTokenIs(T_SEMICOLON)) {
          nextToken();
@@ -172,7 +183,7 @@ Let *Parser::parseLetStatement()
      }
      nextToken();
 
-     //l->setValue(parseExpression(PL_LOWEST));
+     l->setValue(parseExpression(PL_LOWEST));
 
      if (peekTokenIs(T_SEMICOLON)) {
          nextToken();
