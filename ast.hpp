@@ -25,6 +25,8 @@ class Program : public Node
         void emplace_back(Node *stmt) { statements_.emplace_back(stmt); };
         Node *operator[](std::size_t idx) const { return statements_[idx]; }
         const std::vector<Node *> &statements() const { return statements_; }
+        std::vector<Node *>::iterator begin() { return statements_.begin(); }
+        std::vector<Node *>::iterator end() { return statements_.end(); }
     private:
         std::string literal_;
         std::vector<Node *> statements_;
@@ -63,6 +65,22 @@ class Let : public Node
         Token *tok_;
         Identifier *name_;   // the identifier's name
         Node *value_; // the expression that produces a value
+};
+
+
+class Return : public Node
+{
+    public:
+        explicit Return(Token *tok, Node *exp) :
+            token_(tok), returnValue_(exp) {}
+        ~Return() {}
+
+        const std::string &tokenLiteral() const { return token_->literal(); }
+        void setReturnVal(Node *exp) { returnValue_ = exp; }
+        Node *value() const { return returnValue_; }
+    private:
+        Token *token_; // The return statement
+        Node *returnValue_;
 };
 
 
