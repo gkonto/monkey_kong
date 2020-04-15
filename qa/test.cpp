@@ -356,3 +356,50 @@ void TestPoolArena::execute()
 }
 
 
+ void TestReturnStatements::execute()
+ {
+     run_core("return 10;", 10);
+     run_core("return 10; 9;", 10);
+     run_core("return 2 * 5; 9;", 10);
+     run_core("9; return 2 * 5; 9;", 10);
+     run_core("if (10 > 1) {"
+                 "if (10 > 1) {"
+                     "return 10;"
+                 "}"
+                 "return 1"
+             "}", 10);
+ }
+
+
+void TestReturnStatements::run_core(std::string input, int expected)
+ {
+     std::unique_ptr<Program> program = parse(input);
+     if (!program) {
+         errorf(input, "Program is nullptr\n");
+         return;
+     }
+
+     if (program->size() == 0) {
+         errorf(input, "Program returned empty!\n");
+         return;
+     }
+
+     for (auto &stmt : *program) {
+        Return *ret = dynamic_cast<Return *>(stmt);        
+        if (!ret) {
+            errorf(input, "stmt not Return *.\n");
+            return;
+        }
+
+        if (ret->tokenLiteral() != "return") {
+            errorf(input, "Return * tokenLiteral not 'return'. got %s\n", ret->tokenLiteral());
+        }
+     }
+ }
+
+
+
+
+
+
+

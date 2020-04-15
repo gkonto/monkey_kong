@@ -80,6 +80,17 @@ class TestPoolArena : public Test
     private:
 };
 
+class TestReturnStatements : public Test
+ {
+     public:
+         TestReturnStatements()
+             : Test("TestReturnStatements") {}
+         void execute();
+     private:
+         void run_core(std::string input, int expected);
+ };
+
+
 
 
 

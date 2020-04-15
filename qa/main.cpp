@@ -15,6 +15,7 @@ struct Tests
         tests_.emplace("TestPoolArena", new TestPoolArena);
         tests_.emplace("TestNextToken", new TestNextToken);
         tests_.emplace("TestLetStatements", new TestLetStatements);
+        tests_.emplace("TestReturnStatements", new TestReturnStatements);
     }
 
     ~Tests()
