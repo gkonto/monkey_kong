@@ -21,6 +21,7 @@ struct Tests
         tests_.emplace("TestIntegerLiteralExpression", new TestIntegerLiteralExpression);
         tests_.emplace("TestParsingPrefixExpression", new TestParsingPrefixExpression);
         tests_.emplace("TestParsingInfixExpressions", new TestParsingInfixExpressions);
+        tests_.emplace("TestOperatorPrecedenceParsing", new TestOperatorPrecedenceParsing);
     }
 
     ~Tests()

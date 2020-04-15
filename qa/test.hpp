@@ -160,7 +160,25 @@ class TestParsingInfixExpressions : public Test
  };
 
 
+ struct OperatorPrecedence
+ {
+     OperatorPrecedence(const std::string &input, const std::string &expected)
+         : input_(input), expected_(expected) {}
+    
+     std::string input_;
+     std::string expected_;
+ };
+     
 
+ class TestOperatorPrecedenceParsing: public Test
+ {   
+     public:
+         TestOperatorPrecedenceParsing();
+         void execute();
+     private:
+         std::vector<OperatorPrecedence> tests_;
+ };  
+     
 
 
 

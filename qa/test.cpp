@@ -559,3 +559,52 @@ void TestIntegerLiteralExpression::execute()
     }
  }
 
+
+ TestOperatorPrecedenceParsing::TestOperatorPrecedenceParsing()
+     : Test("TestOperatorPrecedenceParsing")
+ {
+     using OP = OperatorPrecedence;
+     tests_.emplace_back(OP("-a * b", "((-a) * b)"));
+     tests_.emplace_back(OP("!-a", "(!(-a))"));
+     tests_.emplace_back(OP("a + b + c", "((a + b) + c)"));
+     tests_.emplace_back(OP("a + b - c", "((a + b) - c)"));
+     tests_.emplace_back(OP("a * b * c", "((a * b) * c)"));
+     tests_.emplace_back(OP("a * b / c", "((a * b) / c)"));
+     tests_.emplace_back(OP("a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"));
+     tests_.emplace_back(OP("3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"));
+     tests_.emplace_back(OP("5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"));
+     tests_.emplace_back(OP("5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"));
+     tests_.emplace_back(OP("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"));
+     tests_.emplace_back(OP("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"));
+     /*
+     tests_.emplace_back(OP("true", "true"));
+     tests_.emplace_back(OP("false", "false"));
+     tests_.emplace_back(OP("3 > 5 == false", "((3 > 5) == false)"));
+     tests_.emplace_back(OP("3 < 5 == true", "((3 < 5) == true)"));
+     tests_.emplace_back(OP( "1 + (2 + 3) + 4", "((1 + (2 + 3)) + 4)"));
+     tests_.emplace_back(OP("(5 + 5) * 2", "((5 + 5) * 2)" ));
+     tests_.emplace_back(OP("2 / (5 + 5)", "(2 / (5 + 5))"));
+     tests_.emplace_back(OP("-(5 + 5)", "(-(5 + 5))"));
+     tests_.emplace_back(OP("!(true == true)", "(!(true == true))"));
+     tests_.emplace_back(OP("a + add(b * c) + d", "((a + add((b * c))) + d)"));
+     tests_.emplace_back(OP("add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"));
+     tests_.emplace_back(OP("add(a + b + c * d / f + g)","add((((a + b) + ((c * d) / f)) + g))"));
+     tests_.emplace_back(OP("a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"));
+     tests_.emplace_back(OP("add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"));
+     */
+ }
+
+ void TestOperatorPrecedenceParsing::execute()
+ {
+     for (auto &a : tests_) {
+         std::unique_ptr<Program>  program = parse(a.input_);
+         std::string actual(program->asString());
+
+         if (actual.compare(a.expected_)) {
+             errorf("expected: %s, got: %s\n", a.expected_.c_str(), actual.c_str());
+         }
+     }
+ }
+
+
+
