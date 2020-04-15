@@ -2,6 +2,8 @@
 #define PARSER_HPP
 
 #include <memory>
+#include <unordered_map>
+#include <functional>
 
 #include "token.hpp"
 
@@ -23,6 +25,12 @@ class Parser
          * Each token type can have up to two parsing functions associated with it, depending on whether the
          * token is found in a prefix or an infix position.
          */
+        using prefixParseFn = std::function<Node *()>;
+        using infixParseFn  = std::function<Node *(Node *)>;
+
+        void registerPrefix(TokenType type, prefixParseFn fun);
+        void registerInfix(TokenType type, infixParseFn fun);
+
         explicit Parser(Lexer *l);
         std::unique_ptr<Program> parseProgram();
     private:
@@ -34,6 +42,10 @@ class Parser
         bool expectPeek(TokenType type);
 
         void nextToken();
+
+        std::unordered_map<TokenType, prefixParseFn> prefixParseFns_;
+        std::unordered_map<TokenType, infixParseFn> infixParseFns_;
+
         Lexer *lexer_      = nullptr;
         Token *cur_token_  = nullptr;
         Token *next_token_ = nullptr;

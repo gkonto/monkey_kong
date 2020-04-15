@@ -11,6 +11,18 @@ Parser::Parser(Lexer *l) : lexer_(l)
     nextToken();
 }
 
+ void Parser::registerPrefix(TokenType type, prefixParseFn fun)
+ {
+     prefixParseFns_.emplace(type, fun);
+ }
+
+
+ void Parser::registerInfix(TokenType type, infixParseFn fun)
+ {
+     infixParseFns_.emplace(type, fun);
+ }
+
+
  Return *Parser::parseReturnStatement()
  {
      Return *statement = new Return(cur_token_, nullptr);
