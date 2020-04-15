@@ -464,8 +464,8 @@ void TestIntegerLiteralExpression::execute()
  {
      run_core(PrefixTest<int>("!5;", "!", 5));
      run_core(PrefixTest<int>("-15;", "-", 15));
-//     run_core(PrefixTest<bool>("!true;", "!", true));
- //    run_core(PrefixTest<bool>("!false;", "!", false));
+     run_core(PrefixTest<bool>("!true;", "!", true));
+     run_core(PrefixTest<bool>("!false;", "!", false));
  }
  
  template<typename T>
@@ -512,11 +512,9 @@ void TestIntegerLiteralExpression::execute()
      run_core(InfixTest<int, int>("5 < 5", 5, "<", 5));
      run_core(InfixTest<int, int>("5 == 5", 5, "==",  5));
      run_core(InfixTest<int, int>("5 != 5", 5, "!=", 5));
-     /*
      run_core(InfixTest<bool, bool>("true == true", true, "==", true));
      run_core(InfixTest<bool, bool>("true != false", true, "!=", false));
      run_core(InfixTest<bool, bool>("false == false", false, "==", false));
-     */
  }
 
  template<typename T, typename C>
@@ -572,7 +570,6 @@ void TestIntegerLiteralExpression::execute()
      tests_.emplace_back(OP("5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"));
      tests_.emplace_back(OP("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"));
      tests_.emplace_back(OP("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"));
-     /*
      tests_.emplace_back(OP("true", "true"));
      tests_.emplace_back(OP("false", "false"));
      tests_.emplace_back(OP("3 > 5 == false", "((3 > 5) == false)"));
@@ -582,6 +579,7 @@ void TestIntegerLiteralExpression::execute()
      tests_.emplace_back(OP("2 / (5 + 5)", "(2 / (5 + 5))"));
      tests_.emplace_back(OP("-(5 + 5)", "(-(5 + 5))"));
      tests_.emplace_back(OP("!(true == true)", "(!(true == true))"));
+     /*
      tests_.emplace_back(OP("a + add(b * c) + d", "((a + add((b * c))) + d)"));
      tests_.emplace_back(OP("add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"));
      tests_.emplace_back(OP("add(a + b + c * d / f + g)","add((((a + b) + ((c * d) / f)) + g))"));
