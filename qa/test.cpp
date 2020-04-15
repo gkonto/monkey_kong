@@ -9,6 +9,7 @@
 #include "../lexer.hpp"
 #include "../ast.hpp"
 #include "../parser.hpp"
+#include "../pool.hpp"
 
 using namespace std;
 
@@ -141,7 +142,7 @@ void TestNextToken::run_core(std::string input, std::vector<Token> expec)
             appendLiterals);
 
     for (auto &expected : expec) {
-        std::unique_ptr<Token> got(lex.nextToken());
+        Token *got = lex.nextToken();
 
         if (got && !(expected == *got)) {
             errorf(input, "[-] Expected: Type '%s' - Value: '%s'\n\t\tGot     : Type '%s' -  Value: '%s'",
@@ -319,6 +320,39 @@ void TestLetStatements::run_core(LetStatementCase<T> c)
         return;
     }
     */
+}
+
+
+void TestPoolArena::execute()
+{
+    Token *tok = Token::alloc(T_EOF, "1");
+    Token *tok1 = Token::alloc(T_EOF, "2");
+    Token::alloc(T_EOF, "3");
+    Token::alloc(T_EOF, "4");
+    Token::alloc(T_EOF, "5");
+    Token::alloc(T_EOF, "6");
+    Token::alloc(T_EOF, "7");
+    Token::alloc(T_EOF, "8");
+    Token::alloc(T_EOF, "9");
+    Token::alloc(T_EOF, "10");
+    Token::alloc(T_EOF, "11");
+    Token::alloc(T_EOF, "12");
+    Token::alloc(T_EOF, "13");
+    Token::alloc(T_EOF, "14");
+    Token::alloc(T_EOF, "15");
+    Token::alloc(T_EOF, "16");
+    Token::alloc(T_EOF, "17");
+    Token::alloc(T_EOF, "18");
+    Token::alloc(T_EOF, "18");
+    Token::alloc(T_EOF, "20");
+
+    Token::dealloc(tok);
+    Token::dealloc(tok1);
+    Token::alloc(T_EOF, "21");
+    Token::alloc(T_EOF, "22");
+
+
+    TokenPool.reset();
 }
 
 

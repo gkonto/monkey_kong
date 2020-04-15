@@ -72,6 +72,16 @@ class TestLetStatements : public Test
 };
 
 
+class TestPoolArena : public Test
+{
+    public:
+        TestPoolArena() : Test("TestPoolArena") {}
+        void execute();
+    private:
+};
+
+
+
 
 
 
