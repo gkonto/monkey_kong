@@ -11,12 +11,28 @@ Parser::Parser(Lexer *l) : lexer_(l)
     nextToken();
 }
 
+ Return *Parser::parseReturnStatement()
+ {
+     Return *statement = new Return(cur_token_, nullptr);
+     nextToken();
+
+     //statement->setReturnVal(parseExpression(PL_LOWEST));
+
+     if (peekTokenIs(T_SEMICOLON)) {
+         nextToken();
+     }
+
+     return statement;
+ }
+
 
 Node *Parser::parseStatement()
 {
     switch (cur_token_->type()) {
         case T_LET:
             return parseLetStatement();
+        case T_RETURN:
+             return parseReturnStatement();
         default:
 //            return parseExpressionStatement();
             break;

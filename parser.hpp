@@ -10,6 +10,7 @@ class Token;
 class Program;
 class Node;
 class Let;
+class Return;
 
 // A Pratt parser. The main idea is the association of parsing functions, 
 // which Pratt calls "semantic code" with token types.
@@ -26,6 +27,7 @@ class Parser
         std::unique_ptr<Program> parseProgram();
     private:
         Let *parseLetStatement();
+        Return *parseReturnStatement();
         Node *parseStatement();
         bool curTokenIs(TokenType type) const;
         bool peekTokenIs(TokenType type) const;
