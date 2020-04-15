@@ -505,3 +505,57 @@ void TestIntegerLiteralExpression::execute()
      }
  }
 
+
+ void TestParsingInfixExpressions::execute()
+ {
+     run_core(InfixTest<int, int>("5 + 5;", 5, "+", 5));
+     run_core(InfixTest<int, int>("5 - 5", 5, "-", 5));
+     run_core(InfixTest<int, int>("5 * 5", 5, "*", 5));
+     run_core(InfixTest<int, int>("5 / 5", 5, "/", 5));
+     run_core(InfixTest<int, int>("5 > 5", 5, ">", 5));
+     run_core(InfixTest<int, int>("5 < 5", 5, "<", 5));
+     run_core(InfixTest<int, int>("5 == 5", 5, "==",  5));
+     run_core(InfixTest<int, int>("5 != 5", 5, "!=", 5));
+     /*
+     run_core(InfixTest<bool, bool>("true == true", true, "==", true));
+     run_core(InfixTest<bool, bool>("true != false", true, "!=", false));
+     run_core(InfixTest<bool, bool>("false == false", false, "==", false));
+     */
+ }
+
+ template<typename T, typename C>
+ void TestParsingInfixExpressions::run_core(InfixTest<T, C> a)
+ {
+     std::unique_ptr<Program>  program = parse(a.input_);
+
+     if (program->size() != 1) {
+         errorf(a.input_, "program does not contain %d statements. got %d\n", 1, program->size());
+     }
+
+     ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>((*program)[0]);
+     if (!stmt) {
+        errorf(a.input_, "program[0] not ExpressionStatement\n");
+        return;
+     }
+
+     InfixExpression *exp = dynamic_cast<InfixExpression *>(stmt->expression());
+
+     if (!exp) {
+         errorf(a.input_, "stmt not InfixExpression\n");
+         return;
+     }
+
+     if (exp->op().compare(a.op_)) {
+         errorf(a.input_, "Operator is not %s. got = %s\n", a.op_.c_str(), exp->op().c_str());
+         return;
+     }
+
+     if (!testLiteralExpression(a.input_, exp->lhs(), a.lhs_)) {
+         return;
+     }
+
+     if (!testLiteralExpression(a.input_, exp->rhs(), a.rhs_)) {
+        return;
+    }
+ }
+

@@ -137,6 +137,28 @@ class TestIntegerLiteralExpression : public Test
  
  };
 
+template<typename T, typename C>
+ struct InfixTest
+ {
+     InfixTest(const std::string &input, T lhs, const std::string &op, C rhs) :
+         input_(input), lhs_(lhs), op_(op), rhs_(rhs) {}
+ 
+     std::string input_;
+     T lhs_;
+     std::string op_;
+     C rhs_;
+ };
+
+class TestParsingInfixExpressions : public Test
+ {
+     public:
+         TestParsingInfixExpressions() : Test("TestParsingInfixExpressions") {}
+         void execute();
+     private:
+         template<typename T, typename C>
+         void run_core(InfixTest<T, C> a);
+ };
+
 
 
 
