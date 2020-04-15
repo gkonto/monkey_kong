@@ -19,7 +19,12 @@ struct Node
 class Program : public Node
 {
     public:
-        ~Program() {}
+        ~Program() 
+        {
+            for (auto &stmt : statements_) {
+                delete stmt;
+            }
+        }
         const std::string &tokenLiteral() const { return literal_; };
         size_t size() const { return statements_.size(); }
         void emplace_back(Node *stmt) { statements_.emplace_back(stmt); };
@@ -73,7 +78,7 @@ class Return : public Node
     public:
         explicit Return(Token *tok, Node *exp) :
             token_(tok), returnValue_(exp) {}
-        ~Return() {}
+        ~Return();
 
         const std::string &tokenLiteral() const { return token_->literal(); }
         void setReturnVal(Node *exp) { returnValue_ = exp; }

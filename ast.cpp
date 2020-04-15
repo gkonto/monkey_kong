@@ -3,12 +3,20 @@
 
 Let::~Let()
 {
-    delete tok_;
+    if (name_) delete name_;
+    if (value_) delete value_;
+//    delete tok_;
 }
 
 Identifier::~Identifier()
 {
-    delete tok_;
+//    delete tok_;
+}
+
+
+Return::~Return()
+{
+    if (returnValue_) delete returnValue_;
 }
 
 
