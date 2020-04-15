@@ -17,7 +17,7 @@ std::unique_ptr<Program> Test::parse(const std::string &input)
 {
     Lexer lex(input);
     Parser parser(&lex);
-    return std::unique_ptr<Program>(parser.parseProgram());
+    return parser.parseProgram();
 }
 
 
@@ -294,7 +294,7 @@ bool Test::testLiteralExpression(const std::string &input, Node *exp, std::strin
 template<typename T>
 void TestLetStatements::run_core(LetStatementCase<T> c)
 {
-    std::unique_ptr<Program> program(parse(c.input_));
+    std::unique_ptr<Program> program = parse(c.input_);
 
     if (!program) {
         errorf(c.input_, "parseProgram returned nullptr\n");
