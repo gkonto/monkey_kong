@@ -225,9 +225,6 @@ bool Test::testIdentifier(const std::string &input, Node *exp, const std::string
 
 bool Test::testBooleanLiteral(const std::string &input, Node *il, bool value)
 {
-    errorf(input, "missing testIntegerLiteral\n");
-    return false;
-    /*)
     Boolean *integ = dynamic_cast<Boolean *>(il);
 
     if (!il) {
@@ -244,7 +241,6 @@ bool Test::testBooleanLiteral(const std::string &input, Node *il, bool value)
         errorf(input, "TokenLiteral not %s. got = %s", value, integ->tokenLiteral().c_str());
         return false;
     }
-    */
 
     return true;
 }
