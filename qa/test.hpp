@@ -102,6 +102,17 @@ class TestReturnStatements : public Test
  };
 
 
+class TestIntegerLiteralExpression : public Test
+ {
+     public:
+         TestIntegerLiteralExpression() :
+             Test("TestIntegerLiteralExpression") {}
+
+         void execute();
+     private:
+ };
+
+
 
 
 

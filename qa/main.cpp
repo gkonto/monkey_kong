@@ -18,6 +18,7 @@ struct Tests
         tests_.emplace("TestLetStatements", new TestLetStatements);
         tests_.emplace("TestReturnStatements", new TestReturnStatements);
         tests_.emplace("TestIdentifierExpression", new TestIdentifierExpression);
+        tests_.emplace("TestIntegerLiteralExpression", new TestIntegerLiteralExpression);
     }
 
     ~Tests()

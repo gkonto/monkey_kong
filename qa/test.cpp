@@ -397,6 +397,40 @@ void TestReturnStatements::run_core(std::string input, int expected)
  }
 
 
+void TestIntegerLiteralExpression::execute()
+ {
+     std::string input("5;");
+     std::unique_ptr<Program> program = parse(input);
+
+     if (program->size() != 1) {
+         errorf(input, "program has not enough statements. got %d\n", program->size());
+     }
+
+     ExpressionStatement *p_exp_state = dynamic_cast<ExpressionStatement *>((*program)[0]);
+     if (!p_exp_state) {
+         errorf(input, "exp not ExpressionStatement!");
+         return;
+     }
+
+     IntegerLiteral *p_literal = dynamic_cast<IntegerLiteral *>(p_exp_state->expression());
+     if (!p_literal) {
+         errorf(input, "exp not IntegerLiteral!");
+         return;
+     }
+
+     if (p_literal->value() != 5) {
+         errorf("literal.Value not %d. got = %d", 5, p_literal->value());
+     }
+
+     if (p_literal->tokenLiteral() != "5") {
+         errorf(input, "literal.TokenLiteral not %s. got %s\n", "5", p_literal->tokenLiteral().c_str());
+         return;
+     }
+
+ }
+
+
+
 
 
  void TestIdentifierExpression::execute()
