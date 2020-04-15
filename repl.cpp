@@ -6,6 +6,7 @@
 #include "argparser.hpp"
 #include "repl.hpp"
 #include "lexer.hpp"
+#include "parser.hpp"
 #include "auxiliaries.hpp"
 
 using namespace std;
@@ -32,7 +33,11 @@ void Repl::start(bool calc_t)
         // Produce program nodes
         auto start = high_resolution_clock::now();
         Lexer lex(input);
+        Parser p(&lex);
+        std::unique_ptr<Program> prog = p.parseProgram();
+        std::cout << prog->asString();
         auto end = high_resolution_clock::now();
+
         if (calc_t) {
             auto time_elapsed = duration_cast<milliseconds>(end - start);
             cout << BOLD << endl << "time elapsed: " << time_elapsed.count() << " millisec" << RESET << std::endl;
