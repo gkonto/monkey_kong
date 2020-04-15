@@ -13,6 +13,7 @@
      argparser.hpp
      pool.hpp
      symbols.hpp
+     object.hpp
      ast.hpp
      parser.hpp
     )
@@ -21,6 +22,7 @@
      parser.cpp
      ast.cpp
      lexer.cpp
+     object.cpp
      symbols.cpp
      argparser.cpp
      token.cpp

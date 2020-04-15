@@ -12,6 +12,7 @@
      ../token.hpp
      ../lexer.hpp
      ../symbols.hpp
+     ../object.hpp
      ../ast.hpp
      ../parser.hpp
      ../pool.hpp
@@ -21,6 +22,7 @@
      ../argparser.cpp
      ../token.cpp
      ../lexer.cpp
+     ../object.cpp
      ../symbols.cpp
      ../ast.cpp
      ../parser.cpp
