@@ -5,6 +5,7 @@
 
 #include "argparser.hpp"
 #include "repl.hpp"
+#include "ast.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "auxiliaries.hpp"
