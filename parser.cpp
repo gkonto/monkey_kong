@@ -19,6 +19,17 @@ Parser::Parser(Lexer *l) : lexer_(l)
     registerPrefix(T_INT,   std::bind(&Parser::parseIntegerLiteral, this));
     registerPrefix(T_BANG, std::bind(&Parser::parsePrefixExpression, this));
     registerPrefix(T_MINUS, std::bind(&Parser::parsePrefixExpression, this));
+         registerPrefix(T_FALSE, std::bind(&Parser::parseBoolean, this));
+     registerPrefix(T_TRUE, std::bind(&Parser::parseBoolean, this));
+     registerPrefix(T_LPAREN, std::bind(&Parser::parseGroupedExpression, this));
+     /*
+     registerPrefix(T_IF,     std::bind(&Parser::parseIfExpression, this));
+     registerPrefix(T_FUNCTION, std::bind(&Parser::parseFunctionLiteral, this));
+     registerPrefix(T_STRING, std::bind(&Parser::parseStringLiteral, this));
+     registerPrefix(T_LBRACKET, std::bind(&Parser::parseArrayLiteral, this));
+     registerPrefix(T_LBRACE,   std::bind(&Parser::parseHashLiteral, this));
+     */
+
 
      using std::placeholders::_1;
      registerInfix(T_PLUS, std::bind(&Parser::parseInfixExpression, this, _1));
@@ -30,10 +41,40 @@ Parser::Parser(Lexer *l) : lexer_(l)
      registerInfix(T_LT, std::bind(&Parser::parseInfixExpression, this, _1));
      registerInfix(T_GT, std::bind(&Parser::parseInfixExpression, this, _1));
      //registerInfix(T_LPAREN, std::bind(&Parser::parseCallExpression, this, _1));
-     //registerInfix(T_LBRACKET, std::bind(&Parser::parseIndexExpression, this, _1));
+   //  registerInfix(T_LBRACKET, std::bind(&Parser::parseIndexExpression, this, _1));
 
     initializePrecedence();
 }
+
+
+/*
+Node *Parser::parseCallExpression(Node *function)
+ {
+     CallExpression *exp = new CallExpression(cur_token_, function);
+     exp->setArguments(parseExpressionList(T_RPAREN));
+     return exp;
+ }
+ */
+ 
+ Node *Parser::parseGroupedExpression()
+ {
+     nextToken();
+ 
+     Node *exp = parseExpression(PL_LOWEST);
+ 
+     if (!expectPeek(T_RPAREN)) {
+         return nullptr;
+     }
+ 
+     return exp;
+ }
+ 
+
+
+Node *Parser::parseBoolean()
+ {
+     return new Boolean(cur_token_, curTokenIs(T_TRUE));
+ }
 
  Node *Parser::parseInfixExpression(Node *left)
  {

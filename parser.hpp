@@ -4,6 +4,7 @@
 #include <memory>
 #include <unordered_map>
 #include <functional>
+#include <vector>
 
 #include "token.hpp"
 
@@ -61,6 +62,9 @@ class Parser
         Node *parseIntegerLiteral();
         Node *parsePrefixExpression();
         Node *parseInfixExpression(Node *left);
+        Node *parseBoolean();
+        Node *parseGroupedExpression();
+        Node *parseCallExpression(Node *function);
         PrecedenceLevel peekPrecedence() const;
         PrecedenceLevel curPrecedence() const;
         int parseInt(const std::string &input) const;

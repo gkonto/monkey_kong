@@ -164,6 +164,20 @@ class ExpressionStatement : public Node
  };
 
 
+ class Boolean : public Node
+ {
+     public:
+         explicit Boolean(Token *tok, bool value)
+             : tok_(tok), value_(value) {}
+         const std::string &tokenLiteral() const { return tok_->literal(); }
+         bool value() const { return value_; }
+         std::string asString() const { return tok_->literal(); }
+     private:
+         Token *tok_;
+         bool value_;
+ };
+ 
+
 
 
 
