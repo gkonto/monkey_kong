@@ -2,6 +2,8 @@
 #define TOKEN_HPP
 
 #include <string>
+#include <memory>
+#include "pool.hpp"
 
 #define TOKEN_TYPES\
     X(T_ILLEGAL, "T_ILLEGAL")\
@@ -52,6 +54,10 @@ const char *const tok_names[] = {
 };
 #undef X
 
+class Token;
+extern std::unique_ptr<Pool<Token>> TokenPool;
+
+extern int num_allocs;
 
 class Token
 {
@@ -62,9 +68,32 @@ class Token
         const std::string &literal() const { return literal_; }
         TokenType type() const { return type_; }
         bool operator==(const Token &b) const;
+        ~Token()
+        {
+        }
+
+        template <typename... Args>
+        static Token *alloc(Args ... args);
+        static void dealloc(Token *tok);
+
     private:
         TokenType type_;
         std::string literal_;
 };
+
+template<typename... Args>
+Token *Token::alloc(Args ... args)
+{
+#ifdef USE_POOL
+    if (!TokenPool) {
+        TokenPool = std::make_unique<Pool<Token>>(10);
+    }
+    return TokenPool->alloc(std::forward<Args>(args)...);
+#else
+    return new Token(std::forward<Args>(args)...);
+#endif
+}
+
+
 
 #endif
