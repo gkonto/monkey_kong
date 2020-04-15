@@ -86,7 +86,7 @@ Token *Token::alloc(Args ... args)
 {
 #ifdef USE_POOL
     if (!TokenPool) {
-        TokenPool = std::make_unique<Pool<Token>>(10);
+        TokenPool = std::make_unique<Pool<Token>>(30);
     }
     return TokenPool->alloc(std::forward<Args>(args)...);
 #else
