@@ -15,6 +15,7 @@ class Node;
 class Let;
 class Return;
 class ExpressionStatement;
+class BlockStatement;
 
 
  enum PrecedenceLevel
@@ -63,7 +64,9 @@ class Parser
         Node *parsePrefixExpression();
         Node *parseInfixExpression(Node *left);
         Node *parseBoolean();
+         BlockStatement *parseBlockStatement();
         Node *parseGroupedExpression();
+        Node *parseIfExpression();
         Node *parseCallExpression(Node *function);
         PrecedenceLevel peekPrecedence() const;
         PrecedenceLevel curPrecedence() const;

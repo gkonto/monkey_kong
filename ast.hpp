@@ -177,8 +177,46 @@ class ExpressionStatement : public Node
          bool value_;
  };
  
+ class BlockStatement : public Node
+ {
+     public:
+         explicit BlockStatement(Token *tok) : tok_(tok) {}
+         ~BlockStatement();
+         std::string asString() const;
+         const std::string &tokenLiteral() const { return tok_->literal(); }
+         size_t size() const { return statements_.size(); }
+         Node *operator[](std::size_t idx) const { return statements_[idx]; }
+         void emplace_back(Node *stmt) { return statements_.emplace_back(stmt); }
+     private:
+         Token *tok_;
+         std::vector<Node *> statements_;
+ };
 
 
+ class If : public Node
+ {
+     public:
+         explicit If(Token *tok) : tok_(tok) {}
+         ~If() {
+             if (consequence_) delete consequence_;
+             if (alternative_) delete alternative_;
+         }
+ 
+         const std::string &tokenLiteral() const { return tok_->literal(); }
+         std::string asString() const;
+         Node *condition() const { return condition_; }
+         void setCondition(Node *condition) { condition_ = condition; }
+         BlockStatement *consequence() const { return consequence_; }
+         void setConsequence(BlockStatement *consequence) { consequence_ = consequence; }
+         BlockStatement *alternative() const { return alternative_; }
+         void setAlternative(BlockStatement *alternative) { alternative_ = alternative; }
+     private:
+         Token *tok_ = nullptr;
+         Node *condition_ = nullptr;
+         BlockStatement *consequence_ = nullptr;
+         BlockStatement *alternative_ = nullptr;
+ };
+ 
 
 
 

@@ -141,5 +141,43 @@ std::string Program::asString() const
 
 
 
+BlockStatement::~BlockStatement()
+{
+    for (auto &stmt : statements_) {
+        delete stmt;
+    }
+}
+
+
+std::string If::asString() const
+ {
+     std::string ret;
+     ret.append("if");
+     ret.append(condition_->asString());
+     ret.append(" ");
+     ret.append(consequence_->asString());
+
+     if (alternative_) {
+         ret.append("else ");
+         ret.append(alternative_->asString());
+     }
+
+     return ret;
+ }
+
+ 
+std::string BlockStatement::asString() const
+ {
+     std::string ret;
+ 
+     for (auto &a : statements_) {
+         ret.append(a->asString());
+     }
+ 
+     return ret;
+ }
+
+
+
 
 

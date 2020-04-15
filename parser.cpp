@@ -22,8 +22,8 @@ Parser::Parser(Lexer *l) : lexer_(l)
          registerPrefix(T_FALSE, std::bind(&Parser::parseBoolean, this));
      registerPrefix(T_TRUE, std::bind(&Parser::parseBoolean, this));
      registerPrefix(T_LPAREN, std::bind(&Parser::parseGroupedExpression, this));
-     /*
      registerPrefix(T_IF,     std::bind(&Parser::parseIfExpression, this));
+     /*
      registerPrefix(T_FUNCTION, std::bind(&Parser::parseFunctionLiteral, this));
      registerPrefix(T_STRING, std::bind(&Parser::parseStringLiteral, this));
      registerPrefix(T_LBRACKET, std::bind(&Parser::parseArrayLiteral, this));
@@ -45,6 +45,58 @@ Parser::Parser(Lexer *l) : lexer_(l)
 
     initializePrecedence();
 }
+
+ BlockStatement *Parser::parseBlockStatement()
+ {
+     BlockStatement *block = new BlockStatement(cur_token_);
+     nextToken();
+ 
+     while (!curTokenIs(T_RBRACE) && !curTokenIs(T_EOF)) {
+         Node *stmt = parseStatement();
+         if (stmt) {
+             block->emplace_back(stmt);
+         }
+         nextToken();
+     }
+     return block;
+ }
+
+
+Node *Parser::parseIfExpression()
+ {
+     If *p_if = new If(cur_token_);
+
+     if (!expectPeek(T_LPAREN)) {
+         return nullptr;
+     }
+
+     nextToken();
+     p_if->setCondition(parseExpression(PL_LOWEST));
+
+     if (!expectPeek(T_RPAREN)) {
+         return nullptr;
+     }
+
+     if (!expectPeek(T_LBRACE)) {
+         return nullptr;
+     }
+
+     p_if->setConsequence(parseBlockStatement());
+
+     if (peekTokenIs(T_ELSE)) {
+         nextToken();
+
+         if (!expectPeek(T_LBRACE)) {
+             return nullptr;
+         }
+
+         p_if->setAlternative(parseBlockStatement());
+     }
+
+
+     return p_if;
+ }
+
 
 
 /*
