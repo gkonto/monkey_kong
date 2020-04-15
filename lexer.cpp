@@ -96,78 +96,78 @@ Token *Lexer::nextToken()
         case '=':
             if (nextChar() == '=') {
                 readChar();
-                tok = new Token(T_EQ, "==");
+                tok = Token::alloc(T_EQ, "==");
             } else {
-                tok = new Token(T_ASSIGN, ch_);
+                tok = Token::alloc(T_ASSIGN, ch_);
             }
             break;
         case ':':
-            tok = new Token(T_COLON, ch_);
+            tok = Token::alloc(T_COLON, ch_);
             break;
         case ';':
-            tok = new Token(T_SEMICOLON, ch_);
+            tok = Token::alloc(T_SEMICOLON, ch_);
             break;
         case '-':
-            tok = new Token(T_MINUS, ch_);
+            tok = Token::alloc(T_MINUS, ch_);
             break;
         case '!':
             if (nextChar() == '=') {
                 readChar();
-                tok = new Token(T_NOT_EQ, "!=");
+                tok = Token::alloc(T_NOT_EQ, "!=");
             } else {
-                tok = new Token(T_BANG, ch_);
+                tok = Token::alloc(T_BANG, ch_);
             }
             break;
         case '[':
-            tok = new Token(T_LBRACKET, ch_);
+            tok = Token::alloc(T_LBRACKET, ch_);
             break;
         case ']':
-            tok = new Token(T_RBRACKET, ch_);
+            tok = Token::alloc(T_RBRACKET, ch_);
             break;
         case '/':
-            tok = new Token(T_SLASH, ch_);
+            tok = Token::alloc(T_SLASH, ch_);
             break;
         case '*':
-            tok = new Token(T_ASTERISK, ch_);
+            tok = Token::alloc(T_ASTERISK, ch_);
             break;
         case '<':
-            tok = new Token(T_LT, ch_);
+            tok = Token::alloc(T_LT, ch_);
             break;
         case '>':
-            tok = new Token(T_GT, ch_);
+            tok = Token::alloc(T_GT, ch_);
             break;
         case '(':
-            tok = new Token(T_LPAREN, ch_);
+            tok = Token::alloc(T_LPAREN, ch_);
             break;
         case ')':
-            tok = new Token(T_RPAREN, ch_);
+            tok = Token::alloc(T_RPAREN, ch_);
             break;
         case ',':
-            tok = new Token(T_COMMA, ch_);
+            tok = Token::alloc(T_COMMA, ch_);
             break;
         case '+':
-            tok = new Token(T_PLUS, ch_);
+            tok = Token::alloc(T_PLUS, ch_);
             break;
         case '{':
-            tok = new Token(T_LBRACE, ch_);
+            tok = Token::alloc(T_LBRACE, ch_);
             break;
         case '}':
-            tok = new Token(T_RBRACE, ch_);
+            tok = Token::alloc(T_RBRACE, ch_);
             break;
         case '"':
-            tok = new Token(T_STRING, readString());
+            tok = Token::alloc(T_STRING, readString());
             break;
         case 0  :
-            tok = new Token(T_EOF, "");
+            tok = Token::alloc(T_EOF, "");
             break;
         default:
             if (currentIsLetter()) {
                 std::string val(readIdentifier());
-                tok = new Token(SymbolTable::LookupIdent(val), val); 
+                tok = Token::alloc(SymbolTable::LookupIdent(val), val); 
             } else if (isdigit(ch_)) {
-                tok = new Token(T_INT, readNumber());
+                tok = Token::alloc(T_INT, readNumber());
             } else {
-                tok = new Token(T_ILLEGAL, 0);
+                tok = Token::alloc(T_ILLEGAL, 0);
             }
     }
 
