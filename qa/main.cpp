@@ -107,6 +107,7 @@ int main(int argc, char **argv)
     for (auto &t : data.test_to_run_) {
         std::cout << "[+] " << t.first << ": ";
         t.second->execute();
+        TokenPool.reset();
         if (t.second->is_failed_) {
             std::cout << RED << "FAILED" << RESET << std::endl;
             std::cout << t.second->report_errors() << std::endl;

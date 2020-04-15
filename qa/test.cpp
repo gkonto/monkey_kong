@@ -352,7 +352,7 @@ void TestPoolArena::execute()
     Token::alloc(T_EOF, "22");
 
 
-    TokenPool.reset();
+    //TokenPool.reset();
 }
 
 
