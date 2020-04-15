@@ -1,15 +1,86 @@
 #include <memory>
+#include <iostream>
+#include <unordered_map>
 #include "parser.hpp"
 #include "token.hpp"
 #include "lexer.hpp"
 #include "ast.hpp"
-#include <iostream>
+
+std::unordered_map<TokenType, PrecedenceLevel> Parser::Precedences;
+
 
 Parser::Parser(Lexer *l) : lexer_(l)
 {
     nextToken();
     nextToken();
+    initializePrecedence();
 }
+
+ void Parser::initializePrecedence()
+ {
+     if (!Precedences.empty()) return;
+ 
+     Precedences.emplace(T_EQ, PL_EQUALS);
+     Precedences.emplace(T_NOT_EQ, PL_EQUALS);
+     Precedences.emplace(T_LT, PL_LESSGREATER);
+     Precedences.emplace(T_GT, PL_LESSGREATER);
+     Precedences.emplace(T_PLUS, PL_SUM);
+     Precedences.emplace(T_MINUS, PL_SUM);
+     Precedences.emplace(T_SLASH, PL_PRODUCT);
+     Precedences.emplace(T_ASTERISK, PL_PRODUCT);
+     Precedences.emplace(T_LPAREN, PL_CALL);
+     Precedences.emplace(T_LBRACKET, PL_INDEX);
+ }
+
+
+ Parser::prefixParseFn Parser::findPrefix(TokenType type)
+ {
+     auto entry = prefixParseFns_.find(type);
+
+     if (entry == prefixParseFns_.end()) {
+         return nullptr;
+     }
+
+     return entry->second;
+ }
+
+ Parser::infixParseFn Parser::findInfix(TokenType type)
+ {
+     auto entry = infixParseFns_.find(type);
+ 
+     if (entry == infixParseFns_.end()) {
+         return nullptr;
+     }
+         
+     return entry->second;
+ } 
+
+Node *Parser::parseExpression(PrecedenceLevel prec)
+ {
+     prefixParseFn prefix_fun = findPrefix(cur_token_->type());
+
+     if (!prefix_fun) {
+         //noPrefixParseFnError(cur_token_->type_);
+         return nullptr;
+     }
+
+      Node *leftExp = prefix_fun();
+
+      /*
+     while (!peekTokenIs(T_SEMICOLON) && prec < peekPrecedence()) {
+         infixParseFn infix_f = findInfix(next_token_->type_);
+
+         if (!infix_f) {
+             return leftExp;
+         }
+         nextToken();
+         leftExp = infix_f(leftExp);
+     }
+     */
+
+     return leftExp;
+ }
+
 
  void Parser::registerPrefix(TokenType type, prefixParseFn fun)
  {
@@ -37,6 +108,19 @@ Parser::Parser(Lexer *l) : lexer_(l)
      return statement;
  }
 
+ ExpressionStatement *Parser::parseExpressionStatement()
+ {
+     ExpressionStatement *stmt = new ExpressionStatement();
+     Node *exp = parseExpression(PL_LOWEST);
+     stmt->setExpression(exp);
+
+     if (peekTokenIs(T_SEMICOLON)) {
+         nextToken();
+     }
+
+     return stmt;
+ }
+
 
 Node *Parser::parseStatement()
 {
@@ -46,8 +130,7 @@ Node *Parser::parseStatement()
         case T_RETURN:
              return parseReturnStatement();
         default:
-//            return parseExpressionStatement();
-            break;
+            return parseExpressionStatement();
     }
     return nullptr;
 }

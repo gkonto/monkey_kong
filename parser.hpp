@@ -13,6 +13,24 @@ class Program;
 class Node;
 class Let;
 class Return;
+class ExpressionStatement;
+
+
+ enum PrecedenceLevel
+ {
+     PL_LOWEST,
+     PL_EQUALS,      // ==
+     PL_LESSGREATER, // > or <
+     PL_SUM,         // +
+     PL_PRODUCT,     // *
+     PL_PREFIX,      // -X or !X
+     PL_CALL,        // myFunction(X)
+     PL_INDEX,
+
+     PL_MAX
+ };
+
+
 
 // A Pratt parser. The main idea is the association of parsing functions, 
 // which Pratt calls "semantic code" with token types.
@@ -37,6 +55,13 @@ class Parser
         Let *parseLetStatement();
         Return *parseReturnStatement();
         Node *parseStatement();
+        ExpressionStatement *parseExpressionStatement();
+        Node *parseExpression(PrecedenceLevel prec);
+
+         prefixParseFn findPrefix(TokenType);
+         infixParseFn findInfix(TokenType);
+
+
         bool curTokenIs(TokenType type) const;
         bool peekTokenIs(TokenType type) const;
         bool expectPeek(TokenType type);
@@ -49,6 +74,9 @@ class Parser
         Lexer *lexer_      = nullptr;
         Token *cur_token_  = nullptr;
         Token *next_token_ = nullptr;
+
+         void initializePrecedence();
+         static std::unordered_map<TokenType, PrecedenceLevel> Precedences;
 };
 
 #endif
