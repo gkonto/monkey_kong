@@ -21,6 +21,36 @@ PrefixExpression::~PrefixExpression()
     //delete tok_;
 }
 
+
+InfixExpression::~InfixExpression()
+{
+    delete lhs_;
+    //delete tok_;
+    delete rhs_;
+}
+
+InfixExpression::InfixExpression(Token *tok, Node *lhs, Node *rhs)
+     : tok_(tok), lhs_(lhs), op_(tok->literal()), rhs_(rhs)
+ {
+ }
+
+
+std::string InfixExpression::asString() const
+ {
+     std::string ret;
+
+     ret.append("(");
+     ret.append(lhs_->asString());
+     ret.append(" " + op_ + " ");
+     if (rhs_) {
+         ret.append(rhs_->asString());
+     }
+     ret.append(")");
+
+     return ret;
+ }
+
+
 std::string PrefixExpression::asString() const
  {
      std::string ret;

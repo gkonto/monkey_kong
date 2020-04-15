@@ -20,9 +20,31 @@ Parser::Parser(Lexer *l) : lexer_(l)
     registerPrefix(T_BANG, std::bind(&Parser::parsePrefixExpression, this));
     registerPrefix(T_MINUS, std::bind(&Parser::parsePrefixExpression, this));
 
+     using std::placeholders::_1;
+     registerInfix(T_PLUS, std::bind(&Parser::parseInfixExpression, this, _1));
+     registerInfix(T_MINUS, std::bind(&Parser::parseInfixExpression, this, _1));
+     registerInfix(T_SLASH, std::bind(&Parser::parseInfixExpression, this, _1));
+     registerInfix(T_ASTERISK, std::bind(&Parser::parseInfixExpression, this, _1));
+     registerInfix(T_EQ, std::bind(&Parser::parseInfixExpression, this, _1));
+     registerInfix(T_NOT_EQ, std::bind(&Parser::parseInfixExpression, this, _1));
+     registerInfix(T_LT, std::bind(&Parser::parseInfixExpression, this, _1));
+     registerInfix(T_GT, std::bind(&Parser::parseInfixExpression, this, _1));
+     //registerInfix(T_LPAREN, std::bind(&Parser::parseCallExpression, this, _1));
+     //registerInfix(T_LBRACKET, std::bind(&Parser::parseIndexExpression, this, _1));
 
     initializePrecedence();
 }
+
+ Node *Parser::parseInfixExpression(Node *left)
+ {
+     InfixExpression *inf_expression = new InfixExpression(cur_token_, left);
+     PrecedenceLevel precedence = curPrecedence();
+     nextToken();
+     inf_expression->setRhs(parseExpression(precedence));
+
+     return inf_expression;
+ }
+
 
 
 Node *Parser::parsePrefixExpression()
@@ -114,9 +136,8 @@ Node *Parser::parseExpression(PrecedenceLevel prec)
 
       Node *leftExp = prefix_fun();
 
-      /*
      while (!peekTokenIs(T_SEMICOLON) && prec < peekPrecedence()) {
-         infixParseFn infix_f = findInfix(next_token_->type_);
+         infixParseFn infix_f = findInfix(next_token_->type());
 
          if (!infix_f) {
              return leftExp;
@@ -124,9 +145,34 @@ Node *Parser::parseExpression(PrecedenceLevel prec)
          nextToken();
          leftExp = infix_f(leftExp);
      }
-     */
 
      return leftExp;
+ }
+
+
+ PrecedenceLevel Parser::peekPrecedence() const
+ {
+     auto &prc = Parser::Precedences;
+     auto entry = prc.find(next_token_->type());
+
+     if (entry != prc.end()) {
+         return entry->second;
+     }
+
+     return PL_LOWEST;
+ }
+
+
+ PrecedenceLevel Parser::curPrecedence() const
+ {
+     auto &prc = Parser::Precedences;
+     auto entry = prc.find(cur_token_->type());
+ 
+     if (entry != prc.end()) {
+         return entry->second;
+     }
+ 
+     return PL_LOWEST;
  }
 
 

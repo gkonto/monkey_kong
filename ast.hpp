@@ -144,6 +144,28 @@ class ExpressionStatement : public Node
  };
 
 
+ class InfixExpression : public Node
+ {
+     public:
+         InfixExpression(Token *tok, Node *lhs, Node *rhs = nullptr);
+         ~InfixExpression();
+         const std::string &tokenLiteral() const { return tok_->literal(); }
+         std::string asString() const;
+         Node *lhs() const { return lhs_; }
+
+         void setRhs(Node *rhs) { rhs_ = rhs; }
+         Node *rhs() const { return rhs_; }
+         const std::string &op() const { return op_; }
+     private:
+         Token *tok_; // The operator token, e.g +
+         Node *lhs_;
+         std::string op_;
+         Node *rhs_;
+ };
+
+
+
+
 
 
 #endif
