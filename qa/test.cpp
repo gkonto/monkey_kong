@@ -400,6 +400,39 @@ void TestReturnStatements::run_core(std::string input, int expected)
 
 
 
+ void TestIdentifierExpression::execute()
+ {
+     std::string input = "foobar;";
+     std::unique_ptr<Program> program = parse(input);
+ 
+     if (program->size() != 1) {
+         errorf(input, "program should have 1 statement. got %d\n", program->size());
+         return;
+     }
+ 
+     ExpressionStatement *es = dynamic_cast<ExpressionStatement *>((*program)[0]);
+     if (!es) {
+         errorf(input, "program[0] is not ExpressionStatement!\n");
+         return;
+     }
+ 
+     Identifier *ident = dynamic_cast<Identifier *>(es->expression());
+     if (!ident) {
+         errorf(input, "not identifier!\n");
+         return;
+     }
+ 
+     if (ident->value() != "foobar") {
+         errorf(input, "ident.Value not foobar. got %s\n", ident->value().c_str());
+         return;
+     }
+ 
+     if (ident->tokenLiteral() != "foobar") {
+         errorf(input, "ident->tokenLiteral not foobar. got %s\n", ident->tokenLiteral().c_str());
+         return;
+     }
+ }
+ 
 
 
 

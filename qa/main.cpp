@@ -17,6 +17,7 @@ struct Tests
         tests_.emplace("TestNextToken", new TestNextToken);
         tests_.emplace("TestLetStatements", new TestLetStatements);
         tests_.emplace("TestReturnStatements", new TestReturnStatements);
+        tests_.emplace("TestIdentifierExpression", new TestIdentifierExpression);
     }
 
     ~Tests()

@@ -91,6 +91,18 @@ class TestReturnStatements : public Test
  };
 
 
+ class TestIdentifierExpression : public Test
+ {
+     public:
+         TestIdentifierExpression() :
+             Test("TestIdentifierExpression") {}
+
+         void execute();
+     private:
+ };
+
+
+
 
 
 
