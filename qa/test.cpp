@@ -849,7 +849,6 @@ void TestEvalBooleanExpression::execute()
 {
     run_core("true", true);
     run_core("false", false);
-    /*
     run_core("1 < 2", true);
     run_core("1 > 2", false);
     run_core("1 < 1", false);
@@ -867,7 +866,6 @@ void TestEvalBooleanExpression::execute()
     run_core("(1 < 2) == false", false);
     run_core("(1 > 2) == true", false);
     run_core("(1 > 2) == false", true);
-    */
 }
 
 
