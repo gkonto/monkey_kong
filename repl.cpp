@@ -6,6 +6,7 @@
 #include "argparser.hpp"
 #include "repl.hpp"
 #include "ast.hpp"
+#include "visitor.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "auxiliaries.hpp"
@@ -30,14 +31,21 @@ void Repl::start(bool calc_t)
         string input;
         cout << prompt_;
         getline(cin, input);
-
         // Produce program nodes
         auto start = high_resolution_clock::now();
         Lexer lex(input);
         Parser p(&lex);
         std::unique_ptr<Program> prog = p.parseProgram();
-        std::cout << prog->asString();
+
+        Evaluator evaluator(prog.get());
+        Object *obj = evaluator.eval();
+
         auto end = high_resolution_clock::now();
+
+        if (obj) {
+            std::cout << obj->inspect() << std::endl;
+            delete obj;
+        }
 
         if (calc_t) {
             auto time_elapsed = duration_cast<milliseconds>(end - start);
