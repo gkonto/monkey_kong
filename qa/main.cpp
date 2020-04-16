@@ -26,6 +26,7 @@ struct Tests
         tests_.emplace("TestFunctionLiteralParsing", new TestFunctionLiteralParsing);
         tests_.emplace("TestFunctionParametersParsing", new TestFunctionParametersParsing);
         tests_.emplace("TestCallExpressionParsing", new TestCallExpressionParsing);
+        tests_.emplace("TestEvalIntegerExpression", new TestEvalIntegerExpression);
     }
 
     ~Tests()

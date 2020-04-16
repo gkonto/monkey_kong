@@ -6,6 +6,7 @@
 #include <memory>
 #include "test.hpp"
 #include "../token.hpp"
+#include "../visitor.hpp"
 #include "../lexer.hpp"
 #include "../ast.hpp"
 #include "../parser.hpp"
@@ -778,10 +779,15 @@ void TestIntegerLiteralExpression::execute()
 
  bool Test::testIntegerObject(const std::string &input, Object *obj, int expected)
  {
+     if (!obj) {
+         errorf(input, "Evaluated obj is nullptr\n");
+         return false;
+     }
+
      Integer *result = dynamic_cast<Integer *>(obj);
 
      if (!result) {
-         errorf(input, "object is not Integer\n");
+         errorf(input, "object is not Integer.got %s\n", object_name[obj->type()]);
          return false;
      }
 
@@ -800,13 +806,16 @@ Object *Test::eval(const std::string &input)
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 
-     return program->eval(&env_);
+     Evaluator evaluator(program.get());
+     Object *ret = evaluator.eval();
+     return ret;
 }
 
 void TestEvalIntegerExpression::run_core(std::string input, int expected)
  {
      Object *evaluated = eval(input);
      testIntegerObject(input, evaluated, expected);
+     delete evaluated;
  }
 
  void TestEvalIntegerExpression::execute()
