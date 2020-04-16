@@ -28,6 +28,7 @@ struct Tests
         tests_.emplace("TestCallExpressionParsing", new TestCallExpressionParsing);
         tests_.emplace("TestEvalIntegerExpression", new TestEvalIntegerExpression);
         tests_.emplace("TestEvalBooleanExpression", new TestEvalBooleanExpression);
+        tests_.emplace("TestBangOperator", new TestBangOperator);
     }
 
     ~Tests()

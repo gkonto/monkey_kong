@@ -9,7 +9,7 @@
 #include <iostream>
 
 #define USE_POOL
-#define DBG
+//#define DBG
 
 /*
  * Very simple memory pool.

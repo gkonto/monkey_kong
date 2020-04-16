@@ -4,7 +4,7 @@
 //#include "object.hpp"
 //#include "ast.hpp"
 class Program;
-class Object;
+class Single;
 #include "object.hpp"
 #include "ast.hpp"
 
@@ -17,6 +17,8 @@ class Visitor {
         virtual void visitProgram(Program *a) = 0;
         virtual void visitExpressionStatement(ExpressionStatement *a) = 0;
         virtual void visitBoolean(Boolean *a) = 0;
+        virtual void visitPrefixExpression(PrefixExpression *a) = 0;
+        virtual void visitInfixExpression(InfixExpression *a) = 0;
     protected:
         Program *root_;
 };
@@ -24,9 +26,9 @@ class Visitor {
 class Evaluator : public Visitor {
     public:
         explicit Evaluator(Program *root) 
-            : Visitor(root), true_o(true), false_o(false) {}
+            : Visitor(root) {}
         
-        Object *eval() { 
+        Single *eval() { 
             visitProgram(root_); 
             return ret_;
         }
@@ -35,14 +37,21 @@ class Evaluator : public Visitor {
         void visitProgram(Program *a);
         void visitExpressionStatement(ExpressionStatement *a);
         void visitBoolean(Boolean *a);
+        void visitPrefixExpression(PrefixExpression *a);
+        void visitInfixExpression(InfixExpression *a);
     private:
         void evalStatements(const std::vector<Node *> &statements);
-        Object *nativeBoolToObject(bool input);
+        void evalPrefixExpression(const std::string &op);
+        void evalBangOperatorExpression();
+        void evalMinusPrefixOperatorExpression();
+        void evalInfixExpression(const std::string &op, Single *left, Single *right);
+        void evalIntegerInfixExpression(const std::string &op, Single *left, Single *right);
+        Single *nativeBoolToSingObj(bool input);
 
-        Object *ret_ = nullptr;
-        Bool true_o; 
-        Bool false_o;
-        Null null_o;
+        void setResult(Single *new_obj);
+        Single *setResultNull();
+
+        Single *ret_ = nullptr; // TODO encapsulate so  that cannot be modified without dellocation
 };
 
 #endif

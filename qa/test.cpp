@@ -777,22 +777,23 @@ void TestIntegerLiteralExpression::execute()
  }
 
 
- bool Test::testIntegerObject(const std::string &input, Object *obj, int expected)
+ bool Test::testIntegerObject(const std::string &input, Single *obj, int expected)
  {
      if (!obj) {
          errorf(input, "Evaluated obj is nullptr\n");
          return false;
      }
 
-     Integer *result = dynamic_cast<Integer *>(obj);
+     //Integer *result = dynamic_cast<Integer *>(obj);
 
-     if (!result) {
-         errorf(input, "object is not Integer.got %s\n", object_name[obj->type()]);
+
+     if (obj->type_ != INTEGER) {
+         errorf(input, "object is not Integer.got %s\n", object_name[obj->type_]);
          return false;
      }
 
-     if (result->value() != expected) {
-         errorf(input, "object value was wrong %d. got %d\n", expected, result->value());
+     if (obj->data.integer.value_ != expected) {
+         errorf(input, "object value was wrong %d. got %d\n", expected, obj->data.integer.value_);
          return false;
      }
 
@@ -800,20 +801,20 @@ void TestIntegerLiteralExpression::execute()
  }
 
 
-Object *Test::eval(const std::string &input)
+Single *Test::eval(const std::string &input)
 {
      Lexer l(input);
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 
      Evaluator evaluator(program.get());
-     Object *ret = evaluator.eval();
+     Single *ret = evaluator.eval();
      return ret;
 }
 
 void TestEvalIntegerExpression::run_core(std::string input, int expected)
  {
-     Object *evaluated = eval(input);
+     Single *evaluated = eval(input);
      testIntegerObject(input, evaluated, expected);
      delete evaluated;
  }
@@ -822,7 +823,6 @@ void TestEvalIntegerExpression::run_core(std::string input, int expected)
  {
      run_core("5", 5);
      run_core("10", 10);
-     /*
      run_core("-5", -5);
      run_core("-10", -10);
      run_core("5 + 5 + 5 + 5 - 10", 10);
@@ -836,6 +836,7 @@ void TestEvalIntegerExpression::run_core(std::string input, int expected)
      run_core("3 * 3 * 3 + 10", 37);
      run_core("3 * (3 * 3) + 10", 37);
      run_core("(5 + 10 * 2 + 15 / 3) * 2 + -10", 50);
+     /*
  
      run_core("let a = 5; a;", 5);
      run_core("let a = 5 * 5; a;", 25);
@@ -872,31 +873,49 @@ void TestEvalBooleanExpression::execute()
 
 void TestEvalBooleanExpression::run_core(std::string input, bool expected)
 {
-    Object *evaluated = eval(input);
+    Single *evaluated = eval(input);
     testBooleanObject(input, evaluated, expected);
     delete evaluated;
 }
 
 
-bool Test::testBooleanObject(const std::string &input, Object *obj, bool expected)
+bool Test::testBooleanObject(const std::string &input, Single *obj, bool expected)
 {
     if (!obj) {
         errorf(input, "Evaluated obj is nullptr\n");
         return false;
     }
 
-    Bool *result = dynamic_cast<Bool *>(obj);
+    //Bool *result = dynamic_cast<Bool *>(obj);
 
-    if (!result) {
-        errorf(input, "object is not Boolean.got %s\n", object_name[obj->type()]);
+    if (obj->type_ != BOOLEAN) {
+        errorf(input, "object is not Boolean.got %s\n", object_name[obj->type_]);
         return false;
     }
 
-    if (result->value() != expected) {
-        errorf(input, "object has wrong value. got=%d, want=%d", input.c_str(), result->value(), expected);
+    if (obj->data.boolean.value_ != expected) {
+        errorf(input, "object has wrong value. got=%d, want=%d\n", input.c_str(), obj->data.boolean.value_, expected);
         return false;
     }
     return true;
+}
+
+
+void TestBangOperator::execute()
+{
+    run_core("!true", false);
+    run_core("!false", true);
+    run_core("!5", false);
+    run_core("!!true", true);
+    run_core("!!false", false);
+    run_core("!!5", true);
+}
+
+void TestBangOperator::run_core(std::string input, bool expected)
+{
+    Single *evaluated = eval(input);
+    testBooleanObject(input, evaluated, expected);
+    delete evaluated;
 }
 
 

@@ -148,7 +148,7 @@ class ExpressionStatement : public Node
          const std::string &operator_s() const { return operat_; }
          Node *right() const { return right_; }
          void setRight(Node *exp) { right_ = exp; }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+         virtual void accept(Visitor &v);
      private:
          std::string operat_;
          Token *tok_; // The prefix token (eg !)
@@ -164,11 +164,10 @@ class ExpressionStatement : public Node
          const std::string &tokenLiteral() const { return tok_->literal(); }
          std::string asString() const;
          Node *lhs() const { return lhs_; }
-
          void setRhs(Node *rhs) { rhs_ = rhs; }
          Node *rhs() const { return rhs_; }
          const std::string &op() const { return op_; }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+         virtual void accept(Visitor &v);
      private:
          Token *tok_; // The operator token, e.g +
          Node *lhs_;

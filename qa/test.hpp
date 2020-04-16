@@ -11,14 +11,14 @@
 class Token;
 class Node;
 class Program;
-class Object;
+class Single;
 struct Test;
 
 struct Test
 {
     Test(std::string name) : name_(name) {}
     virtual ~Test() {};
-    Object *eval(const std::string &input);
+    Single *eval(const std::string &input);
     std::string report_errors() const;
     virtual void execute() = 0;
     void errorf(std::string input_case, const char *fmt, ...);
@@ -34,8 +34,8 @@ struct Test
     template<typename T>
     bool testInfixExpression(const std::string &input, Node *exp, T lhs, const std::string &op, T rhs);
 
-    bool testIntegerObject(const std::string &input, Object *obj, int expected);
-    bool testBooleanObject(const std::string &input, Object *obj, bool expected);
+    bool testIntegerObject(const std::string &input, Single *obj, int expected);
+    bool testBooleanObject(const std::string &input, Single *obj, bool expected);
   //
     std::vector<std::string> errors_;
     std::string name_;
@@ -268,6 +268,18 @@ class TestEvalBooleanExpression : public Test
     public:
         TestEvalBooleanExpression()
             : Test("TestEvalBooleanExpression") {}
+
+        void execute();
+    private:
+        void run_core(std::string input, bool expected);
+};
+
+
+class TestBangOperator : public Test
+{
+    public:
+        TestBangOperator()
+            : Test("TestBangOperator") {}
 
         void execute();
     private:

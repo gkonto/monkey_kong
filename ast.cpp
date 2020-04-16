@@ -263,3 +263,12 @@ void Boolean::accept(Visitor &v)
 {
     v.visitBoolean(this);
 }
+
+
+void PrefixExpression::accept(Visitor &v) {
+    v.visitPrefixExpression(this);
+}
+
+void InfixExpression::accept(Visitor &v) {
+    v.visitInfixExpression(this);
+}
