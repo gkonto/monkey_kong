@@ -35,6 +35,7 @@ struct Test
     bool testInfixExpression(const std::string &input, Node *exp, T lhs, const std::string &op, T rhs);
 
     bool testIntegerObject(const std::string &input, Object *obj, int expected);
+    bool testBooleanObject(const std::string &input, Object *obj, bool expected);
   //
     std::vector<std::string> errors_;
     std::string name_;
@@ -261,6 +262,17 @@ class TestFunctionLiteralParsing : public Test
      private:
          void run_core(std::string input, int expected);
  };
+
+class TestEvalBooleanExpression : public Test
+{
+    public:
+        TestEvalBooleanExpression()
+            : Test("TestEvalBooleanExpression") {}
+
+        void execute();
+    private:
+        void run_core(std::string input, bool expected);
+};
 
 
 

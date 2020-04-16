@@ -844,3 +844,61 @@ void TestEvalIntegerExpression::run_core(std::string input, int expected)
      */
  }
 
+void TestEvalBooleanExpression::execute()
+{
+    run_core("true", true);
+    run_core("false", false);
+    /*
+    run_core("1 < 2", true);
+    run_core("1 > 2", false);
+    run_core("1 < 1", false);
+    run_core("1 > 1", false);
+    run_core("1 == 1", true);
+    run_core("1 != 1", false);
+    run_core("1 == 2", false);
+    run_core("1 != 2", true);
+    run_core("true == true", true);
+    run_core("false == false", true);
+    run_core("true == false", false);
+    run_core("true != false", true);
+    run_core("false != true", true);
+    run_core("(1 < 2) == true", true);
+    run_core("(1 < 2) == false", false);
+    run_core("(1 > 2) == true", false);
+    run_core("(1 > 2) == false", true);
+    */
+}
+
+
+void TestEvalBooleanExpression::run_core(std::string input, bool expected)
+{
+    Object *evaluated = eval(input);
+    testBooleanObject(input, evaluated, expected);
+}
+
+
+bool Test::testBooleanObject(const std::string &input, Object *obj, bool expected)
+{
+    if (!obj) {
+        errorf(input, "Evaluated obj is nullptr\n");
+        return false;
+    }
+
+    Bool *result = dynamic_cast<Bool *>(obj);
+
+    if (!result) {
+        errorf(input, "object is not Boolean.got %s\n", object_name[obj->type()]);
+        return false;
+    }
+
+    if (result->value() != expected) {
+        errorf(input, "object has wrong value. got=%d, want=%d", input.c_str(), result->value(), expected);
+        return false;
+    }
+    return true;
+}
+
+
+
+
+
