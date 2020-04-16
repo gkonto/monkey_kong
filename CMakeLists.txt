@@ -25,6 +25,7 @@
      lexer.cpp
      object.cpp
      symbols.cpp
+     visitor.cpp
      argparser.cpp
      token.cpp
      repl.cpp
