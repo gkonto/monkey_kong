@@ -13,6 +13,7 @@
      ../lexer.hpp
      ../symbols.hpp
      ../object.hpp
+     ../visitor.hpp
      ../ast.hpp
      ../parser.hpp
      ../pool.hpp
@@ -25,6 +26,7 @@
      ../object.cpp
      ../symbols.cpp
      ../ast.cpp
+     ../visitor.cpp
      ../parser.cpp
      test.cpp
      main.cpp
