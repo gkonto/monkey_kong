@@ -918,5 +918,37 @@ void TestBangOperator::run_core(std::string input, bool expected)
 
 
 
+void TestIfElseExpressions::execute()
+{
+    run_core("if (true) { 10 }", 10);
+    run_core("if (false) { 10 }");
+    run_core("if (1) { 10 }", 10);
+    run_core("if (1 < 2) { 10 }", 10);
+    run_core("if (1 > 2) { 10 }");
+    run_core("if (1 > 2) { 10 } else { 20 }", 20);
+    run_core("if (1 < 2) { 10 } else { 20 }", 10);
+}
 
 
+bool Test::testNullObject(const std::string &input, Single *obj)
+{
+    if (obj != &Model::null_o) {
+        errorf(input, "object is not NULL.");
+        return false;
+    }
+
+    return true;
+}
+
+void TestIfElseExpressions::run_core(std::string input)
+{
+    Single *evaluated = eval(input);
+    testNullObject(input, evaluated);
+}
+
+void TestIfElseExpressions::run_core(std::string input, int expected)
+{
+    Single *evaluated = eval(input);
+    testIntegerObject(input, evaluated, expected);
+    delete evaluated;
+}

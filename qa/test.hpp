@@ -36,6 +36,7 @@ struct Test
 
     bool testIntegerObject(const std::string &input, Single *obj, int expected);
     bool testBooleanObject(const std::string &input, Single *obj, bool expected);
+    bool testNullObject(const std::string &input, Single *obj);
   //
     std::vector<std::string> errors_;
     std::string name_;
@@ -284,6 +285,19 @@ class TestBangOperator : public Test
         void execute();
     private:
         void run_core(std::string input, bool expected);
+};
+
+
+class TestIfElseExpressions : public Test
+{
+    public:
+        TestIfElseExpressions()
+            : Test("TestIfElseExpressions") {}
+
+        void execute();
+    private:
+        void run_core(std::string input, int expexted);
+        void run_core(std::string input);
 };
 
 
