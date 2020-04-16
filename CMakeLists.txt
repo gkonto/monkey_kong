@@ -14,6 +14,7 @@
      pool.hpp
      symbols.hpp
      object.hpp
+     visitor.hpp
      ast.hpp
      parser.hpp
     )

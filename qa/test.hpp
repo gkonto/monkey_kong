@@ -11,12 +11,14 @@
 class Token;
 class Node;
 class Program;
+class Object;
 struct Test;
 
 struct Test
 {
     Test(std::string name) : name_(name) {}
     virtual ~Test() {};
+    Object *eval(const std::string &input);
     std::string report_errors() const;
     virtual void execute() = 0;
     void errorf(std::string input_case, const char *fmt, ...);
@@ -26,12 +28,13 @@ struct Test
     bool testLiteralExpression(const std::string &input, Node *exp, int expected);
     bool testLiteralExpression(const std::string &input, Node *exp, std::string &expected);
     bool testLiteralExpression(const std::string &input, Node *exp, const char *expected);
-
     bool testIntegerLiteral(const std::string &input, Node *exp, int expected);
     bool testBooleanLiteral(const std::string &input, Node *exp, bool expected);
     bool testIdentifier(const std::string &input, Node *exp, const std::string &expected);
     template<typename T>
     bool testInfixExpression(const std::string &input, Node *exp, T lhs, const std::string &op, T rhs);
+
+    bool testIntegerObject(const std::string &input, Object *obj, int expected);
   //
     std::vector<std::string> errors_;
     std::string name_;
@@ -246,6 +249,17 @@ class TestFunctionLiteralParsing : public Test
          TestCallExpressionParsing() : Test("TestCallExpressionParsing") {}
          void execute();
      private:
+ };
+
+
+ class TestEvalIntegerExpression : public Test
+ {
+     public:
+         TestEvalIntegerExpression()
+             : Test("TestEvalIntegerExpression") {}
+         void execute();
+     private:
+         void run_core(std::string input, int expected);
  };
 
 

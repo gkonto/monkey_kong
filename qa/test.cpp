@@ -10,6 +10,7 @@
 #include "../ast.hpp"
 #include "../parser.hpp"
 #include "../pool.hpp"
+#include "../object.hpp"
 
 using namespace std;
 
@@ -775,4 +776,62 @@ void TestIntegerLiteralExpression::execute()
  }
 
 
+ bool Test::testIntegerObject(const std::string &input, Object *obj, int expected)
+ {
+     Integer *result = dynamic_cast<Integer *>(obj);
+
+     if (!result) {
+         errorf(input, "object is not Integer\n");
+         return false;
+     }
+
+     if (result->value() != expected) {
+         errorf(input, "object value was wrong %d. got %d\n", expected, result->value());
+         return false;
+     }
+
+     return true;
+ }
+
+
+Object *Test::eval(const std::string &input)
+{
+     Lexer l(input);
+     Parser p(&l);
+     std::unique_ptr<Program> program = p.parseProgram();
+
+     return program->eval(&env_);
+}
+
+void TestEvalIntegerExpression::run_core(std::string input, int expected)
+ {
+     Object *evaluated = eval(input);
+     testIntegerObject(input, evaluated, expected);
+ }
+
+ void TestEvalIntegerExpression::execute()
+ {
+     run_core("5", 5);
+     run_core("10", 10);
+     /*
+     run_core("-5", -5);
+     run_core("-10", -10);
+     run_core("5 + 5 + 5 + 5 - 10", 10);
+     run_core("2 * 2 * 2 * 2 * 2", 32);
+     run_core("-50 + 100 + -50", 0);
+     run_core("5 * 2 + 10", 20);
+     run_core("5 + 2 * 10", 25);
+     run_core("20 + 2 * -10", 0);
+     run_core("50 / 2 * 2 + 10", 60);
+     run_core("2 * (5 + 10)", 30);
+     run_core("3 * 3 * 3 + 10", 37);
+     run_core("3 * (3 * 3) + 10", 37);
+     run_core("(5 + 10 * 2 + 15 / 3) * 2 + -10", 50);
+ 
+     run_core("let a = 5; a;", 5);
+     run_core("let a = 5 * 5; a;", 25);
+     run_core("let a = 5; let b = a; b;", 5);
+     run_core("let a = 5; let b = a; let c = a + b + 5; c;", 15);
+     */
+ }
 
