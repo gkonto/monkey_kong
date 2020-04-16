@@ -1,5 +1,6 @@
 #include <sstream>
 #include "ast.hpp"
+#include "visitor.hpp"
 
 Let::~Let()
 {
@@ -241,4 +242,18 @@ std::string CallExpression::asString() const
      return ret;
  }
 
+void IntegerLiteral::accept(Visitor &v)
+{
+    v.visitIntegerLiteral(this);
+}
 
+
+void Program::accept(Visitor &v)
+{
+    v.visitProgram(this);
+}
+
+void ExpressionStatement::accept(Visitor &v)
+{
+    v.visitExpressionStatement(this);
+}

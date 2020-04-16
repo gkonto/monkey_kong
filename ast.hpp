@@ -5,14 +5,18 @@
 #include <vector>
 
 #include "token.hpp"
+#include "object.hpp"
+//#include "visitor.hpp"
 
 class Token;
+class Visitor;
 
 struct Node
 {
     virtual ~Node() {}
     virtual const std::string &tokenLiteral() const { return literal; }; // Only for debugging and testing
     virtual std::string asString() const = 0;
+    virtual void accept(Visitor &) = 0;
     std::string literal = "No token node";
 };
 
@@ -26,6 +30,7 @@ class Program : public Node
             for (auto &stmt : statements_) {
                 delete stmt;
             }
+            TokenPool.reset();
         }
         std::string asString() const;
         size_t size() const { return statements_.size(); }
@@ -34,6 +39,7 @@ class Program : public Node
         const std::vector<Node *> &statements() const { return statements_; }
         std::vector<Node *>::iterator begin() { return statements_.begin(); }
         std::vector<Node *>::iterator end() { return statements_.end(); }
+        virtual void accept(Visitor &v);
     private:
         std::vector<Node *> statements_;
 };
@@ -49,6 +55,8 @@ class Identifier : public Node
         std::string asString() const;
         const std::string &tokenLiteral() const { return tok_->literal(); }
         const std::string &value() const { return value_; }
+
+        virtual void accept(Visitor &v) { std::cout << "Program: not implemented" << std::endl; }
     private:
         Token *tok_;
         std::string value_;
@@ -69,6 +77,7 @@ class Let : public Node
         const std::string &identName() const { return name_->value(); }
         Node *value() const { return value_; }
         void setValue(Node *exp) { value_ = exp; }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
     private:
         Token *tok_;
         Identifier *name_;   // the identifier's name
@@ -87,6 +96,7 @@ class Return : public Node
         const std::string &tokenLiteral() const { return token_->literal(); }
         void setReturnVal(Node *exp) { returnValue_ = exp; }
         Node *value() const { return returnValue_; }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
     private:
         Token *token_; // The return statement
         Node *returnValue_;
@@ -104,6 +114,7 @@ class ExpressionStatement : public Node
         std::string asString() const;
          Node *expression() const { return expression_; }
          void setExpression(Node *exp) { expression_ = exp; }
+        virtual void accept(Visitor &v);
      private:
          Node *expression_;
  };
@@ -118,6 +129,7 @@ class ExpressionStatement : public Node
          const std::string &tokenLiteral() const { return token_->literal(); }
          int value() const { return value_; }
          std::string asString() const;
+         virtual void accept(Visitor &v);
      private:
          Token *token_ = nullptr;
          int value_ = 0;
@@ -137,6 +149,7 @@ class ExpressionStatement : public Node
          const std::string &operator_s() const { return operat_; }
          Node *right() const { return right_; }
          void setRight(Node *exp) { right_ = exp; }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
      private:
          std::string operat_;
          Token *tok_; // The prefix token (eg !)
@@ -156,6 +169,7 @@ class ExpressionStatement : public Node
          void setRhs(Node *rhs) { rhs_ = rhs; }
          Node *rhs() const { return rhs_; }
          const std::string &op() const { return op_; }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
      private:
          Token *tok_; // The operator token, e.g +
          Node *lhs_;
@@ -172,6 +186,7 @@ class ExpressionStatement : public Node
          const std::string &tokenLiteral() const { return tok_->literal(); }
          bool value() const { return value_; }
          std::string asString() const { return tok_->literal(); }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
      private:
          Token *tok_;
          bool value_;
@@ -187,6 +202,7 @@ class ExpressionStatement : public Node
          size_t size() const { return statements_.size(); }
          Node *operator[](std::size_t idx) const { return statements_[idx]; }
          void emplace_back(Node *stmt) { return statements_.emplace_back(stmt); }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
      private:
          Token *tok_;
          std::vector<Node *> statements_;
@@ -211,6 +227,7 @@ class ExpressionStatement : public Node
          void setConsequence(BlockStatement *consequence) { consequence_ = consequence; }
          BlockStatement *alternative() const { return alternative_; }
          void setAlternative(BlockStatement *alternative) { alternative_ = alternative; }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
      private:
          Token *tok_ = nullptr;
          Node *condition_ = nullptr;
@@ -232,6 +249,7 @@ class ExpressionStatement : public Node
          void setParameters(const std::vector<Identifier *> &parameters) { parameters_ = parameters; }
          const std::vector<Identifier *> &parameters() const { return parameters_; }
          size_t paramSize() const { return parameters_.size(); }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
      private:
          Token *tok_;
          std::vector<Identifier *> parameters_;
@@ -250,6 +268,7 @@ class ExpressionStatement : public Node
          Node *function() const { return function_; }
          Node *argNum(std::size_t idx) const { return arguments_[idx]; }
          void setArguments(std::vector<Node *> args) { arguments_ = args; }
+        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
      private:
          Token *tok_;
          Node *function_;
