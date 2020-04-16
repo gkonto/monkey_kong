@@ -1,10 +1,8 @@
 #ifndef VISITOR_HPP
 #define VISITOR_HPP
 
-//#include "object.hpp"
-//#include "ast.hpp"
-class Program;
 class Single;
+
 #include "object.hpp"
 #include "ast.hpp"
 
@@ -19,6 +17,8 @@ class Visitor {
         virtual void visitBoolean(Boolean *a) = 0;
         virtual void visitPrefixExpression(PrefixExpression *a) = 0;
         virtual void visitInfixExpression(InfixExpression *a) = 0;
+        virtual void visitBlockStatement(BlockStatement *a) = 0;
+        virtual void visitIfExpression(If *a) = 0;
     protected:
         Program *root_;
 };
@@ -39,6 +39,8 @@ class Evaluator : public Visitor {
         void visitBoolean(Boolean *a);
         void visitPrefixExpression(PrefixExpression *a);
         void visitInfixExpression(InfixExpression *a);
+        void visitBlockStatement(BlockStatement *a);
+        void visitIfExpression(If *a);
     private:
         void evalStatements(const std::vector<Node *> &statements);
         void evalPrefixExpression(const std::string &op);
@@ -47,6 +49,7 @@ class Evaluator : public Visitor {
         void evalInfixExpression(const std::string &op, Single *left, Single *right);
         void evalIntegerInfixExpression(const std::string &op, Single *left, Single *right);
         Single *nativeBoolToSingObj(bool input);
+        bool isTruthy(Single *obj) const;
 
         void setResult(Single *new_obj);
         Single *setResultNull();

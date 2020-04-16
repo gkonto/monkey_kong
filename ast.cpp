@@ -272,3 +272,11 @@ void PrefixExpression::accept(Visitor &v) {
 void InfixExpression::accept(Visitor &v) {
     v.visitInfixExpression(this);
 }
+
+void If::accept(Visitor &v) {
+    v.visitIfExpression(this);
+}
+
+void BlockStatement::accept(Visitor &v) {
+    v.visitBlockStatement(this);
+}

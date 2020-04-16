@@ -200,7 +200,8 @@ class ExpressionStatement : public Node
          size_t size() const { return statements_.size(); }
          Node *operator[](std::size_t idx) const { return statements_[idx]; }
          void emplace_back(Node *stmt) { return statements_.emplace_back(stmt); }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+         const std::vector<Node *> &statements() const { return statements_; }
+         virtual void accept(Visitor &v);
      private:
          Token *tok_;
          std::vector<Node *> statements_;
@@ -225,7 +226,7 @@ class ExpressionStatement : public Node
          void setConsequence(BlockStatement *consequence) { consequence_ = consequence; }
          BlockStatement *alternative() const { return alternative_; }
          void setAlternative(BlockStatement *alternative) { alternative_ = alternative; }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+         virtual void accept(Visitor &v);
      private:
          Token *tok_ = nullptr;
          Node *condition_ = nullptr;

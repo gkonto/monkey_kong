@@ -134,3 +134,37 @@ void Evaluator::visitInfixExpression(InfixExpression *a) {
     Single *right = setResultNull();
     evalInfixExpression(a->op(), left, right);
 }
+
+
+void Evaluator::visitBlockStatement(BlockStatement *a) {
+    evalStatements(a->statements());
+}
+
+
+bool Evaluator::isTruthy(Single *obj) const {
+    if (obj == &Model::null_o) {
+        return false;
+    } else if (obj == &Model::true_o) {
+        return true;
+    } else if (obj == &Model::false_o) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
+void Evaluator::visitIfExpression(If *a) {
+    a->condition()->accept(*this);
+    Single *cond = setResultNull();
+    if (isTruthy(cond)) {
+        a->consequence()->accept(*this);
+    } else if (a->alternative()) {
+        a->alternative()->accept(*this);
+    } else {
+        setResult(&Model::null_o);
+    }
+
+    delete cond;
+}
+
