@@ -40,17 +40,20 @@
 
 struct Integer : public Object
 {
+    Integer(int val) : value_(val) {}
     ObjType type() const { return INTEGER; }
     std::string inspect() const;
+    int value() const { return value_; }
 
     int value_;
 };
 
 
-struct Boolean : public Object
+struct Bool : public Object
 {
     ObjType type() const { return BOOLEAN; }
     std::string inspect() const;
+    bool value() const { return value_; }
 
     bool value_;
 };

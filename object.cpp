@@ -9,7 +9,7 @@ std::string Integer::inspect() const {
     return ss.str();
 }
 
-std::string Boolean::inspect() const {
+std::string Bool::inspect() const {
     std::stringstream ss;
     ss << value_;
     return ss.str();
