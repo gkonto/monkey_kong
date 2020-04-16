@@ -40,7 +40,7 @@
 
 struct Integer : public Object
 {
-    Integer(int val) : value_(val) {}
+    explicit Integer(int val) : value_(val) {}
     ObjType type() const { return INTEGER; }
     std::string inspect() const;
     int value() const { return value_; }
@@ -51,6 +51,7 @@ struct Integer : public Object
 
 struct Bool : public Object
 {
+    explicit Bool(bool val) : value_(val) {}
     ObjType type() const { return BOOLEAN; }
     std::string inspect() const;
     bool value() const { return value_; }

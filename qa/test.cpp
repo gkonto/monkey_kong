@@ -874,6 +874,7 @@ void TestEvalBooleanExpression::run_core(std::string input, bool expected)
 {
     Object *evaluated = eval(input);
     testBooleanObject(input, evaluated, expected);
+    delete evaluated;
 }
 
 

@@ -6,7 +6,6 @@
 
 #include "token.hpp"
 #include "object.hpp"
-//#include "visitor.hpp"
 
 class Token;
 class Visitor;
@@ -186,7 +185,7 @@ class ExpressionStatement : public Node
          const std::string &tokenLiteral() const { return tok_->literal(); }
          bool value() const { return value_; }
          std::string asString() const { return tok_->literal(); }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+        virtual void accept(Visitor &v);
      private:
          Token *tok_;
          bool value_;

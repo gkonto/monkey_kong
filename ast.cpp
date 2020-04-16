@@ -257,3 +257,9 @@ void ExpressionStatement::accept(Visitor &v)
 {
     v.visitExpressionStatement(this);
 }
+
+
+void Boolean::accept(Visitor &v)
+{
+    v.visitBoolean(this);
+}
