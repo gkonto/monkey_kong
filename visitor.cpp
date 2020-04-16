@@ -43,7 +43,7 @@ void Evaluator::evalBangOperatorExpression() {
 }
 
 void Evaluator::setResult(Single *obj) {
-    if (ret_ && ret_ != &Model::false_o && ret_ != &Model::true_o && ret_ != &Model::null_o) {
+    if (ret_ && obj != ret_ && ret_ != &Model::false_o && ret_ != &Model::true_o && ret_ != &Model::null_o) {
         delete ret_;
     }
     ret_ = obj;
@@ -82,6 +82,9 @@ void Evaluator::visitPrefixExpression(PrefixExpression *a) {
 
 
 void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, Single *right) {
+    //TODO remove all those compare with an array of function callbacks
+    Single *temp = nullptr;
+
     if (!op.compare("+")) {
         left->data.integer.value_ += right->data.integer.value_;
     } else if (!op.compare("-")) {
@@ -90,16 +93,34 @@ void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, 
         left->data.integer.value_ *= right->data.integer.value_;
     } else if (!op.compare("/")) {
         left->data.integer.value_ /= right->data.integer.value_;
+    } else if (!op.compare("<")) {
+        temp = nativeBoolToSingObj(left->data.integer.value_ < right->data.integer.value_);
+    } else if (!op.compare(">")) {
+        temp = nativeBoolToSingObj(left->data.integer.value_ > right->data.integer.value_);
+    } else if (!op.compare("==")) {
+        temp = nativeBoolToSingObj(left->data.integer.value_ == right->data.integer.value_);
+    } else if (!op.compare("!=")) {
+        temp = nativeBoolToSingObj(left->data.integer.value_ != right->data.integer.value_);
     } else {
         setResult(&Model::null_o);
     }
-    setResult(left);
+
+    if (temp) {
+        delete left;
+        setResult(temp);
+    } else {
+        setResult(left);
+    }
     delete right;
 }
 
 void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single *right) {
     if (left->type_ == INTEGER && right->type_ == INTEGER) {
         evalIntegerInfixExpression(op, left, right);
+    } else if (!op.compare("==")) {
+        setResult(nativeBoolToSingObj(left == right));
+    } else if (!op.compare("!=")) {
+       setResult(nativeBoolToSingObj(left != right));
     } else {
         setResult(&Model::null_o);
     }
