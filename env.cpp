@@ -33,14 +33,15 @@ Single *Environment::set(const std::string &key, Single *entry)
     */
     store_[key] = entry;
     entry->used_ = true;
+    singles_.emplace(entry);
 
     return entry;
 }
 
 
 Environment::~Environment() {
-    for (auto &a : store_) {
-        delete a.second;
+    for (auto &a : singles_) {
+        delete a;
     }
 }
 

@@ -2,6 +2,7 @@
 #define ENV_HPP
 
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 class Single;
 
@@ -12,6 +13,7 @@ class Environment {
         Single *set(const std::string &key, Single *entry);
     private:
         std::unordered_map<std::string, Single *> store_;
+        std::unordered_set<Single *> singles_;
         Environment *outer_ = nullptr;
 };
 

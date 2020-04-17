@@ -819,7 +819,9 @@ void TestEvalIntegerExpression::run_core(std::string input, int expected)
      Environment env;
      Single *evaluated = eval(input, env);
      testIntegerObject(input, evaluated, expected);
-     delete evaluated;
+     if (!evaluated->used_) {
+         delete evaluated;
+     }
  }
 
  void TestEvalIntegerExpression::execute()
@@ -875,7 +877,9 @@ void TestEvalBooleanExpression::run_core(std::string input, bool expected)
     Environment env;
     Single *evaluated = eval(input, env);
     testBooleanObject(input, evaluated, expected);
-    delete evaluated;
+    if (!evaluated->used_) {
+        delete evaluated;
+    }
 }
 
 
@@ -916,7 +920,9 @@ void TestBangOperator::run_core(std::string input, bool expected)
     Environment env;
     Single *evaluated = eval(input, env);
     testBooleanObject(input, evaluated, expected);
-    delete evaluated;
+    if (!evaluated->used_) {
+        delete evaluated;
+    }
 }
 
 
@@ -955,7 +961,9 @@ void TestIfElseExpressions::run_core(std::string input, int expected)
     Environment env;
     Single *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
-    delete evaluated;
+    if (!evaluated->used_) {
+        delete evaluated;
+    }
 }
 
 
@@ -980,7 +988,9 @@ void TestEvalReturnStatements::run_core(std::string input, int expected)
     Environment env;
     Single *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
-    delete evaluated;
+    if (!evaluated->used_) {
+        delete evaluated;
+    }
 }
 
 
@@ -1025,6 +1035,8 @@ void TestErrorHandler::run_core(std::string input, std::string expected_e)
     if (expected_e.compare(evaluated->data.error.msg_)) {
         errorf(input, "wrong error message. Expected '%s', got '%s'\n", expected_e.c_str(), evaluated->data.error.msg_);
     }
-    delete evaluated;
+    if (!evaluated->used_) {
+        delete evaluated;
+    }
 }
 

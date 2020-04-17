@@ -3,10 +3,12 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 class Single;
 class Bool;
 class Null;
+class Identifier;
 
  #define OBJECT_TYPES\
      X(INTEGER, "INTEGER")\
@@ -85,6 +87,9 @@ struct Single
         struct {
             char *msg_;
         } error;
+//        struct {
+//            std::vector<Identifier *> parameters_;
+//        } function;
     }data;
 };
 
