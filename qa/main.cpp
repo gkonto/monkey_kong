@@ -30,6 +30,7 @@ struct Tests
         tests_.emplace("TestEvalBooleanExpression", new TestEvalBooleanExpression);
         tests_.emplace("TestBangOperator", new TestBangOperator);
         tests_.emplace("TestIfElseExpressions", new TestIfElseExpressions);
+        tests_.emplace("TestEvalReturnStatements", new TestEvalReturnStatements);
     }
 
     ~Tests()

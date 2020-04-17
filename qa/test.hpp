@@ -300,6 +300,16 @@ class TestIfElseExpressions : public Test
         void run_core(std::string input);
 };
 
+class TestEvalReturnStatements : public Test
+{
+    public:
+        TestEvalReturnStatements()
+            : Test("TestEvalReturnStatements") {}
+        void execute();
+    private:
+        void run_core(std::string input, int expected);
+};
+
 
 
 

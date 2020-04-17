@@ -952,3 +952,29 @@ void TestIfElseExpressions::run_core(std::string input, int expected)
     testIntegerObject(input, evaluated, expected);
     delete evaluated;
 }
+
+
+
+void TestEvalReturnStatements::execute()
+{
+    run_core("return 10;", 10);
+    run_core("return 10; 9;", 10);
+    run_core("return 2 * 5; 9;", 10);
+    run_core("9; return 2 * 5; 9;", 10);
+    run_core("if (10 > 1) {"
+                "if (10 > 1) {"
+                    "return 10;"
+                "}"
+                "return 1"
+            "}", 10);
+}
+
+
+void TestEvalReturnStatements::run_core(std::string input, int expected)
+{
+    Single *evaluated = eval(input);
+    testIntegerObject(input, evaluated, expected);
+    delete evaluated;
+}
+
+
