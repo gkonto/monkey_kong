@@ -280,3 +280,9 @@ void Evaluator::visitIdentifier(Identifier *a) {
 }
 
 
+void Evaluator::visitFunctionLiteral(FunctionLiteral *a) {
+    Single *o = new Single(&a->parameters(), &env_, a->body());
+    setResult(o);
+}
+
+

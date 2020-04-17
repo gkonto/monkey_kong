@@ -1040,3 +1040,48 @@ void TestErrorHandler::run_core(std::string input, std::string expected_e)
     }
 }
 
+
+void TestFunctionObject::execute()
+{
+    run_core("fn(x) { x + 2;  };");
+}
+
+
+void TestFunctionObject::run_core(std::string input)
+{
+    Environment env;
+
+     Lexer l(input);
+     Parser p(&l);
+     std::unique_ptr<Program> program = p.parseProgram();
+
+     Evaluator evaluator(program.get(), env);
+     Single *fn = evaluator.eval();
+    if (!fn->type_) {
+        errorf(input, "object  is not Function\n");
+        return;
+    }
+
+    if (fn->data.function.parameters_->size() != 1) {
+        errorf(input, "function has wrong parameters");
+        return;
+    }
+
+    const std::vector<Identifier *> &idents = *fn->data.function.parameters_;
+    const std::string &val = idents[0]->value();
+    if (val.compare("x")) {
+        errorf(input, "parameter is not 'x'. got %s\n", val.c_str());
+        return;
+    }
+    std::string expectedBody("(x + 2)");
+    const std::string &b = fn->data.function.body_->asString();
+    if (fn->data.function.body_->asString() != expectedBody) {
+        errorf(input, "body is not %s. got %s\n", expectedBody.c_str(), b.c_str());
+        return;
+    }
+
+    if (!fn->used_) {
+        delete fn;
+    }
+}
+

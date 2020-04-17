@@ -23,6 +23,7 @@ class Visitor {
         virtual void visitReturn(Return *a) = 0;
         virtual void visitLet(Let *a) = 0;
         virtual void visitIdentifier(Identifier *a) = 0;
+        virtual void visitFunctionLiteral(FunctionLiteral *a) = 0;
     protected:
         Program *root_;
 };
@@ -48,6 +49,7 @@ class Evaluator : public Visitor {
         void visitReturn(Return *a);
         void visitLet(Let *a);
         void visitIdentifier(Identifier *a);
+        void visitFunctionLiteral(FunctionLiteral *a);
     private:
         void evalStatements(const std::vector<Node *> &statements);
         void evalPrefixExpression(const std::string &op);

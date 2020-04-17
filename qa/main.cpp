@@ -32,6 +32,7 @@ struct Tests
         tests_.emplace("TestIfElseExpressions", new TestIfElseExpressions);
         tests_.emplace("TestEvalReturnStatements", new TestEvalReturnStatements);
         tests_.emplace("TestErrorHandler", new TestErrorHandler);
+        tests_.emplace("TestFunctionObject", new TestFunctionObject);
     }
 
     ~Tests()

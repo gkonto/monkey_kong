@@ -247,11 +247,11 @@ class ExpressionStatement : public Node
          void setParameters(const std::vector<Identifier *> &parameters) { parameters_ = parameters; }
          const std::vector<Identifier *> &parameters() const { return parameters_; }
          size_t paramSize() const { return parameters_.size(); }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+        virtual void accept(Visitor &v);
      private:
          Token *tok_;
-         std::vector<Identifier *> parameters_;
-         BlockStatement *body_ = nullptr;
+         std::vector<Identifier *> parameters_; //used by object if created
+         BlockStatement *body_ = nullptr;//used by object if created
  };
  
 

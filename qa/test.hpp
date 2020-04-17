@@ -323,6 +323,15 @@ class TestErrorHandler : public Test
 };
 
 
+class TestFunctionObject : public Test
+{
+    public:
+        TestFunctionObject()
+            : Test("TestFunctionObject") {}
+        void execute();
+    private:
+        void run_core(std::string input);
+};
 
 
 

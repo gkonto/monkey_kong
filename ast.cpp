@@ -293,3 +293,7 @@ void Let::accept(Visitor &v) {
 void Identifier::accept(Visitor &v) {
     v.visitIdentifier(this);
 }
+
+void FunctionLiteral::accept(Visitor &v) {
+    v.visitFunctionLiteral(this);
+}

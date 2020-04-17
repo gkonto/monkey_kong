@@ -9,6 +9,8 @@ class Single;
 class Bool;
 class Null;
 class Identifier;
+class BlockStatement;
+class Environment;
 
  #define OBJECT_TYPES\
      X(INTEGER, "INTEGER")\
@@ -59,6 +61,15 @@ struct Single
     explicit Single(char *msg) : type_(ERROR) {
         data.error.msg_ = msg;
     }
+    explicit Single(const std::vector<Identifier *> *parameters, 
+            Environment *env, 
+            BlockStatement *body)
+    : type_(FUNCTION) 
+    {
+        data.function.parameters_ = parameters;
+        data.function.body_ = body;
+        data.function.env_ = env;
+    }
     explicit Single() : type_(NUL) {}
 
     void operator delete(void *p) {
@@ -87,9 +98,11 @@ struct Single
         struct {
             char *msg_;
         } error;
-//        struct {
-//            std::vector<Identifier *> parameters_;
-//        } function;
+        struct {
+            const std::vector<Identifier *> *parameters_;//An auto einai gemato, de prepei na svino to ast!!!
+            BlockStatement *body_; //An auto einai gemato de prepei na sviso to ast!
+            Environment *env_;
+        } function;
     }data;
 };
 
