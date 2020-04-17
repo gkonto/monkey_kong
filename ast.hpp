@@ -54,8 +54,7 @@ class Identifier : public Node
         std::string asString() const;
         const std::string &tokenLiteral() const { return tok_->literal(); }
         const std::string &value() const { return value_; }
-
-        virtual void accept(Visitor &v) { std::cout << "Program: not implemented" << std::endl; }
+        virtual void accept(Visitor &v);
     private:
         Token *tok_;
         std::string value_;

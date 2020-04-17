@@ -263,3 +263,19 @@ void Evaluator::visitLet(Let *a) {
     env_.set(a->name()->value(), val);
 }
 
+void Evaluator::evalIdentifier(Identifier *a) {
+    Single *val = env_.get(a->value());
+    if (!val) {
+        char buffer[80];
+        sprintf(buffer, "identifier not found: %s", a->value().c_str());
+        setResult(new Single(strdup(buffer)));
+        return;
+    }
+    setResult(val);
+}
+
+void Evaluator::visitIdentifier(Identifier *a) {
+    evalIdentifier(a);
+}
+
+

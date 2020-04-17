@@ -22,6 +22,7 @@ class Visitor {
         virtual void visitIfExpression(If *a) = 0;
         virtual void visitReturn(Return *a) = 0;
         virtual void visitLet(Let *a) = 0;
+        virtual void visitIdentifier(Identifier *a) = 0;
     protected:
         Program *root_;
 };
@@ -46,6 +47,7 @@ class Evaluator : public Visitor {
         void visitIfExpression(If *a);
         void visitReturn(Return *a);
         void visitLet(Let *a);
+        void visitIdentifier(Identifier *a);
     private:
         void evalStatements(const std::vector<Node *> &statements);
         void evalPrefixExpression(const std::string &op);
@@ -55,6 +57,7 @@ class Evaluator : public Visitor {
         void evalIntegerInfixExpression(const std::string &op, Single *left, Single *right);
         void evalProgram(Program *a);
         void evalBlockStatement(BlockStatement *a);
+        void evalIdentifier(Identifier *a);
         bool isError(Single *val) const;
         Single *nativeBoolToSingObj(bool input);
         bool isTruthy(Single *obj) const;

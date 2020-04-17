@@ -288,3 +288,8 @@ void Return::accept(Visitor &v) {
 void Let::accept(Visitor &v) {
     v.visitLet(this);
 }
+
+
+void Identifier::accept(Visitor &v) {
+    v.visitIdentifier(this);
+}
