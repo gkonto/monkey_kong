@@ -1,6 +1,7 @@
 #include <string.h>
 #include "visitor.hpp"
 #include "object.hpp"
+#include "env.hpp"
 
 
 //FIXME Delete if not used
@@ -258,5 +259,7 @@ void Evaluator::visitLet(Let *a) {
     if (isError(ret_)) {
         return;
     }
+    Single *val = setResultNull();
+    env_.set(a->name()->value(), val);
 }
 
