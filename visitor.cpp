@@ -1,3 +1,4 @@
+#include <string.h>
 #include "visitor.hpp"
 #include "object.hpp"
 
@@ -16,7 +17,7 @@ void Evaluator::evalStatements(const std::vector<Node *> &statements) {
 void Evaluator::evalBlockStatement(BlockStatement *a) {
     for (auto &s : a->statements()) {
         s->accept(*this);
-        if (ret_ && ret_->type_ == RETURN) {
+        if (ret_ && (ret_->type_ == RETURN || ret_->type_ == ERROR)) {
             return;
         }
     }
@@ -29,12 +30,14 @@ void Evaluator::evalProgram(Program *a) {
             setResult(ret_->data.obj.obj_);
             return;
         }
+        if (ret_->type_ == ERROR) {
+            return;
+        }
     }
 }
 
 
 void Evaluator::visitProgram(Program *a) {
-    const std::vector<Node *> &statements = a->statements();
     evalProgram(a);
 }
 
@@ -68,8 +71,8 @@ void Evaluator::evalBangOperatorExpression() {
 }
 
 void Evaluator::setResult(Single *obj) {
-    if (ret_ && obj != ret_ && ret_ != &Model::false_o && ret_ != &Model::true_o && ret_ != &Model::null_o) {
-        delete ret_;
+    if (ret_ && obj != ret_) {
+        conditionalDelete(ret_);
     }
     ret_ = obj;
 }
@@ -81,10 +84,19 @@ Single *Evaluator::setResultNull() {
     return temp;
 }
 
+void Evaluator::conditionalDelete(Single *del_ent) {
+    if (del_ent != &Model::false_o && del_ent != &Model::true_o &&  del_ent != &Model::null_o) {
+        delete del_ent;
+    }
+}
+
  void Evaluator::evalMinusPrefixOperatorExpression()
  {
      if (ret_->type_ != INTEGER) {
-         setResult(&Model::null_o);
+         char buffer[80];
+         sprintf(buffer, "unknown operator: -%s", object_name[ret_->type_]);
+         setResult(new Single(strdup(buffer)));
+         return;
      }
     ret_->data.integer.value_ = -ret_->data.integer.value_;
  }
@@ -96,7 +108,9 @@ void Evaluator::evalPrefixExpression(const std::string &op) {
     } else if (!op.compare("-")) {
         evalMinusPrefixOperatorExpression();
     } else {
-        setResult(&Model::null_o);
+        char buffer[80];
+        sprintf(buffer, "unknown operator: %s%s", op.c_str(), object_name[ret_->type_] );
+        setResult(new Single(strdup(buffer)));
     }
 }
 
@@ -127,7 +141,9 @@ void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, 
     } else if (!op.compare("!=")) {
         temp = nativeBoolToSingObj(left->data.integer.value_ != right->data.integer.value_);
     } else {
-        setResult(&Model::null_o);
+        char buffer[80];
+        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        temp = new Single(strdup(buffer));
     }
 
     if (temp) {
@@ -140,14 +156,27 @@ void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, 
 }
 
 void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single *right) {
+    Single *temp = nullptr;
     if (left->type_ == INTEGER && right->type_ == INTEGER) {
         evalIntegerInfixExpression(op, left, right);
     } else if (!op.compare("==")) {
         setResult(nativeBoolToSingObj(left == right));
     } else if (!op.compare("!=")) {
        setResult(nativeBoolToSingObj(left != right));
+    } else if (left->type_ != right->type_) {
+        char buffer[80];
+        sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        temp = new Single(strdup(buffer));
     } else {
-        setResult(&Model::null_o);
+        char buffer[80];
+        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        temp = new Single(strdup(buffer));
+    }
+
+    if (temp) {
+       conditionalDelete(left); 
+       conditionalDelete(right); 
+       setResult(temp);
     }
 }
 

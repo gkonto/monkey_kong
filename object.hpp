@@ -54,8 +54,8 @@ struct Single
     explicit Single(Single *val) : type_(RETURN) {
         data.obj.obj_ = val;
     }
-    explicit Single(const std::string &msg) : type_(ERROR) {
-        data.error.msg_ = msg.c_str();
+    explicit Single(char *msg) : type_(ERROR) {
+        data.error.msg_ = msg;
     }
     explicit Single() : type_(NUL) {}
 
@@ -64,6 +64,12 @@ struct Single
             return;
         }
         free(p);
+    }
+
+    ~Single() {
+        if (type_ == ERROR) {
+            free(data.error.msg_);
+        }
     }
 
     ObjType type_;
@@ -78,7 +84,7 @@ struct Single
             Single *obj_;
         } obj;
         struct {
-            const char *msg_;
+            char *msg_;
         } error;
     }data;
 };
