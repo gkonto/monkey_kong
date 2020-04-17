@@ -2,6 +2,7 @@
 #define OBJECT_HPP
 
 #include <string>
+#include <iostream>
 
 class Single;
 class Bool;
@@ -11,7 +12,7 @@ class Null;
      X(INTEGER, "INTEGER")\
      X(BOOLEAN, "BOOLEAN")\
      X(NUL,    "NULL")\
-     X(RETURN_VALUE, "RETURN_VALUE")\
+     X(RETURN, "RETURN")\
      X(ERROR, "ERROR")\
      X(FUNCTION, "FUNCTION")\
      X(STRING, "STRING")\
@@ -42,7 +43,6 @@ namespace Model {
     extern Single null_o;
 }
 
-#include <iostream>
 struct Single
 {
     explicit Single(int value) : type_(INTEGER) {
@@ -50,6 +50,12 @@ struct Single
     }
     explicit Single(bool value) : type_(BOOLEAN) {
         data.boolean.value_ = value;
+    }
+    explicit Single(Single *val) : type_(RETURN) {
+        data.obj.obj_ = val;
+    }
+    explicit Single(const std::string &msg) : type_(ERROR) {
+        data.error.msg_ = msg.c_str();
     }
     explicit Single() : type_(NUL) {}
 
@@ -68,6 +74,12 @@ struct Single
         struct {
             bool value_;
         } boolean;
+        struct {
+            Single *obj_;
+        } obj;
+        struct {
+            const char *msg_;
+        } error;
     }data;
 };
 
@@ -90,7 +102,6 @@ struct Integer : public Object
 };
 
 
-#include <iostream>
 struct Bool : public Object
 {
     void operator delete(void *p) {

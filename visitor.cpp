@@ -2,15 +2,40 @@
 #include "object.hpp"
 
 
+//FIXME Delete if not used
 void Evaluator::evalStatements(const std::vector<Node *> &statements) {
     for (auto &s : statements) {
         s->accept(*this);
+        if (ret_->type_ == RETURN) {
+            setResult(ret_->data.obj.obj_);
+            return;
+        }
     }
 }
 
+void Evaluator::evalBlockStatement(BlockStatement *a) {
+    for (auto &s : a->statements()) {
+        s->accept(*this);
+        if (ret_ && ret_->type_ == RETURN) {
+            return;
+        }
+    }
+}
+
+void Evaluator::evalProgram(Program *a) {
+    for (auto &s : a->statements()) {
+        s->accept(*this);
+        if (ret_->type_ == RETURN) {
+            setResult(ret_->data.obj.obj_);
+            return;
+        }
+    }
+}
+
+
 void Evaluator::visitProgram(Program *a) {
     const std::vector<Node *> &statements = a->statements();
-    evalStatements(statements);
+    evalProgram(a);
 }
 
 void Evaluator::visitIntegerLiteral(IntegerLiteral *a) {
@@ -137,7 +162,7 @@ void Evaluator::visitInfixExpression(InfixExpression *a) {
 
 
 void Evaluator::visitBlockStatement(BlockStatement *a) {
-    evalStatements(a->statements());
+    evalBlockStatement(a);
 }
 
 
@@ -166,5 +191,11 @@ void Evaluator::visitIfExpression(If *a) {
     }
 
     delete cond;
+}
+
+void Evaluator::visitReturn(Return *a) {
+    a->value()->accept(*this);
+    Single *val = setResultNull();
+    setResult(new Single(val));
 }
 

@@ -95,7 +95,7 @@ class Return : public Node
         const std::string &tokenLiteral() const { return token_->literal(); }
         void setReturnVal(Node *exp) { returnValue_ = exp; }
         Node *value() const { return returnValue_; }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+        virtual void accept(Visitor &v);
     private:
         Token *token_; // The return statement
         Node *returnValue_;

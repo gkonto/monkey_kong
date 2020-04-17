@@ -280,3 +280,7 @@ void If::accept(Visitor &v) {
 void BlockStatement::accept(Visitor &v) {
     v.visitBlockStatement(this);
 }
+
+void Return::accept(Visitor &v) {
+    v.visitReturn(this);
+}

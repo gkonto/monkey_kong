@@ -19,6 +19,7 @@ class Visitor {
         virtual void visitInfixExpression(InfixExpression *a) = 0;
         virtual void visitBlockStatement(BlockStatement *a) = 0;
         virtual void visitIfExpression(If *a) = 0;
+        virtual void visitReturn(Return *a) = 0;
     protected:
         Program *root_;
 };
@@ -41,6 +42,7 @@ class Evaluator : public Visitor {
         void visitInfixExpression(InfixExpression *a);
         void visitBlockStatement(BlockStatement *a);
         void visitIfExpression(If *a);
+        void visitReturn(Return *a);
     private:
         void evalStatements(const std::vector<Node *> &statements);
         void evalPrefixExpression(const std::string &op);
@@ -48,6 +50,8 @@ class Evaluator : public Visitor {
         void evalMinusPrefixOperatorExpression();
         void evalInfixExpression(const std::string &op, Single *left, Single *right);
         void evalIntegerInfixExpression(const std::string &op, Single *left, Single *right);
+        void evalProgram(Program *a);
+        void evalBlockStatement(BlockStatement *a);
         Single *nativeBoolToSingObj(bool input);
         bool isTruthy(Single *obj) const;
 
