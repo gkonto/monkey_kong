@@ -20,6 +20,7 @@ class Visitor {
         virtual void visitBlockStatement(BlockStatement *a) = 0;
         virtual void visitIfExpression(If *a) = 0;
         virtual void visitReturn(Return *a) = 0;
+        virtual void visitLet(Let *a) = 0;
     protected:
         Program *root_;
 };
@@ -43,6 +44,7 @@ class Evaluator : public Visitor {
         void visitBlockStatement(BlockStatement *a);
         void visitIfExpression(If *a);
         void visitReturn(Return *a);
+        void visitLet(Let *a);
     private:
         void evalStatements(const std::vector<Node *> &statements);
         void evalPrefixExpression(const std::string &op);

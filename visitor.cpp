@@ -253,3 +253,10 @@ bool Evaluator::isError(Single *val) const {
     return false;
 } 
 
+void Evaluator::visitLet(Let *a) {
+    a->value()->accept(*this);
+    if (isError(ret_)) {
+        return;
+    }
+}
+

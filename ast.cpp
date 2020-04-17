@@ -284,3 +284,7 @@ void BlockStatement::accept(Visitor &v) {
 void Return::accept(Visitor &v) {
     v.visitReturn(this);
 }
+
+void Let::accept(Visitor &v) {
+    v.visitLet(this);
+}

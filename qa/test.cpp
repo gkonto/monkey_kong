@@ -837,12 +837,10 @@ void TestEvalIntegerExpression::run_core(std::string input, int expected)
      run_core("3 * 3 * 3 + 10", 37);
      run_core("3 * (3 * 3) + 10", 37);
      run_core("(5 + 10 * 2 + 15 / 3) * 2 + -10", 50);
-     /*
      run_core("let a = 5; a;", 5);
      run_core("let a = 5 * 5; a;", 25);
      run_core("let a = 5; let b = a; b;", 5);
      run_core("let a = 5; let b = a; let c = a + b + 5; c;", 15);
-     */
  }
 
 void TestEvalBooleanExpression::execute()
@@ -994,8 +992,8 @@ void TestErrorHandler::execute()
                 "}"
                 "return 1;"
             "}","unknown operator: BOOLEAN + BOOLEAN");
-    /*
     run_core("foobar", "identifier not found: foobar");
+    /*
     run_core("\"Hello\" - \"World\"", "unknown operator: OBJ_STRING - OBJ_STRING");
     run_core("{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key: OBJ_FUNCTION");
     */

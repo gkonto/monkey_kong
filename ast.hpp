@@ -76,7 +76,7 @@ class Let : public Node
         const std::string &identName() const { return name_->value(); }
         Node *value() const { return value_; }
         void setValue(Node *exp) { value_ = exp; }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+        virtual void accept(Visitor &v);
     private:
         Token *tok_;
         Identifier *name_;   // the identifier's name
