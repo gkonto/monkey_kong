@@ -838,7 +838,6 @@ void TestEvalIntegerExpression::run_core(std::string input, int expected)
      run_core("3 * (3 * 3) + 10", 37);
      run_core("(5 + 10 * 2 + 15 / 3) * 2 + -10", 50);
      /*
- 
      run_core("let a = 5; a;", 5);
      run_core("let a = 5 * 5; a;", 25);
      run_core("let a = 5; let b = a; b;", 5);
@@ -982,7 +981,6 @@ void TestEvalReturnStatements::run_core(std::string input, int expected)
 void TestErrorHandler::execute()
 {
     run_core("5 + true;", "type mismatch: INTEGER + BOOLEAN");
-    /*
     run_core("5 + true;", "type mismatch: INTEGER + BOOLEAN");
     run_core("5 + true;", "type mismatch: INTEGER + BOOLEAN");
     run_core( "5 + true; 5;","type mismatch: INTEGER + BOOLEAN");
@@ -996,6 +994,7 @@ void TestErrorHandler::execute()
                 "}"
                 "return 1;"
             "}","unknown operator: BOOLEAN + BOOLEAN");
+    /*
     run_core("foobar", "identifier not found: foobar");
     run_core("\"Hello\" - \"World\"", "unknown operator: OBJ_STRING - OBJ_STRING");
     run_core("{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key: OBJ_FUNCTION");

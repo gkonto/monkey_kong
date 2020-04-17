@@ -116,6 +116,9 @@ void Evaluator::evalPrefixExpression(const std::string &op) {
 
 void Evaluator::visitPrefixExpression(PrefixExpression *a) {
     a->right()->accept(*this);
+    if (isError(ret_)) {
+        return;
+    }
     evalPrefixExpression(a->operator_s());
 }
 
@@ -183,8 +186,15 @@ void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single 
 
 void Evaluator::visitInfixExpression(InfixExpression *a) {
     a->lhs()->accept(*this);
+    if (isError(ret_)) {
+        return;
+    }
     Single *left = setResultNull();
     a->rhs()->accept(*this);
+
+    if (isError(ret_)) {
+        return;
+    }
     Single *right = setResultNull();
     evalInfixExpression(a->op(), left, right);
 }
@@ -210,6 +220,10 @@ bool Evaluator::isTruthy(Single *obj) const {
 
 void Evaluator::visitIfExpression(If *a) {
     a->condition()->accept(*this);
+
+    if (isError(ret_)) {
+        return;
+    }
     Single *cond = setResultNull();
     if (isTruthy(cond)) {
         a->consequence()->accept(*this);
@@ -224,7 +238,18 @@ void Evaluator::visitIfExpression(If *a) {
 
 void Evaluator::visitReturn(Return *a) {
     a->value()->accept(*this);
+    if (isError(ret_)) {
+        return;
+    }
     Single *val = setResultNull();
     setResult(new Single(val));
 }
+
+
+bool Evaluator::isError(Single *val) const {
+    if (val) {
+        return val->type_ == ERROR;
+    }
+    return false;
+} 
 

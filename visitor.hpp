@@ -52,6 +52,7 @@ class Evaluator : public Visitor {
         void evalIntegerInfixExpression(const std::string &op, Single *left, Single *right);
         void evalProgram(Program *a);
         void evalBlockStatement(BlockStatement *a);
+        bool isError(Single *val) const;
         Single *nativeBoolToSingObj(bool input);
         bool isTruthy(Single *obj) const;
 
