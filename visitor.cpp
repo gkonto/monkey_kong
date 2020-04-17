@@ -26,11 +26,11 @@ void Evaluator::evalBlockStatement(BlockStatement *a) {
 void Evaluator::evalProgram(Program *a) {
     for (auto &s : a->statements()) {
         s->accept(*this);
-        if (ret_->type_ == RETURN) {
+        if (ret_ && ret_->type_ == RETURN) {
             setResult(ret_->data.obj.obj_);
             return;
         }
-        if (ret_->type_ == ERROR) {
+        if (ret_ && ret_->type_ == ERROR) {
             return;
         }
     }

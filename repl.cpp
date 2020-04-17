@@ -6,6 +6,7 @@
 #include "argparser.hpp"
 #include "repl.hpp"
 #include "ast.hpp"
+#include "env.hpp"
 #include "visitor.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
@@ -26,6 +27,7 @@ void Repl::start(bool calc_t)
 {
     greeting();
 
+    Environment env;
     while (true) {
         // Get input
         string input;
@@ -37,7 +39,7 @@ void Repl::start(bool calc_t)
         Parser p(&lex);
         std::unique_ptr<Program> prog = p.parseProgram();
 
-        Evaluator evaluator(prog.get());
+        Evaluator evaluator(prog.get(), env);
         Single *obj = evaluator.eval();
 
         auto end = high_resolution_clock::now();

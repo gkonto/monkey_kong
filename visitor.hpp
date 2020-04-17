@@ -2,6 +2,7 @@
 #define VISITOR_HPP
 
 class Single;
+class Environment;
 
 #include "object.hpp"
 #include "ast.hpp"
@@ -27,8 +28,8 @@ class Visitor {
 
 class Evaluator : public Visitor {
     public:
-        explicit Evaluator(Program *root) 
-            : Visitor(root) {}
+        explicit Evaluator(Program *root, Environment &env) 
+            : Visitor(root), env_(env) {}
         
         Single *eval() { 
             visitProgram(root_); 
@@ -63,6 +64,7 @@ class Evaluator : public Visitor {
         void conditionalDelete(Single *del_ent);
 
         Single *ret_ = nullptr; // TODO encapsulate so  that cannot be modified without dellocation
+        Environment &env_;
 };
 
 #endif

@@ -2,7 +2,7 @@
 #include "object.hpp"
 
 //FIXME code cleanup. Messy condition statements
-Single *Environment::get(const string &key) const
+Single *Environment::get(const std::string &key) const
 {
     auto entry = store_.find(key);
 
@@ -17,7 +17,7 @@ Single *Environment::get(const string &key) const
 }
 
 
-Single *Environment::set(const string &key, Single *entry)
+Single *Environment::set(const std::string &key, Single *entry)
 {
     /*
     using namespace StandardObjects;
@@ -31,7 +31,7 @@ Single *Environment::set(const string &key, Single *entry)
         }
     }
     */
-    store_[key] = cl;
+    store_[key] = entry;
 
     return entry;
 }

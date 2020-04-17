@@ -11,6 +11,7 @@
 #include "../lexer.hpp"
 #include "../ast.hpp"
 #include "../parser.hpp"
+#include "../env.hpp"
 #include "../pool.hpp"
 #include "../object.hpp"
 
@@ -808,7 +809,8 @@ Single *Test::eval(const std::string &input)
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 
-     Evaluator evaluator(program.get());
+     Environment env;
+     Evaluator evaluator(program.get(), env);
      Single *ret = evaluator.eval();
      return ret;
 }
@@ -1003,6 +1005,10 @@ void TestErrorHandler::execute()
 void TestErrorHandler::run_core(std::string input, std::string expected_e)
 {
     Single *evaluated = eval(input);
+    if (!evaluated) {
+        errorf(input, "evaluted object is nullptr\n");
+        return;
+    }
 
     if (evaluated->type_ != ERROR) {
         errorf(input, "no error object returned.\n");
