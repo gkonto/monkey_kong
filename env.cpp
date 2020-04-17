@@ -38,3 +38,10 @@ Single *Environment::set(const std::string &key, Single *entry)
 }
 
 
+Environment::~Environment() {
+    for (auto &a : store_) {
+        delete a.second;
+    }
+}
+
+

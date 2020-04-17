@@ -7,6 +7,7 @@ class Single;
 
 class Environment {
     public:
+        ~Environment();
         Single *get(const std::string &key) const;
         Single *set(const std::string &key, Single *entry);
     private:

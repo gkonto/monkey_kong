@@ -13,12 +13,13 @@ class Node;
 class Program;
 class Single;
 struct Test;
+class Environment;
 
 struct Test
 {
     Test(std::string name) : name_(name) {}
     virtual ~Test() {};
-    Single *eval(const std::string &input);
+    Single *eval(const std::string &input, Environment &env);
     std::string report_errors() const;
     virtual void execute() = 0;
     void errorf(std::string input_case, const char *fmt, ...);

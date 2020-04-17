@@ -132,13 +132,13 @@ void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, 
     Single *temp = nullptr;
 
     if (!op.compare("+")) {
-        left->data.integer.value_ += right->data.integer.value_;
+        temp = new Single(left->data.integer.value_ + right->data.integer.value_);
     } else if (!op.compare("-")) {
-        left->data.integer.value_ -= right->data.integer.value_;
+        temp = new Single(left->data.integer.value_ - right->data.integer.value_);
     } else if (!op.compare("*")) {
-        left->data.integer.value_ *= right->data.integer.value_;
+        temp = new Single(left->data.integer.value_ * right->data.integer.value_);
     } else if (!op.compare("/")) {
-        left->data.integer.value_ /= right->data.integer.value_;
+        temp = new Single(left->data.integer.value_ / right->data.integer.value_);
     } else if (!op.compare("<")) {
         temp = nativeBoolToSingObj(left->data.integer.value_ < right->data.integer.value_);
     } else if (!op.compare(">")) {
@@ -154,12 +154,10 @@ void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, 
     }
 
     if (temp) {
-        conditionalDelete(left);
         setResult(temp);
-    } else {
-        setResult(left);
     }
     conditionalDelete(right);
+    conditionalDelete(left);
 }
 
 void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single *right) {

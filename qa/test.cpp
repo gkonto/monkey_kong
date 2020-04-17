@@ -803,13 +803,12 @@ void TestIntegerLiteralExpression::execute()
  }
 
 
-Single *Test::eval(const std::string &input)
+Single *Test::eval(const std::string &input, Environment &env)
 {
      Lexer l(input);
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 
-     Environment env;
      Evaluator evaluator(program.get(), env);
      Single *ret = evaluator.eval();
      return ret;
@@ -817,7 +816,8 @@ Single *Test::eval(const std::string &input)
 
 void TestEvalIntegerExpression::run_core(std::string input, int expected)
  {
-     Single *evaluated = eval(input);
+     Environment env;
+     Single *evaluated = eval(input, env);
      testIntegerObject(input, evaluated, expected);
      delete evaluated;
  }
@@ -872,7 +872,8 @@ void TestEvalBooleanExpression::execute()
 
 void TestEvalBooleanExpression::run_core(std::string input, bool expected)
 {
-    Single *evaluated = eval(input);
+    Environment env;
+    Single *evaluated = eval(input, env);
     testBooleanObject(input, evaluated, expected);
     delete evaluated;
 }
@@ -912,7 +913,8 @@ void TestBangOperator::execute()
 
 void TestBangOperator::run_core(std::string input, bool expected)
 {
-    Single *evaluated = eval(input);
+    Environment env;
+    Single *evaluated = eval(input, env);
     testBooleanObject(input, evaluated, expected);
     delete evaluated;
 }
@@ -943,13 +945,15 @@ bool Test::testNullObject(const std::string &input, Single *obj)
 
 void TestIfElseExpressions::run_core(std::string input)
 {
-    Single *evaluated = eval(input);
+    Environment env;
+    Single *evaluated = eval(input, env);
     testNullObject(input, evaluated);
 }
 
 void TestIfElseExpressions::run_core(std::string input, int expected)
 {
-    Single *evaluated = eval(input);
+    Environment env;
+    Single *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
     delete evaluated;
 }
@@ -973,7 +977,8 @@ void TestEvalReturnStatements::execute()
 
 void TestEvalReturnStatements::run_core(std::string input, int expected)
 {
-    Single *evaluated = eval(input);
+    Environment env;
+    Single *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
     delete evaluated;
 }
@@ -1005,7 +1010,8 @@ void TestErrorHandler::execute()
 
 void TestErrorHandler::run_core(std::string input, std::string expected_e)
 {
-    Single *evaluated = eval(input);
+    Environment env;
+    Single *evaluated = eval(input, env);
     if (!evaluated) {
         errorf(input, "evaluted object is nullptr\n");
         return;
