@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <numeric>
+#include <string.h>
 #include <stdarg.h>
 #include <memory>
 #include "test.hpp"
@@ -977,4 +978,43 @@ void TestEvalReturnStatements::run_core(std::string input, int expected)
     delete evaluated;
 }
 
+
+void TestErrorHandler::execute()
+{
+    run_core("5 + true;", "type mismatch: INTEGER + BOOLEAN");
+    /*
+    run_core("5 + true;", "type mismatch: INTEGER + BOOLEAN");
+    run_core("5 + true;", "type mismatch: INTEGER + BOOLEAN");
+    run_core( "5 + true; 5;","type mismatch: INTEGER + BOOLEAN");
+    run_core("-true","unknown operator: -BOOLEAN");
+    run_core("true + false;","unknown operator: BOOLEAN + BOOLEAN");
+    run_core("5; true + false; 5","unknown operator: BOOLEAN + BOOLEAN");
+    run_core("if (10 > 1) { true + false; }","unknown operator: BOOLEAN + BOOLEAN");
+    run_core("if (10 > 1) {"
+                "if (10 > 1) {"
+                    "return true + false;"
+                "}"
+                "return 1;"
+            "}","unknown operator: BOOLEAN + BOOLEAN");
+    run_core("foobar", "identifier not found: foobar");
+    run_core("\"Hello\" - \"World\"", "unknown operator: OBJ_STRING - OBJ_STRING");
+    run_core("{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key: OBJ_FUNCTION");
+    */
+}
+
+
+void TestErrorHandler::run_core(std::string input, std::string expected_e)
+{
+    Single *evaluated = eval(input);
+
+    if (evaluated->type_ != ERROR) {
+        errorf(input, "no error object returned.\n");
+        return;
+    }
+
+    if (expected_e.compare(evaluated->data.error.msg_)) {
+        errorf(input, "wrong error message. Expected '%s', got '%s'\n", expected_e.c_str(), evaluated->data.error.msg_);
+    }
+    delete evaluated;
+}
 

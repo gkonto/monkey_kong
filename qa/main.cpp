@@ -31,6 +31,7 @@ struct Tests
         tests_.emplace("TestBangOperator", new TestBangOperator);
         tests_.emplace("TestIfElseExpressions", new TestIfElseExpressions);
         tests_.emplace("TestEvalReturnStatements", new TestEvalReturnStatements);
+        tests_.emplace("TestErrorHandler", new TestErrorHandler);
     }
 
     ~Tests()

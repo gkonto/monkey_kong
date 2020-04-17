@@ -311,6 +311,19 @@ class TestEvalReturnStatements : public Test
 };
 
 
+class TestErrorHandler : public Test
+{
+    public:
+        TestErrorHandler()
+            : Test("TestErrorHandler") {}
+        void execute();
+    private:
+        void run_core(std::string input, std::string expected);
+};
+
+
+
+
 
 
 #endif
