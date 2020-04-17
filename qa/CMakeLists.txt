@@ -17,6 +17,7 @@
      ../ast.hpp
      ../parser.hpp
      ../pool.hpp
+     ../env.hpp
      test.hpp
     )
  set(SOURCES
@@ -28,6 +29,7 @@
      ../ast.cpp
      ../visitor.cpp
      ../parser.cpp
+     ../env.cpp
      test.cpp
      main.cpp
      )

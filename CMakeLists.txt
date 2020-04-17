@@ -16,6 +16,7 @@
      object.hpp
      visitor.hpp
      ast.hpp
+     env.hpp
      parser.hpp
     )
  set(SOURCES
@@ -27,6 +28,7 @@
      symbols.cpp
      visitor.cpp
      argparser.cpp
+     env.cpp
      token.cpp
      repl.cpp
      )
