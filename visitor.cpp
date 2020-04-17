@@ -86,7 +86,10 @@ Single *Evaluator::setResultNull() {
 }
 
 void Evaluator::conditionalDelete(Single *del_ent) {
-    if (del_ent != &Model::false_o && del_ent != &Model::true_o &&  del_ent != &Model::null_o) {
+    if (!del_ent->used_ &&
+         del_ent != &Model::false_o && 
+         del_ent != &Model::true_o &&  
+         del_ent != &Model::null_o) {
         delete del_ent;
     }
 }
@@ -151,12 +154,12 @@ void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, 
     }
 
     if (temp) {
-        delete left;
+        conditionalDelete(left);
         setResult(temp);
     } else {
         setResult(left);
     }
-    delete right;
+    conditionalDelete(right);
 }
 
 void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single *right) {
@@ -234,7 +237,7 @@ void Evaluator::visitIfExpression(If *a) {
         setResult(&Model::null_o);
     }
 
-    delete cond;
+    conditionalDelete(cond);
 }
 
 void Evaluator::visitReturn(Return *a) {

@@ -60,19 +60,18 @@ struct Single
     explicit Single() : type_(NUL) {}
 
     void operator delete(void *p) {
+        Single *o = static_cast<Single *>(p);
         if (p == &Model::false_o || p == &Model::true_o || p == &Model::null_o) {
             return;
+        }
+        if (o->type_ == ERROR) {
+            free(o->data.error.msg_);
         }
         free(p);
     }
 
-    ~Single() {
-        if (type_ == ERROR) {
-            free(data.error.msg_);
-        }
-    }
-
     ObjType type_;
+    bool used_ = false;
     union {
         struct {
             int value_;

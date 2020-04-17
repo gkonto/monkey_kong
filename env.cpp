@@ -32,6 +32,7 @@ Single *Environment::set(const std::string &key, Single *entry)
     }
     */
     store_[key] = entry;
+    entry->used_ = true;
 
     return entry;
 }
