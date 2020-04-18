@@ -313,6 +313,11 @@ void Evaluator::applyFunction(Single *fn, std::vector<Single *> &args) {
     env_ = extendedEnv->outer();
     unwrapReturnValue();
 
+    extendedEnv->erase(ret_);
+    ret_->used_ = false;
+    if (!fn->used_) {
+        DeleteSingle(fn);
+    }
     delete extendedEnv;
 }
 

@@ -1091,20 +1091,18 @@ void TestFunctionApplication::run_core(std::string input, int expected)
     Environment env;
     Single *ret = eval(input, env);
     testIntegerObject(input, ret, expected);
-    if (ret->used_) {
+    if (!ret->used_) {
         DeleteSingle(ret);
     }
 }
 
 void TestFunctionApplication::execute()
 {
-    //run_core("let identity = fn(x) { x; }; identity(11);", 11);
-    /*
+    run_core("let identity = fn(x) { x; }; identity(11);", 11);
     run_core("let identity = fn(x) { return x; }; identity(12);", 12);
     run_core("let ouble = fn(x) { x * 2; }; ouble(7);", 14);
     run_core("let add = fn(x, y) { x + y; }; add(10, 5);", 15);
     run_core("let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20);
     run_core("fn(x) { x; }(90)", 90);
-    */
 }
 

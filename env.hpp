@@ -14,6 +14,7 @@ class Environment {
         Single *get(const std::string &key) const;
         Single *set(const std::string &key, Single *entry);
         Environment *outer() const { return outer_; }
+        void erase(Single *entity);
     private:
         std::unordered_map<std::string, Single *> store_;
         std::unordered_set<Single *> singles_;

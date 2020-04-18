@@ -16,6 +16,11 @@ Single *Environment::get(const std::string &key) const
     return entry->second;
 }
 
+void Environment::erase(Single *entity) {
+    if (entity) {
+        singles_.erase(entity);
+    }
+}
 
 Single *Environment::set(const std::string &key, Single *entry)
 {
