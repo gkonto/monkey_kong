@@ -355,6 +355,17 @@ class CheckFibonacciTime : public Test
 
 
 
+class TestClosures : public Test
+{
+    public:
+        TestClosures() : Test("TestClosures") {}
+        void execute();
+    private:
+};
+
+
+
+
 
 
 #endif

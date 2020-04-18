@@ -315,6 +315,7 @@ void Evaluator::applyFunction(Single *fn, std::vector<Single *> &args) {
 
     extendedEnv->erase(ret_);
     ret_->used_ = false;
+
     if (!fn->used_) {
         DeleteSingle(fn);
     }

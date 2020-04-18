@@ -1159,3 +1159,20 @@ void CheckFibonacciTime::execute() {
         DeleteSingle(ret);
     }
 }
+
+
+void TestClosures::execute()
+{
+    std::string input("let newAdder = fn(x) {"
+                            "fn(y) { x + y };"
+                        "};"
+                        "let addTwo = newAdder(2);"
+                        "addTwo(2);");
+
+    Environment env;
+    Single *ret = eval(input, env);
+    testIntegerObject(input, ret, 4);
+    if (!ret->used_) {
+        DeleteSingle(ret);
+    }
+}
