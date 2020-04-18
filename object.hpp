@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-class Single;
+struct Single;
 class Bool;
 class Null;
 class Identifier;
@@ -72,17 +72,6 @@ struct Single
     }
     explicit Single() : type_(NUL) {}
 
-    void operator delete(void *p) {
-        Single *o = static_cast<Single *>(p);
-        if (p == &Model::false_o || p == &Model::true_o || p == &Model::null_o) {
-            return;
-        }
-        if (o->type_ == ERROR) {
-            free(o->data.error.msg_);
-        }
-        free(p);
-    }
-
     ObjType type_;
     bool used_ = false;
     union {
@@ -106,48 +95,7 @@ struct Single
     }data;
 };
 
- struct Object
- {
-     //virtual ~Object() {}
-     //void operator delete(void *p) {}
-     virtual ObjType type() const = 0;
-     virtual std::string inspect() const = 0;
- };
-
-struct Integer : public Object
-{
-    explicit Integer(int val) : value_(val) {}
-    ObjType type() const { return INTEGER; }
-    std::string inspect() const;
-    int value() const { return value_; }
-
-    int value_;
-};
-
-
-struct Bool : public Object
-{
-    void operator delete(void *p) {
-        std::cout << "Bool Overloading delete operator" << std::endl;
-    }
-    explicit Bool(bool val) : value_(val) {}
-    ObjType type() const { return BOOLEAN; }
-    std::string inspect() const;
-    bool value() const { return value_; }
-
-    bool value_;
-};
-
-struct Null : public Object
-{
-    void operator delete(void *p) {
-        std::cout << "Overloading delete operator" << std::endl;
-    }
-    ObjType type() const { return NUL; }
-    std::string inspect() const { return "nullptr"; }
-};
-
-
+void DeleteSingle(Single *p);
 
 
 #endif

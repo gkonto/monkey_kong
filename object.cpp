@@ -8,16 +8,15 @@ namespace Model {
     Single null_o;
 }
 
-std::string Integer::inspect() const {
-    std::stringstream ss;
-    ss << value_;
-    return ss.str();
-}
-
-std::string Bool::inspect() const {
-    std::stringstream ss;
-    ss << value_;
-    return ss.str();
+void DeleteSingle(Single *p)
+{
+    if (p == &Model::false_o || p == &Model::true_o || p == &Model::null_o) {
+        return;
+    }
+    if (p->type_ == ERROR) {
+        free(p->data.error.msg_);
+    }
+    delete (p);
 }
 
 
