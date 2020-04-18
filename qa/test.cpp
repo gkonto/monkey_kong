@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <chrono>
 #include <string>
 #include <numeric>
 #include <string.h>
@@ -16,6 +17,7 @@
 #include "../object.hpp"
 
 using namespace std;
+using namespace std::chrono;
 
 std::unique_ptr<Program> Test::parse(const std::string &input)
 {
@@ -57,6 +59,25 @@ void Test::errorf(std::string input_case, const char *fmt, ...)
     is_failed_ = true;
 }
 
+
+void Test::msgf(std::string input_case, const char *fmt, ...)
+{
+     char buffer[4096];
+     va_list args;
+     va_start(args, fmt);
+     vsnprintf(buffer, sizeof(buffer), fmt, args);
+     va_end(args);
+     string msg;
+     if (input_case.compare("")) {
+         if (input_case.length() > 40) {
+            msg.append("[!] Case -> " + input_case.substr(0, 40) + " ... \n");
+         } else {
+             msg.append("[!] Case -> " + input_case + "\n");
+         }
+     }
+    msg.append(buffer);
+    errors_.emplace_back(msg);
+}
 
 void TestNextToken::execute()
 {
@@ -1106,3 +1127,35 @@ void TestFunctionApplication::execute()
     run_core("fn(x) { x; }(90)", 90);
 }
 
+
+void CheckFibonacciTime::execute() {
+    //std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(25);");
+    //std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(30);");
+    std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(33);");
+
+    //fib(25) 75025
+    //fib(30) 832040
+    //fib(33) 3524578
+    Environment env;
+
+
+    Lexer l(input);
+    Parser p(&l);
+    std::unique_ptr<Program> program = p.parseProgram();
+
+    Evaluator evaluator(program.get(), &env);
+
+    auto start = high_resolution_clock::now();
+    Single *ret = evaluator.eval();
+    auto end = high_resolution_clock::now();
+    auto time_elapsed = duration_cast<milliseconds>(end - start);
+    //testIntegerObject(input, ret, 75025);
+    //testIntegerObject(input, ret, 832040);
+    testIntegerObject(input, ret, 3524578);
+    if (!is_failed_) {
+        std::cout << "fib(33): Time elapsed: " << time_elapsed.count() << " millisec" << std::endl;
+    }
+    if (!ret->used_) {
+        DeleteSingle(ret);
+    }
+}

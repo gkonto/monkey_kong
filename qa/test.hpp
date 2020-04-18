@@ -23,6 +23,7 @@ struct Test
     std::string report_errors() const;
     virtual void execute() = 0;
     void errorf(std::string input_case, const char *fmt, ...);
+    void msgf(std::string input_case, const char *fmt, ...);
     std::unique_ptr<Program> parse(const std::string &input);
 
     bool testLiteralExpression(const std::string &input, Node *exp, bool expected);
@@ -341,6 +342,15 @@ class TestFunctionApplication : public Test
         void execute();
     private:
         void run_core(std::string input, int expected);
+};
+
+
+class CheckFibonacciTime : public Test
+{
+    public:
+        CheckFibonacciTime() : Test("CheckFibonacciTime") {}
+        void execute();
+    private:
 };
 
 
