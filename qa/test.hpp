@@ -334,6 +334,17 @@ class TestFunctionObject : public Test
 };
 
 
+class TestFunctionApplication : public Test
+{
+    public:
+        TestFunctionApplication() : Test("TestFunctionApplication") {}
+        void execute();
+    private:
+        void run_core(std::string input, int expected);
+};
+
+
+
 
 
 #endif

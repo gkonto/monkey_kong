@@ -8,9 +8,12 @@ class Single;
 
 class Environment {
     public:
+        Environment() = default;
+        explicit Environment(Environment *outer) : outer_(outer) {}
         ~Environment();
         Single *get(const std::string &key) const;
         Single *set(const std::string &key, Single *entry);
+        Environment *outer() const { return outer_; }
     private:
         std::unordered_map<std::string, Single *> store_;
         std::unordered_set<Single *> singles_;

@@ -297,3 +297,7 @@ void Identifier::accept(Visitor &v) {
 void FunctionLiteral::accept(Visitor &v) {
     v.visitFunctionLiteral(this);
 }
+
+void CallExpression::accept(Visitor &v) {
+    v.visitCallExpression(this);
+}

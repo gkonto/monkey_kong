@@ -261,11 +261,11 @@ void Evaluator::visitLet(Let *a) {
         return;
     }
     Single *val = setResultNull();
-    env_.set(a->name()->value(), val);
+    env_->set(a->name()->value(), val);
 }
 
 void Evaluator::evalIdentifier(Identifier *a) {
-    Single *val = env_.get(a->value());
+    Single *val = env_->get(a->value());
     if (!val) {
         char buffer[80];
         sprintf(buffer, "identifier not found: %s", a->value().c_str());
@@ -281,8 +281,77 @@ void Evaluator::visitIdentifier(Identifier *a) {
 
 
 void Evaluator::visitFunctionLiteral(FunctionLiteral *a) {
-    Single *o = new Single(&a->parameters(), &env_, a->body());
+    Single *o = new Single(&a->parameters(), env_, a->body());
     setResult(o);
+}
+
+void Evaluator::evalExpressions(const std::vector<Node *> &args, Environment *env, std::vector<Single *> &arg_to_return) {
+    for (size_t i = 0; i < args.size(); i++) {
+        args[i]->accept(*this);
+        Single *evaluated = setResultNull();
+        if (isError(evaluated)) {
+            arg_to_return.resize(1);
+            arg_to_return[0] = evaluated;
+            return;
+        }
+        arg_to_return[i] = evaluated;
+    } 
+}
+
+void Evaluator::applyFunction(Single *fn, std::vector<Single *> &args) {
+    if (fn->type_ != FUNCTION) {
+        char buffer[80];
+        sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
+        setResult(new Single(strdup(buffer)));
+        return;
+    }
+    
+
+    Environment *extendedEnv = extendFunctionEnv(fn, args);
+    env_ = extendedEnv;
+    fn->data.function.body_->accept(*this);
+    env_ = extendedEnv->outer();
+    unwrapReturnValue();
+
+    delete extendedEnv;
+}
+
+void Evaluator::unwrapReturnValue() {
+    if (ret_->type_ != RETURN) {
+        return;
+    }
+    setResult(ret_->data.obj.obj_);
+}
+
+
+
+Environment *Evaluator::extendFunctionEnv(Single *fn, std::vector<Single *> &args)
+{
+    Environment *env = new Environment(env_);//FIXME deallocate?
+    std::vector<Identifier *> &params = *(fn->data.function.parameters_);
+    for (size_t i = 0; i < params.size(); i++) {
+        Identifier *iden = params[i];
+        env->set(iden->value(), args[i]);
+    }
+
+    return env;
+}
+
+
+
+void Evaluator::visitCallExpression(CallExpression *a) {
+    a->function()->accept(*this);
+    if (isError(ret_)) {
+        return;
+    }
+
+    Single *fn = setResultNull();
+    std::vector<Single *> args(a->size());
+    evalExpressions(a->arguments(), env_, args);
+    if (args.size() == 1 && isError(args[0])) {
+        setResult(args[0]);
+    }
+    applyFunction(fn, args);
 }
 
 

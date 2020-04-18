@@ -809,7 +809,7 @@ Single *Test::eval(const std::string &input, Environment &env)
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 
-     Evaluator evaluator(program.get(), env);
+     Evaluator evaluator(program.get(), &env);
      Single *ret = evaluator.eval();
      return ret;
 }
@@ -1055,7 +1055,7 @@ void TestFunctionObject::run_core(std::string input)
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 
-     Evaluator evaluator(program.get(), env);
+     Evaluator evaluator(program.get(), &env);
      Single *fn = evaluator.eval();
     if (!fn->type_) {
         errorf(input, "object  is not Function\n");
@@ -1083,5 +1083,28 @@ void TestFunctionObject::run_core(std::string input)
     if (!fn->used_) {
         delete fn;
     }
+}
+
+
+void TestFunctionApplication::run_core(std::string input, int expected)
+{
+    Environment env;
+    Single *ret = eval(input, env);
+    testIntegerObject(input, ret, expected);
+    if (ret->used_) {
+        delete ret;
+    }
+}
+
+void TestFunctionApplication::execute()
+{
+    run_core("let identity = fn(x) { x; }; identity(11);", 11);
+    /*
+    run_core("let identity = fn(x) { return x; }; identity(12);", 12);
+    run_core("let ouble = fn(x) { x * 2; }; ouble(7);", 14);
+    run_core("let add = fn(x, y) { x + y; }; add(10, 5);", 15);
+    run_core("let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20);
+    run_core("fn(x) { x; }(90)", 90);
+    */
 }
 

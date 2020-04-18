@@ -245,7 +245,7 @@ class ExpressionStatement : public Node
          void setBody(BlockStatement *body) { body_ = body; }
          BlockStatement *body() const { return body_; }
          void setParameters(const std::vector<Identifier *> &parameters) { parameters_ = parameters; }
-         const std::vector<Identifier *> &parameters() const { return parameters_; }
+         std::vector<Identifier *> &parameters() { return parameters_; }
          size_t paramSize() const { return parameters_.size(); }
         virtual void accept(Visitor &v);
      private:
@@ -266,7 +266,8 @@ class ExpressionStatement : public Node
          Node *function() const { return function_; }
          Node *argNum(std::size_t idx) const { return arguments_[idx]; }
          void setArguments(std::vector<Node *> args) { arguments_ = args; }
-        virtual void accept(Visitor &v) { std::cout << ": not implemented" << std::endl; }
+         const std::vector<Node *> &arguments() const { return arguments_; }
+        virtual void accept(Visitor &v);
      private:
          Token *tok_;
          Node *function_;

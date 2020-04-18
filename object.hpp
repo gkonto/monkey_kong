@@ -61,7 +61,7 @@ struct Single
     explicit Single(char *msg) : type_(ERROR) {
         data.error.msg_ = msg;
     }
-    explicit Single(const std::vector<Identifier *> *parameters, 
+    explicit Single(std::vector<Identifier *> *parameters, 
             Environment *env, 
             BlockStatement *body)
     : type_(FUNCTION) 
@@ -99,7 +99,7 @@ struct Single
             char *msg_;
         } error;
         struct {
-            const std::vector<Identifier *> *parameters_;//An auto einai gemato, de prepei na svino to ast!!!
+            std::vector<Identifier *> *parameters_;//An auto einai gemato, de prepei na svino to ast!!!
             BlockStatement *body_; //An auto einai gemato de prepei na sviso to ast!
             Environment *env_;
         } function;

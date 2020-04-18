@@ -33,6 +33,7 @@ struct Tests
         tests_.emplace("TestEvalReturnStatements", new TestEvalReturnStatements);
         tests_.emplace("TestErrorHandler", new TestErrorHandler);
         tests_.emplace("TestFunctionObject", new TestFunctionObject);
+        tests_.emplace("TestFunctionApplication", new TestFunctionApplication);
     }
 
     ~Tests()
@@ -122,7 +123,7 @@ int main(int argc, char **argv)
     a_parser.parse(&data);
 
     for (auto &t : data.test_to_run_) {
-        std::cout << "[+] " << t.first << ": ";
+        std::cout << "[+] " << t.first << ": " << std::flush;
         t.second->execute();
         TokenPool.reset();
         if (t.second->is_failed_) {

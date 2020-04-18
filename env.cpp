@@ -43,6 +43,7 @@ Environment::~Environment() {
     for (auto &a : singles_) {
         delete a;
     }
+    //if (outer_) delete outer_;
 }
 
 

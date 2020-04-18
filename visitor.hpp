@@ -24,13 +24,14 @@ class Visitor {
         virtual void visitLet(Let *a) = 0;
         virtual void visitIdentifier(Identifier *a) = 0;
         virtual void visitFunctionLiteral(FunctionLiteral *a) = 0;
+        virtual void visitCallExpression(CallExpression *a) = 0;
     protected:
         Program *root_;
 };
 
 class Evaluator : public Visitor {
     public:
-        explicit Evaluator(Program *root, Environment &env) 
+        explicit Evaluator(Program *root, Environment *env) 
             : Visitor(root), env_(env) {}
         
         Single *eval() { 
@@ -50,6 +51,7 @@ class Evaluator : public Visitor {
         void visitLet(Let *a);
         void visitIdentifier(Identifier *a);
         void visitFunctionLiteral(FunctionLiteral *a);
+        void visitCallExpression(CallExpression *a);
     private:
         void evalStatements(const std::vector<Node *> &statements);
         void evalPrefixExpression(const std::string &op);
@@ -60,6 +62,12 @@ class Evaluator : public Visitor {
         void evalProgram(Program *a);
         void evalBlockStatement(BlockStatement *a);
         void evalIdentifier(Identifier *a);
+        void evalExpressions(const std::vector<Node *> &args,
+                Environment *env,
+                std::vector<Single *> &arg_to_return);
+        void applyFunction(Single *fn, std::vector<Single *> &args);
+        void unwrapReturnValue();
+        Environment *extendFunctionEnv(Single *fn, std::vector<Single *> &args);
         bool isError(Single *val) const;
         Single *nativeBoolToSingObj(bool input);
         bool isTruthy(Single *obj) const;
@@ -69,7 +77,7 @@ class Evaluator : public Visitor {
         void conditionalDelete(Single *del_ent);
 
         Single *ret_ = nullptr; // TODO encapsulate so  that cannot be modified without dellocation
-        Environment &env_;
+        Environment *env_;
 };
 
 #endif
