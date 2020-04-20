@@ -9,6 +9,7 @@ namespace Model {
     Single null_o;
 }
 
+/*
 void DeleteSingle(Single *p)
 {
     if (p == &Model::false_o || p == &Model::true_o || p == &Model::null_o) {
@@ -16,5 +17,6 @@ void DeleteSingle(Single *p)
     }
     delete (p);
 }
+*/
 
 

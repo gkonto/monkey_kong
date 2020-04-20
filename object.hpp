@@ -125,7 +125,7 @@ struct Single
     }data;
 };
 
-void DeleteSingle(Single *p);
+//void DeleteSingle(Single *p);
 
 
 #endif

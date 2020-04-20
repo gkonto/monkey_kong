@@ -26,6 +26,7 @@ void Evaluator::evalBlockStatement(BlockStatement *a) {
 
 void Evaluator::evalProgram(Program *a) {
     for (auto &s : a->statements()) {
+        if (ret_) ret_->release();
         s->accept(*this);
         if (ret_ && ret_->type_ == RETURN) {
             setResult(ret_->data.obj.obj_);
@@ -73,9 +74,10 @@ void Evaluator::evalBangOperatorExpression() {
 
 void Evaluator::setResult(Single *obj) {
     if (ret_ && obj != ret_) {
-        conditionalDelete(ret_);
+        ret_->release();
     }
     ret_ = obj;
+    ret_->retain();
 }
 
 
@@ -83,14 +85,6 @@ Single *Evaluator::setResultNull() {
     Single *temp = ret_;
     ret_ = nullptr;
     return temp;
-}
-
-void Evaluator::conditionalDelete(Single *del_ent) {
-    if ( del_ent != &Model::false_o && 
-         del_ent != &Model::true_o &&  
-         del_ent != &Model::null_o) {
-        delete del_ent;
-    }
 }
 
  void Evaluator::evalMinusPrefixOperatorExpression()
@@ -155,8 +149,8 @@ void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, 
     if (temp) {
         setResult(temp);
     }
-    conditionalDelete(right);
-    conditionalDelete(left);
+    right->release();
+    left->release();
 }
 
 void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single *right) {
@@ -178,8 +172,8 @@ void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single 
     }
 
     if (temp) {
-       conditionalDelete(left); 
-       conditionalDelete(right); 
+        left->release();
+        right->release();
        setResult(temp);
     }
 }
@@ -198,6 +192,7 @@ void Evaluator::visitInfixExpression(InfixExpression *a) {
     }
     Single *right = setResultNull();
     evalInfixExpression(a->op(), left, right);
+    left->release();
 }
 
 
@@ -234,7 +229,7 @@ void Evaluator::visitIfExpression(If *a) {
         setResult(&Model::null_o);
     }
 
-    conditionalDelete(cond);
+    cond->release();
 }
 
 void Evaluator::visitReturn(Return *a) {
@@ -315,7 +310,7 @@ void Evaluator::applyFunction(Single *fn, std::vector<Single *> &args) {
     //extendedEnv->erase(ret_);
     ret_->release();
 
-    DeleteSingle(fn);
+    fn->release();
     delete extendedEnv;
 }
 

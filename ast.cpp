@@ -341,7 +341,7 @@ Single *Program::evalProgram(Environment *s) {
         ret = stmt->eval(s);
         if (ret && ret->type_ == RETURN) {
             Single *o = ret->data.obj.obj_;
-            DeleteSingle(ret);
+            ret->release();
 
             return o;
         }
@@ -431,8 +431,8 @@ static Single *evalPrefixExpression(const std::string &op, Single *right) {
         sprintf(buffer, "unknown operator: %s%s", op.c_str(), object_name[right->type_] );
         ret =  new Single(strdup(buffer));
     }
-    if (ret) {
-        DeleteSingle(right);
+    if (right) {
+        right->release();
     }
     return ret;
 }

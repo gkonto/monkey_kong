@@ -74,7 +74,6 @@ class Evaluator : public Visitor {
 
         void setResult(Single *new_obj);
         Single *setResultNull();
-        void conditionalDelete(Single *del_ent);
 
         Single *ret_ = nullptr; // TODO encapsulate so  that cannot be modified without dellocation
         Environment *env_;
