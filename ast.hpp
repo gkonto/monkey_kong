@@ -7,7 +7,7 @@
 #include "token.hpp"
 #include "object.hpp"
 
-//#define USEVISITOR
+#define USEVISITOR
 
 class Token;
 class Visitor;
