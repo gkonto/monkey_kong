@@ -849,8 +849,8 @@ void TestEvalIntegerExpression::run_core(std::string input, int expected)
 
  void TestEvalIntegerExpression::execute()
  {
-     run_core("5", 5);
      run_core("10", 10);
+     run_core("5", 5);
      run_core("-5", -5);
      run_core("-10", -10);
      run_core("5 + 5 + 5 + 5 - 10", 10);
@@ -1068,9 +1068,11 @@ void TestFunctionObject::run_core(std::string input)
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 #ifdef USEVISITOR
+     std::cout << "USING VISITOR" << std::endl;
      Evaluator evaluator(program.get(), &env);
      Single *fn = evaluator.eval();
 #else
+     std::cout << "NOT USING VISITOR" << std::endl;
      Single *fn = program->eval(&env);
 #endif
     if (!fn->type_) {
@@ -1117,6 +1119,7 @@ void TestFunctionApplication::execute()
     run_core("let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20);
     run_core("fn(x) { x; }(90)", 90);
 }
+
 
 
 void CheckFibonacciTime::execute() {

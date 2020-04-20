@@ -57,8 +57,8 @@ class Evaluator : public Visitor {
         void evalPrefixExpression(const std::string &op);
         void evalBangOperatorExpression();
         void evalMinusPrefixOperatorExpression();
-        void evalInfixExpression(const std::string &op, Single *left, Single *right);
-        void evalIntegerInfixExpression(const std::string &op, Single *left, Single *right);
+        Single *evalInfixExpression(const std::string &op, Single *left, Single *right);
+        Single *evalIntegerInfixExpression(const std::string &op, Single *left, Single *right);
         void evalProgram(Program *a);
         void evalBlockStatement(BlockStatement *a);
         void evalIdentifier(Identifier *a);
@@ -71,9 +71,9 @@ class Evaluator : public Visitor {
         bool isError(Single *val) const;
         Single *nativeBoolToSingObj(bool input);
         bool isTruthy(Single *obj) const;
-
-        void setResult(Single *new_obj);
-        Single *setResultNull();
+        void release();
+        Single *detach();
+        void attach(Single *o);
 
         Single *ret_ = nullptr; // TODO encapsulate so  that cannot be modified without dellocation
         Environment *env_;

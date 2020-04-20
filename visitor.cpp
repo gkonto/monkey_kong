@@ -4,12 +4,32 @@
 #include "env.hpp"
 
 
+void Evaluator::attach(Single *o) {
+    ret_ = o;
+}
+
+Single *Evaluator::detach() {
+    Single *temp = ret_;
+    ret_ = 0;
+    return temp;
+}
+
+void Evaluator::release() {
+    if (ret_) {
+        ret_->release();
+    }
+    ret_ = 0;
+}
+
+
 //FIXME Delete if not used
 void Evaluator::evalStatements(const std::vector<Node *> &statements) {
     for (auto &s : statements) {
         s->accept(*this);
         if (ret_->type_ == RETURN) {
-            setResult(ret_->data.obj.obj_);
+            Single *temp = ret_;
+            ret_ = temp->data.obj.obj_;
+            temp->release();
             return;
         }
     }
@@ -17,6 +37,7 @@ void Evaluator::evalStatements(const std::vector<Node *> &statements) {
 
 void Evaluator::evalBlockStatement(BlockStatement *a) {
     for (auto &s : a->statements()) {
+//        if (ret_) ret_->release();
         s->accept(*this);
         if (ret_ && (ret_->type_ == RETURN || ret_->type_ == ERROR)) {
             return;
@@ -26,10 +47,12 @@ void Evaluator::evalBlockStatement(BlockStatement *a) {
 
 void Evaluator::evalProgram(Program *a) {
     for (auto &s : a->statements()) {
-        if (ret_) ret_->release();
+        release();
         s->accept(*this);
         if (ret_ && ret_->type_ == RETURN) {
-            setResult(ret_->data.obj.obj_);
+            Single *temp = ret_;
+            ret_ = ret_->data.obj.obj_;
+            temp->release();
             return;
         }
         if (ret_ && ret_->type_ == ERROR) {
@@ -44,7 +67,8 @@ void Evaluator::visitProgram(Program *a) {
 }
 
 void Evaluator::visitIntegerLiteral(IntegerLiteral *a) {
-    setResult(new Single(a->value()));
+    release();
+    ret_ = new Single(a->value());
 }
 
 void Evaluator::visitExpressionStatement(ExpressionStatement *a) {
@@ -52,7 +76,8 @@ void Evaluator::visitExpressionStatement(ExpressionStatement *a) {
 }
 
 void Evaluator::visitBoolean(Boolean *a) {
-    setResult(nativeBoolToSingObj(a->value()));
+    release();
+    ret_ = nativeBoolToSingObj(a->value());
 }
 
 
@@ -61,30 +86,17 @@ Single *Evaluator::nativeBoolToSingObj(bool input) {
 }
 
 void Evaluator::evalBangOperatorExpression() {
-    if (ret_ == &Model::true_o) {
-        setResult(&Model::false_o);
-    } else if (ret_ == &Model::false_o) {
-        setResult(&Model::true_o);
-    } else if (ret_ == &Model::null_o) {
-        setResult(&Model::null_o);
-    } else {
-        setResult(&Model::false_o);
-    } 
-}
-
-void Evaluator::setResult(Single *obj) {
-    if (ret_ && obj != ret_) {
-        ret_->release();
-    }
-    ret_ = obj;
-    ret_->retain();
-}
-
-
-Single *Evaluator::setResultNull() {
     Single *temp = ret_;
-    ret_ = nullptr;
-    return temp;
+    if (ret_ == &Model::true_o) {
+        ret_ = &Model::false_o;
+    } else if (ret_ == &Model::false_o) {
+        ret_ = &Model::true_o;
+    } else if (ret_ == &Model::null_o) {
+        ret_ = &Model::null_o;
+    } else {
+        ret_ = &Model::false_o;
+    } 
+    temp->release();
 }
 
  void Evaluator::evalMinusPrefixOperatorExpression()
@@ -92,10 +104,14 @@ Single *Evaluator::setResultNull() {
      if (ret_->type_ != INTEGER) {
          char buffer[80];
          sprintf(buffer, "unknown operator: -%s", object_name[ret_->type_]);
-         setResult(new Single(strdup(buffer)));
+
+         ret_->release();
+         ret_ = new Single(strdup(buffer));
          return;
      }
-    ret_->data.integer.value_ = -ret_->data.integer.value_;
+     Single *temp = ret_;
+     ret_ = new Single(-ret_->data.integer.value_);
+     temp->release();
  }
 
 
@@ -107,7 +123,8 @@ void Evaluator::evalPrefixExpression(const std::string &op) {
     } else {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s%s", op.c_str(), object_name[ret_->type_] );
-        setResult(new Single(strdup(buffer)));
+        ret_->release();
+        ret_ = new Single(strdup(buffer));
     }
 }
 
@@ -120,7 +137,7 @@ void Evaluator::visitPrefixExpression(PrefixExpression *a) {
 }
 
 
-void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, Single *right) {
+Single *Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, Single *right) {
     //TODO remove all those compare with an array of function callbacks
     Single *temp = nullptr;
 
@@ -146,21 +163,17 @@ void Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, 
         temp = new Single(strdup(buffer));
     }
 
-    if (temp) {
-        setResult(temp);
-    }
-    right->release();
-    left->release();
+    return temp;
 }
 
-void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single *right) {
+Single *Evaluator::evalInfixExpression(const std::string &op, Single *left, Single *right) {
     Single *temp = nullptr;
     if (left->type_ == INTEGER && right->type_ == INTEGER) {
-        evalIntegerInfixExpression(op, left, right);
+        temp = evalIntegerInfixExpression(op, left, right);
     } else if (!op.compare("==")) {
-        setResult(nativeBoolToSingObj(left == right));
+        temp = nativeBoolToSingObj(left==right);
     } else if (!op.compare("!=")) {
-       setResult(nativeBoolToSingObj(left != right));
+        temp = nativeBoolToSingObj(left!=right);
     } else if (left->type_ != right->type_) {
         char buffer[80];
         sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
@@ -171,11 +184,7 @@ void Evaluator::evalInfixExpression(const std::string &op, Single *left, Single 
         temp = new Single(strdup(buffer));
     }
 
-    if (temp) {
-        left->release();
-        right->release();
-       setResult(temp);
-    }
+    return temp;
 }
 
 
@@ -184,15 +193,19 @@ void Evaluator::visitInfixExpression(InfixExpression *a) {
     if (isError(ret_)) {
         return;
     }
-    Single *left = setResultNull();
+    Single *left = detach();
     a->rhs()->accept(*this);
 
     if (isError(ret_)) {
         return;
     }
-    Single *right = setResultNull();
-    evalInfixExpression(a->op(), left, right);
-    left->release();
+    Single *right = detach();
+    Single *temp = evalInfixExpression(a->op(), left, right);
+    release();
+    attach(temp);
+
+    if (left) left->release();
+    if (right) right->release();
 }
 
 
@@ -220,13 +233,13 @@ void Evaluator::visitIfExpression(If *a) {
     if (isError(ret_)) {
         return;
     }
-    Single *cond = setResultNull();
+    Single *cond = detach();
     if (isTruthy(cond)) {
         a->consequence()->accept(*this);
     } else if (a->alternative()) {
         a->alternative()->accept(*this);
     } else {
-        setResult(&Model::null_o);
+        ret_ = &Model::null_o;
     }
 
     cond->release();
@@ -237,8 +250,7 @@ void Evaluator::visitReturn(Return *a) {
     if (isError(ret_)) {
         return;
     }
-    Single *val = setResultNull();
-    setResult(new Single(val));
+    ret_ = new Single(ret_);
 }
 
 
@@ -254,8 +266,7 @@ void Evaluator::visitLet(Let *a) {
     if (isError(ret_)) {
         return;
     }
-    Single *val = setResultNull();
-    env_->set(a->name()->value(), val);
+    env_->set(a->name()->value(), ret_);
 }
 
 void Evaluator::evalIdentifier(Identifier *a) {
@@ -263,10 +274,12 @@ void Evaluator::evalIdentifier(Identifier *a) {
     if (!val) {
         char buffer[80];
         sprintf(buffer, "identifier not found: %s", a->value().c_str());
-        setResult(new Single(strdup(buffer)));
+        release();
+        attach(new Single(strdup(buffer)));
         return;
     }
-    setResult(val);
+    val->retain();
+    attach(val);
 }
 
 void Evaluator::visitIdentifier(Identifier *a) {
@@ -276,13 +289,15 @@ void Evaluator::visitIdentifier(Identifier *a) {
 
 void Evaluator::visitFunctionLiteral(FunctionLiteral *a) {
     Single *o = new Single(&a->parameters(), env_, a->body());
-    setResult(o);
+    release();
+    ret_ = o;
 }
 
 void Evaluator::evalExpressions(const std::vector<Node *> &args, Environment *env, std::vector<Single *> &arg_to_return) {
     for (size_t i = 0; i < args.size(); i++) {
+        //release();
         args[i]->accept(*this);
-        Single *evaluated = setResultNull();
+        Single *evaluated = detach();
         if (isError(evaluated)) {
             arg_to_return.resize(1);
             arg_to_return[0] = evaluated;
@@ -296,7 +311,8 @@ void Evaluator::applyFunction(Single *fn, std::vector<Single *> &args) {
     if (fn->type_ != FUNCTION) {
         char buffer[80];
         sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
-        setResult(new Single(strdup(buffer)));
+        ret_->release();
+        ret_ = new Single(strdup(buffer));
         return;
     }
     
@@ -305,20 +321,17 @@ void Evaluator::applyFunction(Single *fn, std::vector<Single *> &args) {
     env_ = extendedEnv;
     fn->data.function.body_->accept(*this);
     env_ = extendedEnv->outer();
+    extendedEnv->release();
     unwrapReturnValue();
-
-    //extendedEnv->erase(ret_);
-    ret_->release();
-
-    fn->release();
-    delete extendedEnv;
 }
 
 void Evaluator::unwrapReturnValue() {
     if (ret_->type_ != RETURN) {
         return;
     }
-    setResult(ret_->data.obj.obj_);
+    Single *temp = ret_;
+    ret_ = ret_->data.obj.obj_;
+    temp->release();
 }
 
 
@@ -343,13 +356,17 @@ void Evaluator::visitCallExpression(CallExpression *a) {
         return;
     }
 
-    Single *fn = setResultNull();
+    Single *fn = detach();
     std::vector<Single *> args(a->size());
     evalExpressions(a->arguments(), env_, args);
     if (args.size() == 1 && isError(args[0])) {
-        setResult(args[0]);
+        ret_ = args[0];
     }
     applyFunction(fn, args);
+    for (auto &a : args) {
+        a->release();
+    }
+    fn->release();
 }
 
 
