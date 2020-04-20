@@ -1,6 +1,7 @@
 #include <string>
 #include <sstream>
 #include "object.hpp"
+#include "env.hpp"
 
 namespace Model {
     Single true_o(true);
@@ -13,12 +14,7 @@ void DeleteSingle(Single *p)
     if (p == &Model::false_o || p == &Model::true_o || p == &Model::null_o) {
         return;
     }
-    if (p->type_ == ERROR) {
-        free(p->data.error.msg_);
-    }
     delete (p);
 }
-
-
 
 

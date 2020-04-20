@@ -830,8 +830,12 @@ Single *Test::eval(const std::string &input, Environment &env)
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 
+#ifdef USEVISITOR
      Evaluator evaluator(program.get(), &env);
      Single *ret = evaluator.eval();
+#else
+     Single *ret = program->eval(&env);
+#endif
      return ret;
 }
 
@@ -840,9 +844,7 @@ void TestEvalIntegerExpression::run_core(std::string input, int expected)
      Environment env;
      Single *evaluated = eval(input, env);
      testIntegerObject(input, evaluated, expected);
-     if (!evaluated->used_) {
-         DeleteSingle(evaluated);
-     }
+     evaluated->release();
  }
 
  void TestEvalIntegerExpression::execute()
@@ -898,9 +900,7 @@ void TestEvalBooleanExpression::run_core(std::string input, bool expected)
     Environment env;
     Single *evaluated = eval(input, env);
     testBooleanObject(input, evaluated, expected);
-    if (!evaluated->used_) {
-        DeleteSingle(evaluated);
-    }
+    evaluated->release();
 }
 
 
@@ -941,9 +941,7 @@ void TestBangOperator::run_core(std::string input, bool expected)
     Environment env;
     Single *evaluated = eval(input, env);
     testBooleanObject(input, evaluated, expected);
-    if (!evaluated->used_) {
-        DeleteSingle(evaluated);
-    }
+    evaluated->release();
 }
 
 
@@ -982,9 +980,7 @@ void TestIfElseExpressions::run_core(std::string input, int expected)
     Environment env;
     Single *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
-    if (!evaluated->used_) {
-        DeleteSingle(evaluated);
-    }
+    evaluated->release();
 }
 
 
@@ -1009,9 +1005,7 @@ void TestEvalReturnStatements::run_core(std::string input, int expected)
     Environment env;
     Single *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
-    if (!evaluated->used_) {
-        DeleteSingle(evaluated);
-    }
+    evaluated->release();
 }
 
 
@@ -1056,9 +1050,7 @@ void TestErrorHandler::run_core(std::string input, std::string expected_e)
     if (expected_e.compare(evaluated->data.error.msg_)) {
         errorf(input, "wrong error message. Expected '%s', got '%s'\n", expected_e.c_str(), evaluated->data.error.msg_);
     }
-    if (!evaluated->used_) {
-        DeleteSingle(evaluated);
-    }
+    evaluated->release();
 }
 
 
@@ -1075,9 +1067,12 @@ void TestFunctionObject::run_core(std::string input)
      Lexer l(input);
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
-
+#ifdef USEVISITOR
      Evaluator evaluator(program.get(), &env);
      Single *fn = evaluator.eval();
+#else
+     Single *fn = program->eval(&env);
+#endif
     if (!fn->type_) {
         errorf(input, "object  is not Function\n");
         return;
@@ -1101,9 +1096,7 @@ void TestFunctionObject::run_core(std::string input)
         return;
     }
 
-    if (!fn->used_) {
-        DeleteSingle(fn);
-    }
+    fn->release();
 }
 
 
@@ -1112,9 +1105,7 @@ void TestFunctionApplication::run_core(std::string input, int expected)
     Environment env;
     Single *ret = eval(input, env);
     testIntegerObject(input, ret, expected);
-    if (!ret->used_) {
-        DeleteSingle(ret);
-    }
+    ret->release();
 }
 
 void TestFunctionApplication::execute()
@@ -1142,11 +1133,13 @@ void CheckFibonacciTime::execute() {
     Lexer l(input);
     Parser p(&l);
     std::unique_ptr<Program> program = p.parseProgram();
-
-    Evaluator evaluator(program.get(), &env);
-
     auto start = high_resolution_clock::now();
+#ifdef USEVISITOR
+    Evaluator evaluator(program.get(), &env);
     Single *ret = evaluator.eval();
+#else
+     Single *ret = program->eval(&env);
+#endif
     auto end = high_resolution_clock::now();
     auto time_elapsed = duration_cast<milliseconds>(end - start);
     //testIntegerObject(input, ret, 75025);
@@ -1155,9 +1148,7 @@ void CheckFibonacciTime::execute() {
     if (!is_failed_) {
         std::cout << "fib(33): Time elapsed: " << time_elapsed.count() << " millisec" << std::endl;
     }
-    if (!ret->used_) {
-        DeleteSingle(ret);
-    }
+    ret->release();
 }
 
 
@@ -1172,7 +1163,5 @@ void TestClosures::execute()
     Environment env;
     Single *ret = eval(input, env);
     testIntegerObject(input, ret, 4);
-    if (!ret->used_) {
-        DeleteSingle(ret);
-    }
+    ret->release();
 }

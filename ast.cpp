@@ -1,6 +1,32 @@
 #include <sstream>
+#include <string.h>
 #include "ast.hpp"
+#include "env.hpp"
 #include "visitor.hpp"
+
+bool isTruthy(Single *obj) {
+    if (obj == &Model::null_o) {
+        return false;
+    } else if (obj == &Model::true_o) {
+        return true;
+    } else if (obj == &Model::false_o) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static bool isError(Single *val) {
+    if (val) {
+        return val->type_ == ERROR;
+    }
+    return false;
+} 
+
+
+static Single *nativeBoolToSingObj(bool input) {
+    return input ? &Model::true_o : &Model::false_o;
+}
 
 Let::~Let()
 {
@@ -301,3 +327,322 @@ void FunctionLiteral::accept(Visitor &v) {
 void CallExpression::accept(Visitor &v) {
     v.visitCallExpression(this);
 }
+
+
+Single *IntegerLiteral::eval(Environment *s) {
+    return new Single(value());
+}
+
+Single *Program::evalProgram(Environment *s) {
+    Single *ret = nullptr;
+    for (auto &stmt : statements()) {
+        if (ret) ret->release();
+
+        ret = stmt->eval(s);
+        if (ret && ret->type_ == RETURN) {
+            Single *o = ret->data.obj.obj_;
+            DeleteSingle(ret);
+
+            return o;
+        }
+
+        if (ret && ret->type_ == ERROR) {
+            return ret;
+        }
+    }
+    return ret;
+}
+
+Single *Program::eval(Environment *s) {
+    return evalProgram(s);
+}
+
+static Single *evalIdentifier(const std::string &key, Environment *s) {
+    Single *val = s->get(key);
+    if (!val) {
+        char buffer[80];
+        sprintf(buffer, "identifier not found: %s", key.c_str());
+        return new Single(strdup(buffer));
+    }
+    val->retain();
+    return val;
+}
+
+Single *Identifier::eval(Environment *s) {
+   return evalIdentifier(value(), s); 
+}
+
+Single *Let::eval(Environment *s) {
+    Single *val = value()->eval(s);
+    if (isError(val)) {
+        return val;
+    }
+    s->set(name()->value(), val);
+    return val;
+}
+
+Single *Return::eval(Environment *s) {
+    Single *ret = value()->eval(s);
+    if (isError(ret)) {
+        return ret;
+    }
+    return new Single(ret);
+}
+
+Single *ExpressionStatement::eval(Environment *s) {
+    return expression()->eval(s);
+}
+
+
+static Single *evalBangOperatorExpression(Single *right) {
+    if (right == &Model::true_o) {
+        return &Model::false_o;
+    } else if (right == &Model::false_o) {
+        return &Model::true_o;
+    } else if (right == &Model::null_o) {
+        return &Model::null_o;
+    } else {
+        return &Model::false_o;
+    } 
+}
+
+ static Single *evalMinusPrefixOperatorExpression(Single *right)
+ {
+     if (right->type_ != INTEGER) {
+         char buffer[80];
+         sprintf(buffer, "unknown operator: -%s", object_name[right->type_]);
+         return new Single(strdup(buffer));
+     }
+     return new Single(-right->data.integer.value_);
+ }
+
+
+
+
+
+static Single *evalPrefixExpression(const std::string &op, Single *right) {
+    Single *ret = nullptr;
+    if (!op.compare("!")) {
+        ret = evalBangOperatorExpression(right);
+    } else if (!op.compare("-")) {
+        ret = evalMinusPrefixOperatorExpression(right);
+    } else {
+        char buffer[80];
+        sprintf(buffer, "unknown operator: %s%s", op.c_str(), object_name[right->type_] );
+        ret =  new Single(strdup(buffer));
+    }
+    if (ret) {
+        DeleteSingle(right);
+    }
+    return ret;
+}
+
+
+
+Single *PrefixExpression::eval(Environment *s) {
+    Single *r = right()->eval(s);
+    if (isError(r)) {
+        return r;
+    }
+    return evalPrefixExpression(operator_s(), r);
+}
+
+
+static Single *evalIntegerInfixExpression(const std::string &op, Single *left, Single *right) {
+    //TODO remove all those compare with an array of function callbacks
+    Single *temp = nullptr;
+
+    if (!op.compare("+")) {
+        temp = new Single(left->data.integer.value_ + right->data.integer.value_);
+    } else if (!op.compare("-")) {
+        temp = new Single(left->data.integer.value_ - right->data.integer.value_);
+    } else if (!op.compare("*")) {
+        temp = new Single(left->data.integer.value_ * right->data.integer.value_);
+    } else if (!op.compare("/")) {
+        temp = new Single(left->data.integer.value_ / right->data.integer.value_);
+    } else if (!op.compare("<")) {
+        temp = nativeBoolToSingObj(left->data.integer.value_ < right->data.integer.value_);
+    } else if (!op.compare(">")) {
+        temp = nativeBoolToSingObj(left->data.integer.value_ > right->data.integer.value_);
+    } else if (!op.compare("==")) {
+        temp = nativeBoolToSingObj(left->data.integer.value_ == right->data.integer.value_);
+    } else if (!op.compare("!=")) {
+        temp = nativeBoolToSingObj(left->data.integer.value_ != right->data.integer.value_);
+    } else {
+        char buffer[80];
+        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        temp = new Single(strdup(buffer));
+    }
+
+    return temp;
+}
+
+
+Single *evalInfixExpression(const std::string &op, Single *left, Single *right) {
+    Single *temp = nullptr;
+    if (left->type_ == INTEGER && right->type_ == INTEGER) {
+        temp = evalIntegerInfixExpression(op, left, right);
+    } else if (!op.compare("==")) {
+        temp = nativeBoolToSingObj(left == right);
+    } else if (!op.compare("!=")) {
+       temp = nativeBoolToSingObj(left != right);
+    } else if (left->type_ != right->type_) {
+        char buffer[80];
+        sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        temp = new Single(strdup(buffer));
+    } else {
+        char buffer[80];
+        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        temp = new Single(strdup(buffer));
+    }
+
+    if (temp) {
+       left->release(); 
+       right->release(); 
+    }
+    return temp;
+}
+
+
+Single *InfixExpression::eval(Environment *s) {
+    Single *l = lhs()->eval(s);
+    if (isError(l)) {
+        return l;
+    }
+    Single *r = rhs()->eval(s);
+    if (isError(r)) {
+        return r;
+    }
+    Single *ret = evalInfixExpression(op(), l, r);
+
+    return ret;
+}
+
+
+Single *Boolean::eval(Environment *s) {
+    return nativeBoolToSingObj(value());
+}
+
+Single *evalBlockStatement(BlockStatement *a, Environment *store) {
+    Single *temp = nullptr;
+    for (auto &s : a->statements()) {
+        if (temp)  temp->release();
+        temp = s->eval(store);
+        if (temp && (temp->type_ == RETURN || temp->type_ == ERROR)) {
+            return temp;
+        }
+    }
+    return temp;
+}
+
+Single *BlockStatement::eval(Environment *s) {
+    return evalBlockStatement(this, s);
+}
+
+Single *If::eval(Environment *s) {
+     Single *cond = condition()->eval(s);
+    if (isError(cond)) {
+        return cond;
+    }
+
+    Single *ret = nullptr;
+    if (isTruthy(cond)) {
+        ret = consequence()->eval(s);
+    } else if (alternative()) {
+        ret = alternative()->eval(s);
+    } else {
+        ret = &Model::null_o;
+    }
+
+    cond->release();
+    return ret;
+
+}
+
+Single *FunctionLiteral::eval(Environment *s) {
+    std::vector<Identifier *> &params = parameters();
+    BlockStatement *b = body();
+    return new Single(&params, s, b);
+}
+
+
+void evalExpressions(const std::vector<Node *> &args, std::vector<Single *> &arg_to_return, Environment *s) {
+    for (size_t i = 0; i < args.size(); i++) {
+        Single *evaluated = args[i]->eval(s);
+        if (isError(evaluated)) {
+            arg_to_return.resize(1);
+            arg_to_return[0] = evaluated;
+            return;
+        }
+        arg_to_return[i] = evaluated;
+    } 
+}
+
+
+Environment *extendFunctionEnv(Single *fn, std::vector<Single *> &args)
+{
+    Environment *env = new Environment(fn->data.function.env_);//FIXME deallocate?
+    std::vector<Identifier *> &params = *(fn->data.function.parameters_);
+    for (size_t i = 0; i < params.size(); i++) {
+        Identifier *iden = params[i];
+        env->set(iden->value(), args[i]);
+    }
+
+    return env;
+}
+
+
+//OK
+static Single *unwrapReturnValue(Single *val) {
+    if (val->type_ != RETURN) {
+        return val;
+    }
+    Single *result = val->data.obj.obj_;
+    val->release();
+    return result;
+}
+
+
+
+static Single *applyFunction(Single *fn, std::vector<Single *> &args, Environment *s) {
+    if (fn->type_ != FUNCTION) {
+        char buffer[80];
+        sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
+        return new Single(strdup(buffer));
+    }
+    
+
+    Environment *extended_env = extendFunctionEnv(fn, args);
+    Single *ret = fn->data.function.body_->eval(extended_env);
+
+    //To extended env de xrisimopoieitai allo.
+    //Giauto to svino.
+    //Mporei omos na mou gurnaei metavliti apo to extendedn env.
+    // opote tin kano unused kai svino to env.
+    ret = unwrapReturnValue(ret);
+    extended_env->release();
+    //ret->used_ = false;
+    //extended_env->erase(ret);
+    //delete extended_env;
+    return ret;
+}
+
+Single *CallExpression::eval(Environment *s) {
+    Single *fn = function()->eval(s);
+    if (isError(fn)) {
+        return fn;
+    }
+    std::vector<Single *> args(size());
+    evalExpressions(arguments(), args, s);
+    if (args.size() == 1 && isError(args[0])) {
+        return args[0];
+    }
+    //delete fn
+    Single *ret = applyFunction(fn, args, s);
+    for (auto &a : args) {
+        a->release();
+    }
+    fn->release();
+    return ret;
+}
+

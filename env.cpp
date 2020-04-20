@@ -16,37 +16,29 @@ Single *Environment::get(const std::string &key) const
     return entry->second;
 }
 
+/*
 void Environment::erase(Single *entity) {
     if (entity) {
         singles_.erase(entity);
     }
 }
+*/
 
 Single *Environment::set(const std::string &key, Single *entry)
 {
-    /*
-    using namespace StandardObjects;
-    Single *cl = entry->clone();
-
-    auto it = store_.find(key);
-    if (it != store_.end()) {
-        Single *o = it->second;
-        if (o && o != &false_obj && o != &true_obj && o != &null_obj) {
-            delete it->second;
-        }
-    }
-    */
     store_[key] = entry;
-    entry->used_ = true;
-    singles_.emplace(entry);
+    entry->retain();
+    //singles_.emplace(entry);
 
     return entry;
 }
 
 
 Environment::~Environment() {
-    for (auto &a : singles_) {
-        delete a;
+    for (auto &a : store_) {
+        a.second->release();
+        //a->release();
+        //delete a;
     }
     //if (outer_) delete outer_;
 }

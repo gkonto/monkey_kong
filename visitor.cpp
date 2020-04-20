@@ -86,8 +86,7 @@ Single *Evaluator::setResultNull() {
 }
 
 void Evaluator::conditionalDelete(Single *del_ent) {
-    if (!del_ent->used_ &&
-         del_ent != &Model::false_o && 
+    if ( del_ent != &Model::false_o && 
          del_ent != &Model::true_o &&  
          del_ent != &Model::null_o) {
         delete del_ent;
@@ -313,12 +312,10 @@ void Evaluator::applyFunction(Single *fn, std::vector<Single *> &args) {
     env_ = extendedEnv->outer();
     unwrapReturnValue();
 
-    extendedEnv->erase(ret_);
-    ret_->used_ = false;
+    //extendedEnv->erase(ret_);
+    ret_->release();
 
-    if (!fn->used_) {
-        DeleteSingle(fn);
-    }
+    DeleteSingle(fn);
     delete extendedEnv;
 }
 

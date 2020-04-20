@@ -7,6 +7,8 @@
 #include "token.hpp"
 #include "object.hpp"
 
+//#define USEVISITOR
+
 class Token;
 class Visitor;
 
@@ -16,6 +18,7 @@ struct Node
     virtual const std::string &tokenLiteral() const { return literal; }; // Only for debugging and testing
     virtual std::string asString() const = 0;
     virtual void accept(Visitor &) = 0;
+    virtual Single *eval(Environment *s) = 0;
     std::string literal = "No token node";
 };
 
@@ -39,7 +42,9 @@ class Program : public Node
         std::vector<Node *>::iterator begin() { return statements_.begin(); }
         std::vector<Node *>::iterator end() { return statements_.end(); }
         virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
     private:
+        Single *evalProgram(Environment *s);
         std::vector<Node *> statements_;
 };
 
@@ -55,6 +60,7 @@ class Identifier : public Node
         const std::string &tokenLiteral() const { return tok_->literal(); }
         const std::string &value() const { return value_; }
         virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
     private:
         Token *tok_;
         std::string value_;
@@ -76,6 +82,7 @@ class Let : public Node
         Node *value() const { return value_; }
         void setValue(Node *exp) { value_ = exp; }
         virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
     private:
         Token *tok_;
         Identifier *name_;   // the identifier's name
@@ -95,6 +102,7 @@ class Return : public Node
         void setReturnVal(Node *exp) { returnValue_ = exp; }
         Node *value() const { return returnValue_; }
         virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
     private:
         Token *token_; // The return statement
         Node *returnValue_;
@@ -113,6 +121,7 @@ class ExpressionStatement : public Node
          Node *expression() const { return expression_; }
          void setExpression(Node *exp) { expression_ = exp; }
         virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          Node *expression_;
  };
@@ -128,6 +137,7 @@ class ExpressionStatement : public Node
          int value() const { return value_; }
          std::string asString() const;
          virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          Token *token_ = nullptr;
          int value_ = 0;
@@ -148,6 +158,7 @@ class ExpressionStatement : public Node
          Node *right() const { return right_; }
          void setRight(Node *exp) { right_ = exp; }
          virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          std::string operat_;
          Token *tok_; // The prefix token (eg !)
@@ -167,6 +178,7 @@ class ExpressionStatement : public Node
          Node *rhs() const { return rhs_; }
          const std::string &op() const { return op_; }
          virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          Token *tok_; // The operator token, e.g +
          Node *lhs_;
@@ -184,6 +196,7 @@ class ExpressionStatement : public Node
          bool value() const { return value_; }
          std::string asString() const { return tok_->literal(); }
         virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          Token *tok_;
          bool value_;
@@ -201,6 +214,7 @@ class ExpressionStatement : public Node
          void emplace_back(Node *stmt) { return statements_.emplace_back(stmt); }
          const std::vector<Node *> &statements() const { return statements_; }
          virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          Token *tok_;
          std::vector<Node *> statements_;
@@ -226,6 +240,7 @@ class ExpressionStatement : public Node
          BlockStatement *alternative() const { return alternative_; }
          void setAlternative(BlockStatement *alternative) { alternative_ = alternative; }
          virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          Token *tok_ = nullptr;
          Node *condition_ = nullptr;
@@ -248,6 +263,7 @@ class ExpressionStatement : public Node
          std::vector<Identifier *> &parameters() { return parameters_; }
          size_t paramSize() const { return parameters_.size(); }
         virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          Token *tok_;
          std::vector<Identifier *> parameters_; //used by object if created
@@ -268,6 +284,7 @@ class ExpressionStatement : public Node
          void setArguments(std::vector<Node *> args) { arguments_ = args; }
          const std::vector<Node *> &arguments() const { return arguments_; }
         virtual void accept(Visitor &v);
+        Single *eval(Environment *s);
      private:
          Token *tok_;
          Node *function_;

@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include "env.hpp"
 
 struct Single;
 class Bool;
@@ -69,11 +70,40 @@ struct Single
         data.function.parameters_ = parameters;
         data.function.body_ = body;
         data.function.env_ = env;
+        env->retain();
     }
     explicit Single() : type_(NUL) {}
+    void retain() {
+        ++count_;
+    }
+
+    void release() {
+        --count_;
+        if (count_ == 0) {
+            if (this == &Model::false_o || this == &Model::true_o || this == &Model::null_o) {
+                return;
+            }
+
+            if (type_ == ERROR) {
+                free(data.error.msg_);
+            } else if (type_ == FUNCTION) {
+                data.function.env_->release();
+            }
+            delete this;
+        }
+    }
+
+    /*
+     * FIXME an to kano etsi exo free mismatch sto valgrind. giati?
+    ~Single() {
+        if (type_ == ERROR) {
+            free(data.error.msg_);
+        }
+    }
+    */
 
     ObjType type_;
-    bool used_ = false;
+    char count_ = 1;
     union {
         struct {
             int value_;
