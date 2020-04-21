@@ -615,15 +615,8 @@ static Single *applyFunction(Single *fn, std::vector<Single *> &args, Environmen
     Environment *extended_env = extendFunctionEnv(fn, args);
     Single *ret = fn->data.function.body_->eval(extended_env);
 
-    //To extended env de xrisimopoieitai allo.
-    //Giauto to svino.
-    //Mporei omos na mou gurnaei metavliti apo to extendedn env.
-    // opote tin kano unused kai svino to env.
     ret = unwrapReturnValue(ret);
     extended_env->release();
-    //ret->used_ = false;
-    //extended_env->erase(ret);
-    //delete extended_env;
     return ret;
 }
 
