@@ -1,6 +1,6 @@
  cmake_minimum_required(VERSION 2.8.7)
  PROJECT(monkey)
- add_definitions("-O0 -g  -pg -ggdb -Wunreachable-code")
+ add_definitions("-O3 -g  -pg -ggdb -Wunreachable-code")
  #//set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3 -g")
  #set(CMAKE_CXX_FLAGS_RELEASE " -O3 -Wall -Wextra")
  set(CMAKE_CXX_STANDARD 14)

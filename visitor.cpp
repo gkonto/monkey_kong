@@ -318,9 +318,11 @@ void Evaluator::applyFunction(Single *fn, std::vector<Single *> &args) {
     
 
     Environment *extendedEnv = extendFunctionEnv(fn, args);
+    Environment *temp = env_;
     env_ = extendedEnv;
+
     fn->data.function.body_->accept(*this);
-    env_ = extendedEnv->outer();
+    env_ = temp;
     extendedEnv->release();
     unwrapReturnValue();
 }
