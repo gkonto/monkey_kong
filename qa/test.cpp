@@ -1068,11 +1068,9 @@ void TestFunctionObject::run_core(std::string input)
      Parser p(&l);
      std::unique_ptr<Program> program = p.parseProgram();
 #ifdef USEVISITOR
-     std::cout << "USING VISITOR" << std::endl;
      Evaluator evaluator(program.get(), &env);
      Single *fn = evaluator.eval();
 #else
-     std::cout << "NOT USING VISITOR" << std::endl;
      Single *fn = program->eval(&env);
 #endif
     if (!fn->type_) {

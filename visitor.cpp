@@ -289,7 +289,7 @@ void Evaluator::visitIdentifier(Identifier *a) {
 
 void Evaluator::visitFunctionLiteral(FunctionLiteral *a) {
     Single *o = new Single(&a->parameters(), env_, a->body());
-    release();
+    //release();
     ret_ = o;
 }
 
@@ -338,7 +338,7 @@ void Evaluator::unwrapReturnValue() {
 
 Environment *Evaluator::extendFunctionEnv(Single *fn, std::vector<Single *> &args)
 {
-    Environment *env = new Environment(env_);//FIXME deallocate?
+    Environment *env = new Environment(fn->data.function.env_);//FIXME deallocate?
     std::vector<Identifier *> &params = *(fn->data.function.parameters_);
     for (size_t i = 0; i < params.size(); i++) {
         Identifier *iden = params[i];
