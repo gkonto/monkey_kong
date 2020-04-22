@@ -38,7 +38,6 @@ void Environment::dealloc(Environment *env) {
     if (!env) return;
     assert(EnvPool);
     if (EnvPool) {
-        env->release();
         EnvPool->free(env);
     }
 }

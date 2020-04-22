@@ -409,7 +409,7 @@ void CallExpression::accept(Visitor &v) {
 
 
 Single *IntegerLiteral::evalIntegerLiteral(Environment *s) {
-    return SinglePool::create(value());
+    return Single::alloc(value());
 }
 
 Single *IntegerLiteral::eval(Environment *s) {
@@ -446,7 +446,7 @@ Single *Identifier::evalIdentifier(Environment *s) {
     if (!val) {
         char buffer[80];
         sprintf(buffer, "identifier not found: %s", key.c_str());
-        return SinglePool::create(strdup(buffer));
+        return Single::alloc(strdup(buffer));
     }
     val->retain();
     return val;
@@ -479,7 +479,7 @@ Single *Return::evalReturn(Environment *s) {
     if (isError(ret)) {
         return ret;
     }
-    return SinglePool::create(ret);
+    return Single::alloc(ret);
 }
 
 Single *ExpressionStatement::eval(Environment *s) {
@@ -508,9 +508,9 @@ static Single *evalBangOperatorExpression(Single *right) {
      if (right->type_ != INTEGER) {
          char buffer[80];
          sprintf(buffer, "unknown operator: -%s", object_name[right->type_]);
-         return SinglePool::create(strdup(buffer));
+         return Single::alloc(strdup(buffer));
      }
-     return SinglePool::create(-right->data.integer.value_);
+     return Single::alloc(-right->data.integer.value_);
  }
 
 
@@ -526,7 +526,7 @@ static Single *evalPrefixExpression_core(const std::string &op, Single *right) {
     } else {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s%s", op.c_str(), object_name[right->type_] );
-        ret =  SinglePool::create(strdup(buffer));
+        ret =  Single::alloc(strdup(buffer));
     }
     if (right) {
         right->release();
@@ -554,13 +554,13 @@ static Single *evalIntegerInfixExpression(const std::string &op, Single *left, S
     Single *temp = nullptr;
 
     if (!op.compare("+")) {
-        temp = SinglePool::create(left->data.integer.value_ + right->data.integer.value_);
+        temp = Single::alloc(left->data.integer.value_ + right->data.integer.value_);
     } else if (!op.compare("-")) {
-        temp = SinglePool::create(left->data.integer.value_ - right->data.integer.value_);
+        temp = Single::alloc(left->data.integer.value_ - right->data.integer.value_);
     } else if (!op.compare("*")) {
-        temp = SinglePool::create(left->data.integer.value_ * right->data.integer.value_);
+        temp = Single::alloc(left->data.integer.value_ * right->data.integer.value_);
     } else if (!op.compare("/")) {
-        temp = SinglePool::create(left->data.integer.value_ / right->data.integer.value_);
+        temp = Single::alloc(left->data.integer.value_ / right->data.integer.value_);
     } else if (!op.compare("<")) {
         temp = nativeBoolToSingObj(left->data.integer.value_ < right->data.integer.value_);
     } else if (!op.compare(">")) {
@@ -572,7 +572,7 @@ static Single *evalIntegerInfixExpression(const std::string &op, Single *left, S
     } else {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
-        temp = SinglePool::create(strdup(buffer));
+        temp = Single::alloc(strdup(buffer));
     }
 
     return temp;
@@ -590,11 +590,11 @@ static Single *evalInfixExpression_core(const std::string &op, Single *left, Sin
     } else if (left->type_ != right->type_) {
         char buffer[80];
         sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
-        temp = SinglePool::create(strdup(buffer));
+        temp = Single::alloc(strdup(buffer));
     } else {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
-        temp = SinglePool::create(strdup(buffer));
+        temp = Single::alloc(strdup(buffer));
     }
 
     if (temp) {
@@ -682,7 +682,7 @@ Single *FunctionLiteral::eval(Environment *s) {
 Single *FunctionLiteral::evalFunctionLiteral(Environment *s) {
     std::vector<Identifier *> &params = parameters();
     BlockStatement *b = body();
-    return SinglePool::create(&params, s, b);
+    return Single::alloc(&params, s, b);
 }
 
 
@@ -693,7 +693,7 @@ static bool evalExpressions(const std::vector<Node *> &args, std::array<Single *
     if (numArgs > MAX_ARGS_NUM) {
         char buffer[80];
         sprintf(buffer, "Cannot support more than 25 args in a function");
-        Single *err =  SinglePool::create(strdup(buffer));
+        Single *err =  Single::alloc(strdup(buffer));
         arg_to_return[0] = err;
         return true;
     }
@@ -741,7 +741,7 @@ static Single *applyFunction(Single *fn, std::array<Single *, MAX_ARGS_NUM> &arg
     if (fn->type_ != FUNCTION) {
         char buffer[80];
         sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
-        return SinglePool::create(strdup(buffer));
+        return Single::alloc(strdup(buffer));
     }
     
 

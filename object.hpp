@@ -15,7 +15,7 @@ class BlockStatement;
 class Environment;
 
 struct SinglePool;
-extern SinglePool *testPool;
+extern std::unique_ptr<Pool<Single>> SingPool;
 
  #define OBJECT_TYPES\
      X(INTEGER, "INTEGER")\
@@ -82,107 +82,42 @@ struct Single
 
     void release();
 
-    Single *getNext() const { return next_; }
-    void setNext(Single *next) {
-        next_ = next;
-    }
+    template<typename... Args>
+    static Single *alloc(Args... args);
+    static void dealloc(Single *env);
 
     union {
-        union {
-            struct {
-                int value_;
-            } integer;
-            struct {
-                bool value_;
-            } boolean;
-            struct {
-                Single *obj_;
-            } obj;
-            struct {
-                char *msg_;
-            } error;
-            struct {
-                std::vector<Identifier *> *parameters_;
-                BlockStatement *body_; 
-                Environment *env_;
-            } function;
-        } data;
-        Single *next_;
-    } ;
+        struct {
+            int value_;
+        } integer;
+        struct {
+            bool value_;
+        } boolean;
+        struct {
+            Single *obj_;
+        } obj;
+        struct {
+            char *msg_;
+        } error;
+        struct {
+            std::vector<Identifier *> *parameters_;
+            BlockStatement *body_; 
+            Environment *env_;
+        } function;
+    } data;
     ObjType type_;
     char count_ = 0;
 };
 
-struct SinglePool {
-    SinglePool() {
-        firstAvailable_ = &objects_[0];
-        for (int i = 0; i < POOL_SIZE - 1; ++i) {
-            objects_[i].setNext(&objects_[i+1]);
-        }
+template<typename... Args>
+Single  *Single::alloc(Args... args) {
+    if (!SingPool) {
+        SingPool = std::make_unique<Pool<Single>>(50);
     }
-
-    ~SinglePool() {
-        std::cout << "Number of used objects: " << numOfAllocated_ << std::endl;
-    }
-
-    template<typename... Args>
-    static Single *create(Args &&... args) {
-
-        SinglePool &p = SinglePool::getInstance();
-        assert(p.firstAvailable_ != nullptr);
-        //Remove from the available list
-        Single *newSingle = p.firstAvailable_;
-        p.firstAvailable_ = newSingle->getNext();
-        p.init(*newSingle, std::forward<Args>(args)...);
-        p.numOfAllocated_++;
-        newSingle->retain();
-        return newSingle;
-    }
-
-
-    static SinglePool &getInstance() {
-        return *testPool;
-    }
-
-    void makeAvailable(Single *obj) {
-        obj->setNext(firstAvailable_);
-        firstAvailable_ = obj;
-        --numOfAllocated_;
-    }
-
-    void init(Single &obj, int value) {
-        obj.type_ = INTEGER;
-        obj.data.integer.value_ = value;
-    }
-    void init(Single &obj, bool value) {
-        obj.type_ = BOOLEAN;
-        obj.data.boolean.value_ = value;
-    }
-    void init(Single &obj, Single *val) {
-        obj.type_ = RETURN;
-        obj.data.obj.obj_ = val;
-    }
-    void init(Single &obj, char *msg) {
-        obj.type_ = ERROR;
-        obj.data.error.msg_ = msg;
-    }
-    void init(Single &obj, std::vector<Identifier *> *parameters, 
-            Environment *env, 
-            BlockStatement *body) {
-        obj.type_ = FUNCTION;
-        obj.data.function.parameters_ = parameters;
-        obj.data.function.body_ = body;
-        obj.data.function.env_ = env;
-        env->retain();
-    }
-
-    private:
-        int numOfAllocated_ = 0;
-        static const int POOL_SIZE = 100;
-        Single *firstAvailable_ = nullptr;
-        Single objects_[POOL_SIZE];
-
-};
+    Single *newSingle = SingPool->alloc(std::forward<Args>(args)...);
+    newSingle->retain();
+    return newSingle;
+}
 
 
 #endif

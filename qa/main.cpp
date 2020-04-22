@@ -119,8 +119,6 @@ static void gatherTests(const class CmdArg &ard, const std::vector<std::string> 
 
 int main(int argc, char **argv)
 {
-    SinglePool p;
-    testPool = &p;
     Tests tt;
     QAArgs data(tt);
     ArgParser a_parser("Interpreter QA mechanism", argc, argv);

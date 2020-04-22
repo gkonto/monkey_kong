@@ -5,6 +5,8 @@
 
 SinglePool *testPool = nullptr;
 
+std::unique_ptr<Pool<Single>> SingPool = nullptr;
+
 namespace Model {
     Single true_o(true);
     Single false_o(false);
@@ -23,9 +25,16 @@ void Single::release() {
         } else if (type_ == FUNCTION) {
             data.function.env_->release();
         }
-        //Auto prepei na fugei kai na allaksei to next
-        SinglePool &p = SinglePool::getInstance();
-        p.makeAvailable(this);
+
+        Single::dealloc(this);
+    }
+}
+
+void Single::dealloc(Single *o) {
+    if (!o) return;
+    assert(SingPool);
+    if (SingPool) {
+        SingPool->free(o);
     }
 }
 
