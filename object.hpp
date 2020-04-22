@@ -55,19 +55,15 @@ namespace Model {
 struct Single
 {
     explicit Single(int value) : type_(INTEGER) {
-        std::cout << "COnstructor" << std::endl;
         data.integer.value_ = value;
     }
     explicit Single(bool value) : type_(BOOLEAN) {
-        std::cout << "COnstructor" << std::endl;
         data.boolean.value_ = value;
     }
     explicit Single(Single *val) : type_(RETURN) {
-        std::cout << "COnstructor" << std::endl;
         data.obj.obj_ = val;
     }
     explicit Single(char *msg) : type_(ERROR) {
-        std::cout << "COnstructor" << std::endl;
         data.error.msg_ = msg;
     }
     explicit Single(std::vector<Identifier *> *parameters, 
@@ -75,14 +71,12 @@ struct Single
             BlockStatement *body)
     : type_(FUNCTION) 
     {
-        std::cout << "COnstructor" << std::endl;
         data.function.parameters_ = parameters;
         data.function.body_ = body;
         data.function.env_ = env;
         env->retain();
     }
     explicit Single() : type_(NUL) {
-        std::cout << "COnstructor" << std::endl;
     }
     void retain() {
         ++count_;
