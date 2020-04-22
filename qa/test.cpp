@@ -1123,9 +1123,9 @@ void TestFunctionApplication::execute()
 
 void CheckFibonacciTime::execute() {
     //std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(8);");
-    //std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(25);");
+    std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(25);");
     //std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(30);");
-    std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(33);");
+    //std::string input("let fibonacci = fn(x) { if (x == 0) { 0 } else { if (x == 1) { 1 } else { fibonacci(x - 1) + fibonacci(x - 2); } } }; fibonacci(33);");
 
     //fib(8)  21
     //fib(25) 75025
@@ -1149,9 +1149,9 @@ void CheckFibonacciTime::execute() {
     auto end = high_resolution_clock::now();
     auto time_elapsed = duration_cast<milliseconds>(end - start);
     //testIntegerObject(input, ret, 21);
-    //testIntegerObject(input, ret, 75025);
+    testIntegerObject(input, ret, 75025);
     //testIntegerObject(input, ret, 832040);
-    testIntegerObject(input, ret, 3524578);
+    //testIntegerObject(input, ret, 3524578);
     if (!is_failed_) {
         std::cout << "fib(33): Time elapsed: " << time_elapsed.count() << " millisec" << std::endl;
     }

@@ -78,14 +78,7 @@ struct Single
     }
     explicit Single() : type_(NUL) {
     }
-    void retain() {
-        ++count_;
-        /*
-        if (count_ == 1) {
-            // auto molis ksekinise na xrisimopoieitai.
-        }
-        */
-    }
+    void retain() {  ++count_; }
 
     void release();
 

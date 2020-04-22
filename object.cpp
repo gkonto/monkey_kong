@@ -11,17 +11,6 @@ namespace Model {
     Single null_o;
 }
 
-/*
-void DeleteSingle(Single *p)
-{
-    if (p == &Model::false_o || p == &Model::true_o || p == &Model::null_o) {
-        return;
-    }
-    delete (p);
-}
-*/
-
-
 void Single::release() {
     --count_;
     if (count_ == 0) {

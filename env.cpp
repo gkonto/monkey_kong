@@ -1,5 +1,8 @@
 #include "env.hpp"
 #include "object.hpp"
+#include "pool.hpp"
+
+std::unique_ptr<Pool<Environment>> EnvPool = nullptr;
 
 //FIXME code cleanup. Messy condition statements
 Single *Environment::get(const std::string &key) const
@@ -16,19 +19,10 @@ Single *Environment::get(const std::string &key) const
     return entry->second;
 }
 
-/*
-void Environment::erase(Single *entity) {
-    if (entity) {
-        singles_.erase(entity);
-    }
-}
-*/
-
 Single *Environment::set(const std::string &key, Single *entry)
 {
     store_[key] = entry;
     entry->retain();
-    //singles_.emplace(entry);
 
     return entry;
 }
@@ -37,10 +31,17 @@ Single *Environment::set(const std::string &key, Single *entry)
 Environment::~Environment() {
     for (auto &a : store_) {
         a.second->release();
-        //a->release();
-        //delete a;
     }
-    //if (outer_) delete outer_;
 }
+
+void Environment::dealloc(Environment *env) {
+    if (!env) return;
+    assert(EnvPool);
+    if (EnvPool) {
+        env->release();
+        EnvPool->free(env);
+    }
+}
+
 
 

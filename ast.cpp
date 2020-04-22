@@ -714,7 +714,7 @@ static bool evalExpressions(const std::vector<Node *> &args, std::array<Single *
 
 Environment *extendFunctionEnv(Single *fn, std::array<Single *, MAX_ARGS_NUM> &args)
 {
-    Environment *env = new Environment(fn->data.function.env_);//FIXME deallocate?
+    Environment *env = Environment::alloc(fn->data.function.env_);//FIXME deallocate?
     std::vector<Identifier *> &params = *(fn->data.function.parameters_);
     for (size_t i = 0; i < params.size(); i++) {
         Identifier *iden = params[i];
