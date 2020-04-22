@@ -4,6 +4,8 @@
 #include "env.hpp"
 #include "visitor.hpp"
 
+const int MAX_ARGS_NUM = 25;
+
 #ifdef NODISPATCH
 Single *Node::eval(Environment *s) {
     Single *temp = nullptr;
@@ -684,20 +686,33 @@ Single *FunctionLiteral::evalFunctionLiteral(Environment *s) {
 }
 
 
-void evalExpressions(const std::vector<Node *> &args, std::vector<Single *> &arg_to_return, Environment *s) {
-    for (size_t i = 0; i < args.size(); i++) {
+static bool evalExpressions(const std::vector<Node *> &args, std::array<Single *, MAX_ARGS_NUM> &arg_to_return, Environment *s) {
+
+    size_t numArgs = args.size();
+
+    if (numArgs > MAX_ARGS_NUM) {
+        char buffer[80];
+        sprintf(buffer, "Cannot support more than 25 args in a function");
+        Single *err =  SinglePool::create(strdup(buffer));
+        arg_to_return[0] = err;
+        return true;
+    }
+
+    for (size_t i = 0; i < numArgs; i++) {
         Single *evaluated = args[i]->eval(s);
         if (isError(evaluated)) {
-            arg_to_return.resize(1);
+            //FIXME! mem leak here! Needs release osa mpikan sto arg_to_return prin ftaso edo.
             arg_to_return[0] = evaluated;
-            return;
+            return true;
         }
         arg_to_return[i] = evaluated;
     } 
+
+    return false;
 }
 
 
-Environment *extendFunctionEnv(Single *fn, std::vector<Single *> &args)
+Environment *extendFunctionEnv(Single *fn, std::array<Single *, MAX_ARGS_NUM> &args)
 {
     Environment *env = new Environment(fn->data.function.env_);//FIXME deallocate?
     std::vector<Identifier *> &params = *(fn->data.function.parameters_);
@@ -722,7 +737,7 @@ static Single *unwrapReturnValue(Single *val) {
 
 
 
-static Single *applyFunction(Single *fn, std::vector<Single *> &args, Environment *s) {
+static Single *applyFunction(Single *fn, std::array<Single *, MAX_ARGS_NUM> &args, Environment *s) {
     if (fn->type_ != FUNCTION) {
         char buffer[80];
         sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
@@ -748,15 +763,15 @@ Single *CallExpression::evalCallExpression(Environment *s) {
     if (isError(fn)) {
         return fn;
     }
-    std::vector<Single *> args(size());
-    evalExpressions(arguments(), args, s);
-    if (args.size() == 1 && isError(args[0])) {
+    std::array<Single *, MAX_ARGS_NUM> args;
+    bool isError = evalExpressions(arguments(), args, s);
+    if (isError) {
         return args[0];
     }
     //delete fn
     Single *ret = applyFunction(fn, args, s);
-    for (auto &a : args) {
-        a->release();
+    for (size_t i = 0; i < size(); i++) {
+        args[i]->release();
     }
     fn->release();
     return ret;

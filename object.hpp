@@ -115,8 +115,8 @@ struct Single
                 char *msg_;
             } error;
             struct {
-                std::vector<Identifier *> *parameters_;//An auto einai gemato, de prepei na svino to ast!!!
-                BlockStatement *body_; //An auto einai gemato de prepei na sviso to ast!
+                std::vector<Identifier *> *parameters_;
+                BlockStatement *body_; 
                 Environment *env_;
             } function;
         } data;
