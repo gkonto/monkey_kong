@@ -7,12 +7,13 @@ std::unique_ptr<Pool<Environment>> EnvPool = nullptr;
 //FIXME code cleanup. Messy condition statements
 Single *Environment::get(const std::string &key) const
 {
-    auto entry = store_.find(key);
+    const auto &entry = store_.find(key);
 
-    if (entry == store_.end() && outer_) {
-        auto e = outer_->get(key);
+    const auto &end = store_.end();
+    if (outer_ && entry == end) {
+        const auto &e = outer_->get(key);
         return e;
-    } else if (entry == store_.end()) {
+    } else if (entry == end) {
         return nullptr;
     }
 
