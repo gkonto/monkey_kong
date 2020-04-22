@@ -2,6 +2,7 @@
 #define OBJECT_HPP
 
 #include <string>
+#include <cassert>
 #include <iostream>
 #include <vector>
 #include "env.hpp"
@@ -12,6 +13,9 @@ class Null;
 class Identifier;
 class BlockStatement;
 class Environment;
+
+struct SinglePool;
+extern SinglePool *testPool;
 
  #define OBJECT_TYPES\
      X(INTEGER, "INTEGER")\
@@ -51,15 +55,19 @@ namespace Model {
 struct Single
 {
     explicit Single(int value) : type_(INTEGER) {
+        std::cout << "COnstructor" << std::endl;
         data.integer.value_ = value;
     }
     explicit Single(bool value) : type_(BOOLEAN) {
+        std::cout << "COnstructor" << std::endl;
         data.boolean.value_ = value;
     }
     explicit Single(Single *val) : type_(RETURN) {
+        std::cout << "COnstructor" << std::endl;
         data.obj.obj_ = val;
     }
     explicit Single(char *msg) : type_(ERROR) {
+        std::cout << "COnstructor" << std::endl;
         data.error.msg_ = msg;
     }
     explicit Single(std::vector<Identifier *> *parameters, 
@@ -67,65 +75,127 @@ struct Single
             BlockStatement *body)
     : type_(FUNCTION) 
     {
+        std::cout << "COnstructor" << std::endl;
         data.function.parameters_ = parameters;
         data.function.body_ = body;
         data.function.env_ = env;
         env->retain();
     }
-    explicit Single() : type_(NUL) {}
+    explicit Single() : type_(NUL) {
+        std::cout << "COnstructor" << std::endl;
+    }
     void retain() {
         ++count_;
-    }
-
-    void release() {
-        --count_;
-        if (count_ == 0) {
-            if (this == &Model::false_o || this == &Model::true_o || this == &Model::null_o) {
-                return;
-            }
-
-            if (type_ == ERROR) {
-                free(data.error.msg_);
-            } else if (type_ == FUNCTION) {
-                data.function.env_->release();
-            }
-            delete this;
+        /*
+        if (count_ == 1) {
+            // auto molis ksekinise na xrisimopoieitai.
         }
+        */
     }
 
-    /*
-     * FIXME an to kano etsi exo free mismatch sto valgrind. giati?
-    ~Single() {
-        if (type_ == ERROR) {
-            free(data.error.msg_);
-        }
-    }
-    */
+    void release();
 
-    ObjType type_;
-    char count_ = 1;
+    Single *getNext() const { return next_; }
+    void setNext(Single *next) {
+        next_ = next;
+    }
+
     union {
-        struct {
-            int value_;
-        } integer;
-        struct {
-            bool value_;
-        } boolean;
-        struct {
-            Single *obj_;
-        } obj;
-        struct {
-            char *msg_;
-        } error;
-        struct {
-            std::vector<Identifier *> *parameters_;//An auto einai gemato, de prepei na svino to ast!!!
-            BlockStatement *body_; //An auto einai gemato de prepei na sviso to ast!
-            Environment *env_;
-        } function;
-    }data;
+        union {
+            struct {
+                int value_;
+            } integer;
+            struct {
+                bool value_;
+            } boolean;
+            struct {
+                Single *obj_;
+            } obj;
+            struct {
+                char *msg_;
+            } error;
+            struct {
+                std::vector<Identifier *> *parameters_;//An auto einai gemato, de prepei na svino to ast!!!
+                BlockStatement *body_; //An auto einai gemato de prepei na sviso to ast!
+                Environment *env_;
+            } function;
+        } data;
+        Single *next_;
+    } ;
+    ObjType type_;
+    char count_ = 0;
 };
 
-//void DeleteSingle(Single *p);
+struct SinglePool {
+    SinglePool() {
+        firstAvailable_ = &objects_[0];
+        for (int i = 0; i < POOL_SIZE - 1; ++i) {
+            objects_[i].setNext(&objects_[i+1]);
+        }
+    }
+
+    ~SinglePool() {
+        std::cout << "Number of used objects: " << numOfAllocated_ << std::endl;
+    }
+
+    template<typename... Args>
+    static Single *create(Args &&... args) {
+
+        SinglePool &p = SinglePool::getInstance();
+        assert(p.firstAvailable_ != nullptr);
+        //Remove from the available list
+        Single *newSingle = p.firstAvailable_;
+        p.firstAvailable_ = newSingle->getNext();
+        p.init(*newSingle, std::forward<Args>(args)...);
+        p.numOfAllocated_++;
+        newSingle->retain();
+        return newSingle;
+    }
+
+
+    static SinglePool &getInstance() {
+        return *testPool;
+    }
+
+    void makeAvailable(Single *obj) {
+        obj->setNext(firstAvailable_);
+        firstAvailable_ = obj;
+        --numOfAllocated_;
+    }
+
+    void init(Single &obj, int value) {
+        obj.type_ = INTEGER;
+        obj.data.integer.value_ = value;
+    }
+    void init(Single &obj, bool value) {
+        obj.type_ = BOOLEAN;
+        obj.data.boolean.value_ = value;
+    }
+    void init(Single &obj, Single *val) {
+        obj.type_ = RETURN;
+        obj.data.obj.obj_ = val;
+    }
+    void init(Single &obj, char *msg) {
+        obj.type_ = ERROR;
+        obj.data.error.msg_ = msg;
+    }
+    void init(Single &obj, std::vector<Identifier *> *parameters, 
+            Environment *env, 
+            BlockStatement *body) {
+        obj.type_ = FUNCTION;
+        obj.data.function.parameters_ = parameters;
+        obj.data.function.body_ = body;
+        obj.data.function.env_ = env;
+        env->retain();
+    }
+
+    private:
+        int numOfAllocated_ = 0;
+        static const int POOL_SIZE = 100;
+        Single *firstAvailable_ = nullptr;
+        Single objects_[POOL_SIZE];
+
+};
 
 
 #endif
