@@ -207,14 +207,14 @@ class ExpressionStatement : public Node
          Node *lhs() const { return lhs_; }
          void setRhs(Node *rhs) { rhs_ = rhs; }
          Node *rhs() const { return rhs_; }
-         const std::string &op() const { return op_; }
+         TokenType op() const { return op_; }
          virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalInfixExpression(Environment *s);
      private:
          Token *tok_; // The operator token, e.g +
          Node *lhs_;
-         std::string op_;
+         TokenType op_;
          Node *rhs_;
  };
 

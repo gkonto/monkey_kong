@@ -215,8 +215,8 @@ bool Test::testInfixExpression(const std::string &input, Node *exp, T lhs, const
          return false;
      }
  
-     if (opExp->op() != op) {
-         errorf(input, "Operator is not %s. got = %s\n", op.c_str(), opExp->op().c_str());
+     if (op.compare(tok_names[opExp->op()])) {
+         errorf(input, "Operator is not %s. got = %s\n", op.c_str(), tok_names[opExp->op()]);
          return false;
      }
  

@@ -57,8 +57,8 @@ class Evaluator : public Visitor {
         void evalPrefixExpression(const std::string &op);
         void evalBangOperatorExpression();
         void evalMinusPrefixOperatorExpression();
-        Single *evalInfixExpression(const std::string &op, Single *left, Single *right);
-        Single *evalIntegerInfixExpression(const std::string &op, Single *left, Single *right);
+        Single *evalInfixExpression(TokenType op, Single *left, Single *right);
+        Single *evalIntegerInfixExpression(TokenType op, Single *left, Single *right);
         void evalProgram(Program *a);
         void evalBlockStatement(BlockStatement *a);
         void evalIdentifier(Identifier *a);

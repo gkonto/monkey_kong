@@ -567,8 +567,8 @@ void TestIntegerLiteralExpression::execute()
          return;
      }
 
-     if (exp->op().compare(a.op_)) {
-         errorf(a.input_, "Operator is not %s. got = %s\n", a.op_.c_str(), exp->op().c_str());
+     if (a.op_.compare(tok_names[exp->op()])) {
+         errorf(a.input_, "Operator is not %s. got = %s\n", a.op_.c_str(), tok_names[exp->op()]);
          return;
      }
 

@@ -137,50 +137,50 @@ void Evaluator::visitPrefixExpression(PrefixExpression *a) {
 }
 
 
-Single *Evaluator::evalIntegerInfixExpression(const std::string &op, Single *left, Single *right) {
+Single *Evaluator::evalIntegerInfixExpression(TokenType op, Single *left, Single *right) {
     //TODO remove all those compare with an array of function callbacks
     Single *temp = nullptr;
 
-    if (!op.compare("+")) {
+    if (op == T_PLUS) {
         temp = new Single(left->data.integer.value_ + right->data.integer.value_);
-    } else if (!op.compare("-")) {
+    } else if (op == T_MINUS) {
         temp = new Single(left->data.integer.value_ - right->data.integer.value_);
-    } else if (!op.compare("*")) {
+    } else if (op == T_ASTERISK) {
         temp = new Single(left->data.integer.value_ * right->data.integer.value_);
-    } else if (!op.compare("/")) {
+    } else if (op == T_SLASH) {
         temp = new Single(left->data.integer.value_ / right->data.integer.value_);
-    } else if (!op.compare("<")) {
+    } else if (op == T_LT) {
         temp = nativeBoolToSingObj(left->data.integer.value_ < right->data.integer.value_);
-    } else if (!op.compare(">")) {
+    } else if (op == T_GT) {
         temp = nativeBoolToSingObj(left->data.integer.value_ > right->data.integer.value_);
-    } else if (!op.compare("==")) {
+    } else if (op == T_EQ) {
         temp = nativeBoolToSingObj(left->data.integer.value_ == right->data.integer.value_);
-    } else if (!op.compare("!=")) {
+    } else if (op == T_NOT_EQ) {
         temp = nativeBoolToSingObj(left->data.integer.value_ != right->data.integer.value_);
     } else {
         char buffer[80];
-        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
         temp = new Single(strdup(buffer));
     }
 
     return temp;
 }
 
-Single *Evaluator::evalInfixExpression(const std::string &op, Single *left, Single *right) {
+Single *Evaluator::evalInfixExpression(TokenType op, Single *left, Single *right) {
     Single *temp = nullptr;
     if (left->type_ == INTEGER && right->type_ == INTEGER) {
         temp = evalIntegerInfixExpression(op, left, right);
-    } else if (!op.compare("==")) {
+    } else if (op == T_EQ) {
         temp = nativeBoolToSingObj(left==right);
-    } else if (!op.compare("!=")) {
+    } else if (op == T_NOT_EQ) {
         temp = nativeBoolToSingObj(left!=right);
     } else if (left->type_ != right->type_) {
         char buffer[80];
-        sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
         temp = new Single(strdup(buffer));
     } else {
         char buffer[80];
-        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], op.c_str(), object_name[right->type_]);
+        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
         temp = new Single(strdup(buffer));
     }
 
