@@ -2,7 +2,7 @@
 #define ENV_HPP
 
 #include <unordered_map>
-#include <unordered_set>
+#include <map>
 #include <string>
 #include <memory>
 #include "pool.hpp"
@@ -36,7 +36,7 @@ class Environment {
 
     private:
         int count_ = 1;
-        std::unordered_map<std::string, Single *> store_;
+        std::map<std::string, Single *> store_;
         Environment *outer_ = nullptr;
 };
 
