@@ -1184,12 +1184,27 @@ void TestStringLiteralExpression::execute()
     StringLiteral *literal = dynamic_cast<StringLiteral *>(stmt->expression());
 
     if (!literal) {
-        errorf(input, "exp not *ast.StringLiteral)");
+        errorf(input, "exp not *ast.StringLiteral\n");
         return;
     }
 
     if (literal->value().compare("hello world")) {
-        errorf(input, "literal.Value not %s. got=%s", "\"hello world\"", literal->value().c_str());
+        errorf(input, "literal.Value not %s. got=%s\n", "\"hello world\"", literal->value().c_str());
+        return;
+    }
+}
+
+void TestStringLiteral::execute()
+{
+    std::string input("\"Hello World\"");
+    Environment env;
+    Single *evaluated = eval(input, env);
+    if (evaluated->type_ != STRING) {
+        errorf(input, "object is not string.got %s\n", object_name[evaluated->type_]);
+        return;
+    }
+    if (strcmp(evaluated->data.string.value_, "Hello World")) {
+        errorf("String has wrong value. Expected %s, got %s\n", input.c_str(), evaluated->data.string.value_);
         return;
     }
 }

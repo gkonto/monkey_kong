@@ -371,6 +371,14 @@ struct TestStringLiteralExpression : public Test
 };
 
 
+struct TestStringLiteral : public Test
+{
+    TestStringLiteral() : Test("TestStringLiteral") {}
+    void execute();
+};
+
+
+
 
 
 

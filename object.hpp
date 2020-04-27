@@ -30,7 +30,7 @@ extern std::unique_ptr<Pool<Single>> SingPool;
      X(HASH_KEY, "HASH_KEY")\
      X(COMPILED_FUNCTION, "COMPILED_FUNCTION")\
      X(CLOSURE, "CLOSURE")\
-     X(MAX, "MAX")\
+     X(MAX, "MAX")
 
  #define X(a, b) a,
  enum ObjType
@@ -65,6 +65,9 @@ struct Single
     }
     explicit Single(char *msg) : type_(ERROR) {
         data.error.msg_ = msg;
+    }
+    explicit Single(const char *msg) : type_(STRING) {
+        data.string.value_ = msg;
     }
     explicit Single(std::vector<Identifier *> *parameters, 
             Environment *env, 
@@ -104,6 +107,9 @@ struct Single
             BlockStatement *body_; 
             Environment *env_;
         } function;
+        struct {
+            const char *value_;
+        }string;
     } data;
     ObjType type_;
     char count_ = 0;
