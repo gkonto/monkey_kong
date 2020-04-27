@@ -378,6 +378,13 @@ struct TestStringLiteral : public Test
 };
 
 
+struct TestStringConcatenation : public Test
+{
+    TestStringConcatenation() : Test("TestStringConcatenation") {}
+    void execute();
+};
+
+
 
 
 

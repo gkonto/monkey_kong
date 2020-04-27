@@ -549,6 +549,21 @@ Single *PrefixExpression::evalPrefixExpression(Environment *s) {
 }
 
 
+static Single *evalStringInfixExpression(TokenType op, Single *left, Single *right) {
+    if (op != T_PLUS) {
+        char buffer[80];
+        sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
+        return Single::alloc(strdup(buffer));
+    }
+
+    char buffer[1024];
+    const char *l = left->data.string.value_;
+    const char *r = right->data.string.value_;
+    strcpy(buffer, l);
+    strcat(buffer, r);
+    return Single::alloc(buffer, STRING);
+}
+
 static Single *evalIntegerInfixExpression(TokenType op, Single *left, Single *right) {
     //TODO remove all those compare with an array of function callbacks
     Single *temp = nullptr;
@@ -583,6 +598,7 @@ static Single *evalInfixExpression_core(TokenType op, Single *left, Single *righ
     Single *temp = nullptr;
     if (left->type_ == INTEGER && right->type_ == INTEGER) {
         temp = evalIntegerInfixExpression(op, left, right);
+    
     } else if (op == T_EQ) {
         temp = nativeBoolToSingObj(left == right);
     } else if (op == T_NOT_EQ) {
@@ -591,6 +607,8 @@ static Single *evalInfixExpression_core(TokenType op, Single *left, Single *righ
         char buffer[80];
         sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
         temp = Single::alloc(strdup(buffer));
+    } else if (left->type_ == STRING) { 
+        temp = evalStringInfixExpression(op, left, right);
     } else {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);

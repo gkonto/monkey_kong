@@ -1207,6 +1207,27 @@ void TestStringLiteral::execute()
         errorf("String has wrong value. Expected %s, got %s\n", input.c_str(), evaluated->data.string.value_);
         return;
     }
+    evaluated->release();
+}
+
+
+void TestStringConcatenation::execute()
+{
+    std::string input("\"Hello\" + \" \" + \"World!\"");
+
+    Environment env;
+    Single *evaluated = eval(input, env);
+
+    if (evaluated->type_ != STRING) {
+        errorf(input, "object is not String.got = %s\n", object_name[evaluated->type_]);
+        return;
+    }
+
+    if (strcmp(evaluated->data.string.value_, "Hello World!")) {
+        errorf(input, "String has wrong value. got=%s, expected %s\n", evaluated->data.string.value_, "Hello World!");
+        return;
+    }
+    evaluated->release();
 }
 
 

@@ -36,10 +36,11 @@ struct Tests
         tests_.emplace("TestErrorHandler", new TestErrorHandler);
         tests_.emplace("TestFunctionObject", new TestFunctionObject);
         tests_.emplace("TestFunctionApplication", new TestFunctionApplication);
-        tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
+        //tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
         tests_.emplace("TestClosures", new TestClosures);
         tests_.emplace("TestStringLiteralExpression", new TestStringLiteralExpression);
         tests_.emplace("TestStringLiteral", new TestStringLiteral);
+        tests_.emplace("TestStringConcatenation", new TestStringConcatenation);
     }
 
     ~Tests()

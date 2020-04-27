@@ -20,7 +20,7 @@ void Single::release() {
             return;
         }
 
-        if (type_ == ERROR) {
+        if (type_ == ERROR || type_ == STRING) {
             free(data.error.msg_);
         } else if (type_ == FUNCTION) {
             data.function.env_->release();

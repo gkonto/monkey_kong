@@ -338,7 +338,7 @@ class StringLiteral : public Node
 
         std::string asString() const;
         const std::string &value() const { return value_; }
-        Single *eval(Environment *s) { return Single::alloc(value_.c_str()); }
+        Single *eval(Environment *s) { return Single::alloc(value_.c_str(), STRING); }
         void accept(Visitor &v) {};
     private:
         std::string value_;

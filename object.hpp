@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <iostream>
+#include <string.h>
 #include <vector>
 #include "env.hpp"
 
@@ -66,8 +67,8 @@ struct Single
     explicit Single(char *msg) : type_(ERROR) {
         data.error.msg_ = msg;
     }
-    explicit Single(const char *msg) : type_(STRING) {
-        data.string.value_ = msg;
+    explicit Single(const char *msg, ObjType type) : type_(type) {
+        data.string.value_ = strdup(msg);
     }
     explicit Single(std::vector<Identifier *> *parameters, 
             Environment *env, 
@@ -108,7 +109,7 @@ struct Single
             Environment *env_;
         } function;
         struct {
-            const char *value_;
+            char *value_;
         }string;
     } data;
     ObjType type_;
