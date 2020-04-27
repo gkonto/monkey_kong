@@ -364,6 +364,13 @@ class TestClosures : public Test
 };
 
 
+struct TestStringLiteralExpression : public Test
+{
+        TestStringLiteralExpression() : Test("TestStringLiteralExpression") {}
+        void execute();
+};
+
+
 
 
 

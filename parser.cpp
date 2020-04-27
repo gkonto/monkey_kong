@@ -24,8 +24,8 @@ Parser::Parser(Lexer *l) : lexer_(l)
      registerPrefix(T_LPAREN, std::bind(&Parser::parseGroupedExpression, this));
      registerPrefix(T_IF,     std::bind(&Parser::parseIfExpression, this));
      registerPrefix(T_FUNCTION, std::bind(&Parser::parseFunctionLiteral, this));
-     /*
      registerPrefix(T_STRING, std::bind(&Parser::parseStringLiteral, this));
+     /*
      registerPrefix(T_LBRACKET, std::bind(&Parser::parseArrayLiteral, this));
      registerPrefix(T_LBRACE,   std::bind(&Parser::parseHashLiteral, this));
      */
@@ -44,6 +44,11 @@ Parser::Parser(Lexer *l) : lexer_(l)
    //  registerInfix(T_LBRACKET, std::bind(&Parser::parseIndexExpression, this, _1));
 
     initializePrecedence();
+}
+
+Node *Parser::parseStringLiteral()
+{
+    return new StringLiteral(cur_token_);
 }
 
  std::vector<Identifier *> Parser::parseFunctionParameters()

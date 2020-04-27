@@ -57,6 +57,7 @@ class Parser
     private:
         Let *parseLetStatement();
         Return *parseReturnStatement();
+        Node *parseStringLiteral();
         Node *parseStatement();
         Node *parseIdentifier();
         ExpressionStatement *parseExpressionStatement();

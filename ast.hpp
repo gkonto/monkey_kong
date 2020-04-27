@@ -26,7 +26,8 @@ enum AstNodeType {
     AST_BLOCKSTATEMENT,
     AST_IF,
     AST_FUNCTIONLITERAL,
-    AST_CALLEXPRESSION
+    AST_CALLEXPRESSION,
+    AST_STRINGLITERAL
 };
 
 struct Node
@@ -327,7 +328,22 @@ class ExpressionStatement : public Node
          Node *function_;
          std::vector<Node *> arguments_;
  };
- 
+
+
+class StringLiteral : public Node
+{
+    public: 
+        explicit StringLiteral(Token *tok) 
+            : Node(AST_STRINGLITERAL), value_(tok->literal()), tok_(tok) {}
+
+        std::string asString() const;
+        const std::string &value() const { return value_; }
+        Single *eval(Environment *s) { return nullptr; }
+        void accept(Visitor &v) {};
+    private:
+        std::string value_;
+        Token *tok_;
+};
 
 
 #endif

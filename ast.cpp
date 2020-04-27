@@ -777,3 +777,7 @@ Single *CallExpression::evalCallExpression(Environment *s) {
     return ret;
 }
 
+
+std::string StringLiteral::asString() const {
+    return tok_->literal();
+}

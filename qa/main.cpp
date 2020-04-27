@@ -38,6 +38,7 @@ struct Tests
         tests_.emplace("TestFunctionApplication", new TestFunctionApplication);
         tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
         tests_.emplace("TestClosures", new TestClosures);
+        tests_.emplace("TestStringLiteralExpression", new TestStringLiteralExpression);
     }
 
     ~Tests()

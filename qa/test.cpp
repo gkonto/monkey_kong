@@ -1172,3 +1172,26 @@ void TestClosures::execute()
     testIntegerObject(input, ret, 4);
     ret->release();
 }
+
+
+void TestStringLiteralExpression::execute()
+{
+    std::string input("\"hello world\"");
+    std::unique_ptr<Program> program = parse(input);
+
+    ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>(program->operator[](0));
+
+    StringLiteral *literal = dynamic_cast<StringLiteral *>(stmt->expression());
+
+    if (!literal) {
+        errorf(input, "exp not *ast.StringLiteral)");
+        return;
+    }
+
+    if (literal->value().compare("hello world")) {
+        errorf(input, "literal.Value not %s. got=%s", "\"hello world\"", literal->value().c_str());
+        return;
+    }
+}
+
+
