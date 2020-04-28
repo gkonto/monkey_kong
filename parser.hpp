@@ -64,6 +64,7 @@ class Parser
         Node *parseExpression(PrecedenceLevel prec);
          std::vector<Identifier *> parseFunctionParameters();
         Node *parseIntegerLiteral();
+        Node *parseArrayLiteral();
         std::vector<Node *> parseExpressionList(TokenType end);
         Node *parsePrefixExpression();
         Node *parseInfixExpression(Node *left);

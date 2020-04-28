@@ -42,6 +42,7 @@ struct Tests
         tests_.emplace("TestStringLiteral", new TestStringLiteral);
         tests_.emplace("TestStringConcatenation", new TestStringConcatenation);
         tests_.emplace("TestBuiltinFunction", new TestBuiltinFunction);
+        tests_.emplace("TestParsingArrayLiteral", new TestParsingArrayLiteral);
     }
 
     ~Tests()

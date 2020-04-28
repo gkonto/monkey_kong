@@ -1265,4 +1265,31 @@ void TestBuiltinFunction::run_core(std::string input, int expected)
 }
 
 
+void TestParsingArrayLiteral::execute() {
+
+    std::string input("[1, 2 * 2, 3 + 3]");
+
+    std::unique_ptr<Program> program = parse(input);
+
+    ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>(program->operator[](0));
+
+    ArrayLiteral *array = dynamic_cast<ArrayLiteral *>(stmt->expression());
+
+    if (!array) {
+        errorf(input, "exp not ArrayLiteral.");
+        return;
+    }
+
+    if (array->size() != 3) {
+        errorf(input, "len(array.Elements) not 3. got: %d", array->size());
+        return;
+    }
+
+    testIntegerLiteral(input, array->at(0), 1);
+
+    testInfixExpression(input, array->at(1), 2, "*", 2);
+    testInfixExpression(input, array->at(2), 3, "+", 3);
+}
+
+
 

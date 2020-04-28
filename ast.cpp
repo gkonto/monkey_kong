@@ -809,3 +809,47 @@ Single *CallExpression::evalCallExpression(Environment *s) {
 std::string StringLiteral::asString() const {
     return tok_->literal();
 }
+
+std::string ArrayLiteral::asString() const {
+    std::string ret;
+    
+    ret.append("[");
+
+    //TODO refactoring. I need the index during the loop
+    // I should not add comma in the last argument.
+    size_t i = 1;
+    size_t total = elements_.size();
+    for (auto &a : elements_) {
+        ret.append(a->asString());
+        if (i != total) {
+            ret.append(", ");
+        }
+        i++;
+    }
+    ret.append("]");
+
+    return ret;
+}
+
+ArrayLiteral::~ArrayLiteral() {
+    for (auto &a: elements_) {
+        delete a;
+    }
+}
+
+
+std::string IndexExpression::asString() const
+{
+    std::string ret;
+
+    ret.append("(");
+    ret.append(left_->asString());
+    ret.append("[");
+    ret.append(index_->asString());
+    ret.append("])");
+
+    return ret;
+}
+
+
+

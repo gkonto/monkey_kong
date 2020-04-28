@@ -21,6 +21,7 @@ enum AstNodeType {
     AST_EXPRESSIONSTATEMENT,
     AST_INTEGERLITERAL,
     AST_INFIXEXPRESSION,
+    AST_ARRAYLITERAL,
     AST_PREFIXEXPRESSION,
     AST_BOOLEAN,
     AST_BLOCKSTATEMENT,
@@ -147,8 +148,8 @@ class ExpressionStatement : public Node
          };
 
         std::string asString() const;
-         Node *expression() const { return expression_; }
-         void setExpression(Node *exp) { expression_ = exp; }
+        Node *expression() const { return expression_; }
+        void setExpression(Node *exp) { expression_ = exp; }
         virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalExpressionStatement(Environment *s);
@@ -343,6 +344,35 @@ class StringLiteral : public Node
     private:
         std::string value_;
         Token *tok_;
+};
+
+
+class ArrayLiteral : public Node
+{
+    public:
+        ArrayLiteral(Token *tok, std::vector<Node *> &elements)
+            : Node(AST_ARRAYLITERAL), elements_(elements), tok_(tok) {}
+
+        ~ArrayLiteral();
+        std::string asString() const;
+        size_t size() const { return elements_.size(); }
+        Node *at(size_t idx) const { return elements_.at(idx); }
+        Single *eval(Environment *s) { return nullptr; }
+        void accept(Visitor &v) {}
+    private:
+        std::vector<Node *>elements_;
+        Token *tok_;
+};
+
+
+class IndexExpression : public Node
+{
+    public:
+        std::string asString() const;
+    private:
+        Token tok_;
+        Node *left_;
+        Node *index_;
 };
 
 

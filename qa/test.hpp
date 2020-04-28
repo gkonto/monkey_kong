@@ -398,6 +398,15 @@ class TestBuiltinFunction : public Test
 
 
 
+struct TestParsingArrayLiteral : public Test
+{
+        TestParsingArrayLiteral() : Test("TestParsingArrayLiteral") {}
+        void execute();
+};
+
+
+
+
 
 
 #endif
