@@ -385,6 +385,16 @@ struct TestStringConcatenation : public Test
 };
 
 
+class TestBuiltinFunction : public Test
+{
+    public:
+        TestBuiltinFunction() : Test("TestBuiltinFunction") {}
+        void execute();
+    private:
+        void run_core(std::string input, std::string expected);
+        void run_core(std::string input, int expected);
+
+};
 
 
 

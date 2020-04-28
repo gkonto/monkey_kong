@@ -15,6 +15,7 @@
      ../symbols.hpp
      ../object.hpp
      ../visitor.hpp
+     ../builtins.hpp
      ../ast.hpp
      ../parser.hpp
      ../pool.hpp
@@ -26,6 +27,7 @@
      ../token.cpp
      ../lexer.cpp
      ../object.cpp
+     ../builtins.cpp
      ../symbols.cpp
      ../ast.cpp
      ../visitor.cpp

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <vector>
 #include "env.hpp"
+#include "builtins.hpp"
 
 struct Single;
 class Bool;
@@ -65,7 +66,7 @@ struct Single
         data.obj.obj_ = val;
     }
     explicit Single(char *msg) : type_(ERROR) {
-        data.error.msg_ = msg;
+        data.error.msg_ = strdup(msg);
     }
     explicit Single(const char *msg, ObjType type) : type_(type) {
         data.string.value_ = strdup(msg);
@@ -80,8 +81,13 @@ struct Single
         data.function.env_ = env;
         env->retain();
     }
-    explicit Single() : type_(NUL) {
+   
+    explicit Single(Builtins::Function f) : type_(BUILTIN) {
+        data.builtin.f_ = f;
     }
+
+    explicit Single() : type_(NUL) {}
+
     void retain() {  ++count_; }
 
     void release();
@@ -111,6 +117,9 @@ struct Single
         struct {
             char *value_;
         }string;
+        struct {
+            Builtins::Function f_;
+        }builtin;
     } data;
     ObjType type_;
     char count_ = 0;

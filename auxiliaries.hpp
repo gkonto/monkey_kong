@@ -9,5 +9,7 @@
 #define BOLD    "\033[1m"
 #define RESET   "\033[0m"
 
+const int MAX_ARGS_NUM = 25;
+
 
 #endif

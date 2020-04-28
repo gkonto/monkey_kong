@@ -1204,7 +1204,7 @@ void TestStringLiteral::execute()
         return;
     }
     if (strcmp(evaluated->data.string.value_, "Hello World")) {
-        errorf("String has wrong value. Expected %s, got %s\n", input.c_str(), evaluated->data.string.value_);
+        errorf(input, "String has wrong value. Expected %s, got %s\n", input.c_str(), evaluated->data.string.value_);
         return;
     }
     evaluated->release();
@@ -1229,5 +1229,40 @@ void TestStringConcatenation::execute()
     }
     evaluated->release();
 }
+
+
+void TestBuiltinFunction::execute()
+{
+    run_core("len(\"\")", 0);
+    run_core("len(\"four\")", 4);
+    run_core("len(\"hello world\")", 11);
+    run_core("len(1)", "argument to 'len' not supported. got INTEGER\n");
+    run_core("len(\"one\", \"two\")", "wrong number of arguments. got: 2, want: 1");
+}
+
+void TestBuiltinFunction::run_core(std::string input, std::string expected)
+{
+    Environment env;
+    Single *evaluated = eval(input, env);
+
+    if (evaluated->type_ != ERROR) {
+        errorf(input, "object is not ErrorObj");
+        return;
+    }
+    if (strcmp(evaluated->data.error.msg_, expected.c_str())) {
+        errorf(input, "wrong error message.\nexpected = %s, got %s\n", expected.c_str(), evaluated->data.error.msg_);
+    }
+
+    evaluated->release();
+}
+
+void TestBuiltinFunction::run_core(std::string input, int expected)
+{
+    Environment env;
+    Single *evaluated = eval(input, env);
+    testIntegerObject(input, evaluated, expected);
+    evaluated->release();
+}
+
 
 

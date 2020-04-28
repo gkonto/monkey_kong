@@ -4,8 +4,6 @@
 #include "env.hpp"
 #include "visitor.hpp"
 
-const int MAX_ARGS_NUM = 25;
-
 #ifdef NODISPATCH
 Single *Node::eval(Environment *s) {
     Single *temp = nullptr;
@@ -443,13 +441,20 @@ Single *Program::eval(Environment *s) {
 Single *Identifier::evalIdentifier(Environment *s) {
     const std::string &key = value();
     Single *val = s->get(key);
-    if (!val) {
-        char buffer[80];
-        sprintf(buffer, "identifier not found: %s", key.c_str());
-        return Single::alloc(strdup(buffer));
+    if (val) {
+        val->retain();
+        return val;
     }
-    val->retain();
-    return val;
+
+    val = Builtins::Get(key);
+    if (val) {
+        val->retain();
+        return val;
+    }
+
+    char buffer[80];
+    sprintf(buffer, "identifier not found: %s", key.c_str());
+    return Single::alloc(buffer);
 }
 
 Single *Identifier::eval(Environment *s) {
@@ -508,7 +513,7 @@ static Single *evalBangOperatorExpression(Single *right) {
      if (right->type_ != INTEGER) {
          char buffer[80];
          sprintf(buffer, "unknown operator: -%s", object_name[right->type_]);
-         return Single::alloc(strdup(buffer));
+         return Single::alloc(buffer);
      }
      return Single::alloc(-right->data.integer.value_);
  }
@@ -526,7 +531,7 @@ static Single *evalPrefixExpression_core(const std::string &op, Single *right) {
     } else {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s%s", op.c_str(), object_name[right->type_] );
-        ret =  Single::alloc(strdup(buffer));
+        ret =  Single::alloc(buffer);
     }
     if (right) {
         right->release();
@@ -553,7 +558,7 @@ static Single *evalStringInfixExpression(TokenType op, Single *left, Single *rig
     if (op != T_PLUS) {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
-        return Single::alloc(strdup(buffer));
+        return Single::alloc(buffer);
     }
 
     char buffer[1024];
@@ -587,7 +592,7 @@ static Single *evalIntegerInfixExpression(TokenType op, Single *left, Single *ri
     } else {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
-        temp = Single::alloc(strdup(buffer));
+        temp = Single::alloc(buffer);
     }
 
     return temp;
@@ -606,13 +611,13 @@ static Single *evalInfixExpression_core(TokenType op, Single *left, Single *righ
     } else if (left->type_ != right->type_) {
         char buffer[80];
         sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
-        temp = Single::alloc(strdup(buffer));
+        temp = Single::alloc(buffer);
     } else if (left->type_ == STRING) { 
         temp = evalStringInfixExpression(op, left, right);
     } else {
         char buffer[80];
         sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_], tok_names[op], object_name[right->type_]);
-        temp = Single::alloc(strdup(buffer));
+        temp = Single::alloc(buffer);
     }
 
     if (temp) {
@@ -711,7 +716,7 @@ static bool evalExpressions(const std::vector<Node *> &args, std::array<Single *
     if (numArgs > MAX_ARGS_NUM) {
         char buffer[80];
         sprintf(buffer, "Cannot support more than 25 args in a function");
-        Single *err =  Single::alloc(strdup(buffer));
+        Single *err =  Single::alloc(buffer);
         arg_to_return[0] = err;
         return true;
     }
@@ -755,20 +760,24 @@ static Single *unwrapReturnValue(Single *val) {
 
 
 
-static Single *applyFunction(Single *fn, std::array<Single *, MAX_ARGS_NUM> &args, Environment *s) {
-    if (fn->type_ != FUNCTION) {
-        char buffer[80];
-        sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
-        return Single::alloc(strdup(buffer));
+static Single *applyFunction(Single *fn, std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num) {
+    if (fn->type_ == BUILTIN) {
+        return fn->data.builtin.f_(args, args_num);
     }
-    
+   
+    if (fn->type_ == FUNCTION) {
+        Environment *extended_env = extendFunctionEnv(fn, args);
+        Single *ret = fn->data.function.body_->eval(extended_env);
 
-    Environment *extended_env = extendFunctionEnv(fn, args);
-    Single *ret = fn->data.function.body_->eval(extended_env);
+        ret = unwrapReturnValue(ret);
+        extended_env->release();
+        return ret;
+    }
 
-    ret = unwrapReturnValue(ret);
-    extended_env->release();
-    return ret;
+    char buffer[80];
+    sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
+    return Single::alloc(buffer);
+
 }
 
 
@@ -781,15 +790,16 @@ Single *CallExpression::evalCallExpression(Environment *s) {
     if (isError(fn)) {
         return fn;
     }
-    std::array<Single *, MAX_ARGS_NUM> args;
-    bool isError = evalExpressions(arguments(), args, s);
+    std::array<Single *, MAX_ARGS_NUM> applied_args;
+    const std::vector<Node *> &args = arguments();
+    bool isError = evalExpressions(args, applied_args, s);
     if (isError) {
-        return args[0];
+        return applied_args[0];
     }
     //delete fn
-    Single *ret = applyFunction(fn, args, s);
+    Single *ret = applyFunction(fn, applied_args, args.size());
     for (size_t i = 0; i < size(); i++) {
-        args[i]->release();
+        applied_args[i]->release();
     }
     fn->release();
     return ret;
