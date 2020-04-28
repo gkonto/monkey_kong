@@ -610,10 +610,8 @@ void TestIntegerLiteralExpression::execute()
      tests_.emplace_back(OP("a + add(b * c) + d", "((a + add((b * c))) + d)"));
      tests_.emplace_back(OP("add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"));
      tests_.emplace_back(OP("add(a + b + c * d / f + g)","add((((a + b) + ((c * d) / f)) + g))"));
-     /*
      tests_.emplace_back(OP("a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"));
      tests_.emplace_back(OP("add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"));
-     */
  }
 
  void TestOperatorPrecedenceParsing::execute()
@@ -1289,6 +1287,29 @@ void TestParsingArrayLiteral::execute() {
 
     testInfixExpression(input, array->at(1), 2, "*", 2);
     testInfixExpression(input, array->at(2), 3, "+", 3);
+}
+
+
+void TestParsingIndexExpression::execute()
+{
+    std::string input("myArray[1 + 1]");
+
+    std::unique_ptr<Program> program = parse(input);
+
+    ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>(program->operator[](0));
+    IndexExpression *indexExp = dynamic_cast<IndexExpression *>(stmt->expression());
+    if (!indexExp) {
+        errorf(input, "exp not IndexExpression");
+        return;
+    }
+
+    if (!testIdentifier(input, indexExp->left(), "myArray")) {
+        return;
+    }
+
+    if (!testInfixExpression(input, indexExp->index(), 1, "+", 1)) {
+        return;
+    }
 }
 
 

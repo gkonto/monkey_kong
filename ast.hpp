@@ -25,6 +25,7 @@ enum AstNodeType {
     AST_PREFIXEXPRESSION,
     AST_BOOLEAN,
     AST_BLOCKSTATEMENT,
+    AST_INDEXEXPRESSION,
     AST_IF,
     AST_FUNCTIONLITERAL,
     AST_CALLEXPRESSION,
@@ -368,9 +369,24 @@ class ArrayLiteral : public Node
 class IndexExpression : public Node
 {
     public:
+        IndexExpression(Token *tok, Node *left, Node *index = nullptr) 
+            : Node(AST_INDEXEXPRESSION), tok_(tok), left_(left), index_(index) {
+
+        }
+        ~IndexExpression() {
+            delete left_;
+            if (index_) {
+                delete index_;
+            }
+        }
         std::string asString() const;
+        Node *index() const { return index_; }
+        Node *left() const { return left_; }
+        void setIndex(Node *index) { index_ = index; }
+        Single *eval(Environment *s) { return nullptr; }
+        void accept(Visitor &v) {}
     private:
-        Token tok_;
+        Token *tok_;
         Node *left_;
         Node *index_;
 };

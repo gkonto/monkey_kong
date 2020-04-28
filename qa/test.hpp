@@ -405,6 +405,12 @@ struct TestParsingArrayLiteral : public Test
 };
 
 
+struct TestParsingIndexExpression : public Test
+{
+        TestParsingIndexExpression() : Test("TestParsingIndexExpression") {}
+        void execute();
+};
+
 
 
 

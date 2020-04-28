@@ -41,10 +41,26 @@ Parser::Parser(Lexer *l) : lexer_(l)
      registerInfix(T_LT, std::bind(&Parser::parseInfixExpression, this, _1));
      registerInfix(T_GT, std::bind(&Parser::parseInfixExpression, this, _1));
      registerInfix(T_LPAREN, std::bind(&Parser::parseCallExpression, this, _1));
-   //  registerInfix(T_LBRACKET, std::bind(&Parser::parseIndexExpression, this, _1));
+     registerInfix(T_LBRACKET, std::bind(&Parser::parseIndexExpression, this, _1));
 
     initializePrecedence();
 }
+
+Node *Parser::parseIndexExpression(Node *left)
+{
+    IndexExpression *exp = new IndexExpression(cur_token_, left, nullptr);
+
+    nextToken();
+    exp->setIndex(parseExpression(PL_LOWEST));
+
+    if (!expectPeek(T_RBRACKET)) {
+        return nullptr;
+    }
+
+    return exp;
+}
+
+
 
 Node *Parser::parseArrayLiteral()
 {
