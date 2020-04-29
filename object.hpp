@@ -72,7 +72,7 @@ struct Single
         data.string.value_ = strdup(msg);
     }
     explicit Single(Single **elements, int num) : type_(ARRAY) {
-        data.array.elems_ = new Single *[num]; 
+        data.array.elems_ = new Single *[num];
         memcpy(data.array.elems_, elements, sizeof(Single *) * num);
         data.array.num_ = num;
     }
