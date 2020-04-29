@@ -1314,3 +1314,27 @@ void TestParsingIndexExpression::execute()
 
 
 
+void TestArrayLiterals::execute()
+{
+    std::string input("[1, 2 * 2, 3 + 3]");
+
+    Environment env;
+    Single *evaluated = eval(input, env);
+    if (evaluated->type_ != ARRAY) {
+        errorf(input, "object is not ArrayObj");
+        return;
+    }
+
+    if (evaluated->data.array.num_ != 3) {
+        errorf(input, "array has wrong num of elements. got: %d, expected: 3", evaluated->data.array.num_);
+        return;
+    }
+
+    testIntegerObject(input, evaluated->data.array.elems_[0], 1);
+    testIntegerObject(input, evaluated->data.array.elems_[1], 4);
+    testIntegerObject(input, evaluated->data.array.elems_[2], 6);
+
+    evaluated->release();
+}
+
+

@@ -71,6 +71,11 @@ struct Single
     explicit Single(const char *msg, ObjType type) : type_(type) {
         data.string.value_ = strdup(msg);
     }
+    explicit Single(Single **elements, int num) : type_(ARRAY) {
+        data.array.elems_ = new Single *[num]; 
+        memcpy(data.array.elems_, elements, sizeof(Single *) * num);
+        data.array.num_ = num;
+    }
     explicit Single(std::vector<Identifier *> *parameters, 
             Environment *env, 
             BlockStatement *body)
@@ -87,7 +92,6 @@ struct Single
     }
 
     explicit Single() : type_(NUL) {}
-
     void retain() {  ++count_; }
 
     void release();
@@ -120,6 +124,10 @@ struct Single
         struct {
             Builtins::Function f_;
         }builtin;
+        struct {
+            Single **elems_;
+            int num_;
+        } array;
     } data;
     ObjType type_;
     char count_ = 0;

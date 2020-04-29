@@ -400,8 +400,8 @@ class TestBuiltinFunction : public Test
 
 struct TestParsingArrayLiteral : public Test
 {
-        TestParsingArrayLiteral() : Test("TestParsingArrayLiteral") {}
-        void execute();
+    TestParsingArrayLiteral() : Test("TestParsingArrayLiteral") {}
+    void execute();
 };
 
 
@@ -410,6 +410,14 @@ struct TestParsingIndexExpression : public Test
         TestParsingIndexExpression() : Test("TestParsingIndexExpression") {}
         void execute();
 };
+
+
+struct TestArrayLiterals : public Test
+{
+    TestArrayLiterals() : Test("TestArrayLiterals") {}
+    void execute();
+};
+
 
 
 

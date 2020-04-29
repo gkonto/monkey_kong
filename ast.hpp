@@ -358,8 +358,13 @@ class ArrayLiteral : public Node
         std::string asString() const;
         size_t size() const { return elements_.size(); }
         Node *at(size_t idx) const { return elements_.at(idx); }
-        Single *eval(Environment *s) { return nullptr; }
-        void accept(Visitor &v) {}
+        const std::vector<Node *> &elements() const { return elements_; }
+        Single *eval(Environment *s);
+        void accept(Visitor &v) { 
+            std::cout << "ArrayLiteral::accept(): TODO" << std::endl;
+            exit(1);
+
+        }
     private:
         std::vector<Node *>elements_;
         Token *tok_;
