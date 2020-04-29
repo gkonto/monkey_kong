@@ -24,6 +24,8 @@ void Single::release() {
             free(data.error.msg_);
         } else if (type_ == FUNCTION) {
             data.function.env_->release();
+        } else if (type_ == ARRAY) {
+            delete []data.array.elems_;
         }
 
         Single::dealloc(this);

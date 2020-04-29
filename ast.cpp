@@ -852,4 +852,12 @@ std::string IndexExpression::asString() const
 }
 
 
-
+Single *ArrayLiteral::eval(Environment *s) {
+    std::array<Single *, MAX_ARGS_NUM> eval_elems_; // TODO fix me. This must be a vector;
+    const std::vector<Node *> &elems = elements();
+    bool isError = evalExpressions(elems, eval_elems_, s);
+    if (isError) {
+        return eval_elems_[0];
+    }
+    return Single::alloc(&eval_elems_[0], elems.size());
+}
