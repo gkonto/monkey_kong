@@ -861,3 +861,44 @@ Single *ArrayLiteral::eval(Environment *s) {
     }
     return Single::alloc(&eval_elems_[0], elems.size());
 }
+
+
+static Single *evalArrayIndexExpression(Single *left, Single *index) {
+    int idx = index->data.integer.value_;
+    int max = left->data.array.num_ - 1;
+    if (idx < 0 || idx > max) {
+        return &Model::null_o;
+    }
+    Single *ret = left->data.array.elems_[idx];
+    ret->retain();
+    return ret;
+}
+
+static Single *evalIndexExpression(Single *left, Single *index) {
+    if (left->type_ == ARRAY && index->type_ == INTEGER) {
+        return evalArrayIndexExpression(left, index);
+    } else {
+        char buffer[80];
+        sprintf(buffer, "index operator not supported: %s", object_name[left->type_]);
+        return Single::alloc(buffer);
+    }
+}
+
+Single *IndexExpression::eval(Environment *s) {
+    Single *l= left()->eval(s);
+    if (l->type_ == ERROR) {
+        return l;
+    }
+    Single *i = index()->eval(s);
+    if (i->type_ == ERROR) {
+        return i;
+    }
+
+    Single *ret = evalIndexExpression(l, i);
+    l->release();
+    i->release();
+
+    return ret;
+}
+
+

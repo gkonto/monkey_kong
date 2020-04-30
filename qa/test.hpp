@@ -419,6 +419,17 @@ struct TestArrayLiterals : public Test
 };
 
 
+class TestArrayIndexExpressions : public Test
+{
+    public:
+        TestArrayIndexExpressions() : Test("TestArrayIndexExpressions") {}
+        void execute();
+    private:
+        void run_core(std::string input, int expected);
+        void run_core(std::string input, void *expected);
+
+};
+
 
 
 

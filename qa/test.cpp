@@ -1337,4 +1337,36 @@ void TestArrayLiterals::execute()
     evaluated->release();
 }
 
+void TestArrayIndexExpressions::execute()
+{
+    run_core("[1, 2, 3][0]", 1);
+    run_core("[1, 2, 3][1]", 2);
+    run_core("[1, 2, 3][2]", 3);
+    run_core("let i = 0; [1][i];", 1);
+    run_core("[1, 2, 3][ 1 + 1 ];", 3);
+    run_core("let myArray = [1, 2, 3]; myArray[2];", 3);
+    run_core("let myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", 6);
+    run_core("let myArray = [1, 2, 3]; let i = myArray[0]; myArray[i]", 2);
+    run_core("[1, 2, 3][3]", nullptr);
+    run_core("[1, 2, 3][-1]", nullptr);
+}
+
+void TestArrayIndexExpressions::run_core(std::string input, int expected)
+{
+    Environment env;
+    Single *evaluated = eval(input, env);
+    testIntegerObject(input, evaluated, expected);
+    evaluated->release();
+}
+
+void TestArrayIndexExpressions::run_core(std::string input, void *expected)
+{
+    Environment env;
+    Single *evaluated = eval(input, env);
+    testNullObject(input, evaluated);
+    evaluated->release();
+}
+
+
+
 

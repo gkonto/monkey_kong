@@ -388,7 +388,7 @@ class IndexExpression : public Node
         Node *index() const { return index_; }
         Node *left() const { return left_; }
         void setIndex(Node *index) { index_ = index; }
-        Single *eval(Environment *s) { return nullptr; }
+        Single *eval(Environment *s);
         void accept(Visitor &v) {}
     private:
         Token *tok_;
