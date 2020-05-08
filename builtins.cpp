@@ -68,8 +68,7 @@ static Single *last_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
 
     return &Model::null_o;
 }
-/*
-edo eimai kano autes tis callbacks. na ta ksanado
+
 
 static Single *rest_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
@@ -85,17 +84,17 @@ static Single *rest_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
         return Single::alloc(buffer);
     }
 
-    size_t length = args_num;
+    Single *arr = args[0];
+    size_t length = arr->data.array.num_;
     if (length > 0) {
-        std::vector<Object *>::const_iterator first = args[0]->begin() + 1;
-        std::vector<Object *>::const_iterator last = args[args_num]->end();
-        return new ArrayObj(std::vector<Object *>(first, last));
+        return new Single(&arr->data.array.elems_[1], length - 1);
     }
 
-    return &StandardObjects::null_obj;
+    return &Model::null_o;
 }
 
 
+/*
 static Single *push_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
     if (args.size() != 2) {
@@ -151,8 +150,8 @@ Builtins::Builtins()
     builtins_.emplace("last", new Single(last_b));
     /*
     builtins_.emplace("push", new Single(push_b));
-    builtins_.emplace("rest", new Single(rest_b));
     */
+    builtins_.emplace("rest", new Single(rest_b));
 }
 
 Builtins::~Builtins()
