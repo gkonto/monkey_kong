@@ -94,24 +94,32 @@ static Single *rest_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
 }
 
 
-/*
 static Single *push_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
-    if (args.size() != 2) {
-        return new ErrorObj("wrong number of arguments. got: %d, want: %d\n", args.size(), 2);
+    if (args_num != 2) {
+        char buffer[80];
+        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 2);
+        return Single::alloc(buffer);
     }
 
-    ArrayObj *arrObj = dynamic_cast<ArrayObj *>(args[0]);
-    if (!arrObj) {
-        return new ErrorObj("argument to 'push' must be ARRAY");
+    if (args[0]->type_ != ARRAY) {
+        char buffer[80];
+        sprintf(buffer, "argument to 'push' must be ARRAY");
+        return Single::alloc(buffer);
     }
 
-    std::vector<Object *> elems = arrObj->elements();
-    elems.emplace_back(args[1]);
+    Single **arr = args[0]->data.array.elems_;
+    int elems_num = args[0]->data.array.num_;
 
-    return new ArrayObj(elems);
+
+    void *new_arr = realloc(arr, (elems_num + 1) * sizeof(Single *));
+    args[0]->data.array.elems_ = static_cast<Single **>(new_arr);
+    args[0]->data.array.num_++;
+    args[0]->data.array.elems_[elems_num] = args[1];
+    args[1]->retain();
+
+    return args[0];
 }
-*/
 
 
 Builtins &Builtins::getInstance()
@@ -148,9 +156,7 @@ Builtins::Builtins()
     builtins_.emplace("len", Single::alloc(len_b));
     builtins_.emplace("first", new Single(first_b));
     builtins_.emplace("last", new Single(last_b));
-    /*
     builtins_.emplace("push", new Single(push_b));
-    */
     builtins_.emplace("rest", new Single(rest_b));
 }
 
