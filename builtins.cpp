@@ -17,74 +17,78 @@ static Single *len_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args
     Single *f = args[0];
     if (f->type_ == STRING) {
         return Single::alloc(static_cast<int>(strlen(f->data.string.value_)));
+    } else if (f->type_ == ARRAY) {
+        return Single::alloc(static_cast<int>(args_num));
     }
-
-    /*
-    ArrayObj *arrObj = dynamic_cast<ArrayObj *>(args[0]);
-    if (arrObj) {
-        return new IntObj(arrObj->size());
-    }
-    */
 
     char buffer[80];
     sprintf(buffer, "argument to 'len' not supported. got %s\n", object_name[f->type_]);
     return Single::alloc(buffer);
 }
 
+static Single *first_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
+{
+    if (args_num != 1) {
+        char buffer[80];
+        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 1);
+        return Single::alloc(buffer);
+    }
+
+    if (args[0]->type_ != ARRAY) {
+        char buffer[80];
+        sprintf(buffer, "argument to 'first' must be ARRAY");
+        return Single::alloc(buffer);
+    }
+
+    if (args_num > 0) {
+        return args[0]->data.array.elems_[0];
+    }
+
+    return &Model::null_o;
+}
+
+
 /*
-static Object * first_b(const std::vector<Object *> &args)
+static Single *last_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
-    if (args.size() != 1) {
-        return new ErrorObj("wrong number of arguments. got: %d, want: %d\n", args.size(), 1);
+    if (args_num != 1) {
+        char buffer[80];
+        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 1);
+        return Single::alloc(buffer);
     }
 
-    ArrayObj *arrObj = dynamic_cast<ArrayObj *>(args[0]);
-    if (!arrObj) {
-        return new ErrorObj("argument to 'first' must be ARRAY");
+    if (args[0]->type_ != ARRAY) {
+        char buffer[80];
+        sprintf(buffer, "argument to 'last' must be ARRAY", args_num, 1);
+        return Single::alloc(buffer);
     }
 
-    if (arrObj->size() > 0) {
-        return arrObj->operator[](0);
+    if (args_num > 0) {
+        return args[args_num - 1];
     }
 
-    return &StandardObjects::null_obj;
+    return &Model::null_o;
 }
+edo eimai kano autes tis callbacks. na ta ksanado
 
-
-static Object * last_b(const std::vector<Object *> &args)
+static Single *rest_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
-    if (args.size() != 1) {
-        return new ErrorObj("wrong number of arguments. got: %d, want: %d\n", args.size(), 1);
+    if (args_num != 1) {
+        char buffer[80];
+        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 1);
+        return Single::alloc(buffer);
     }
 
-    ArrayObj *arrObj = dynamic_cast<ArrayObj *>(args[0]);
-    if (!arrObj) {
-        return new ErrorObj("argument to 'last' must be ARRAY");
+    if (args[0]->type_ != ARRAY) {
+        char buffer[80];
+        sprintf(buffer, "argument to 'rest' must be ARRAY");
+        return Single::alloc(buffer);
     }
 
-    if (arrObj->size() > 0) {
-        return arrObj->operator[](arrObj->size() - 1);
-    }
-
-    return &StandardObjects::null_obj;
-}
-
-
-static Object * rest_b(const std::vector<Object *> &args)
-{
-    if (args.size() != 1) {
-        return new ErrorObj("wrong number of arguments. got: %d, want: %d\n", args.size(), 1);
-    }
-
-    ArrayObj *arrObj = dynamic_cast<ArrayObj *>(args[0]);
-    if (!arrObj) {
-        return new ErrorObj("argument to 'rest' must be ARRAY");
-    }
-
-    size_t length = arrObj->size();
+    size_t length = args_num;
     if (length > 0) {
-        std::vector<Object *>::const_iterator first = arrObj->begin() + 1;
-        std::vector<Object *>::const_iterator last = arrObj->end();
+        std::vector<Object *>::const_iterator first = args[0]->begin() + 1;
+        std::vector<Object *>::const_iterator last = args[args_num]->end();
         return new ArrayObj(std::vector<Object *>(first, last));
     }
 
@@ -92,7 +96,7 @@ static Object * rest_b(const std::vector<Object *> &args)
 }
 
 
-static Object * push_b(const std::vector<Object *> &args)
+static Single *push_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
     if (args.size() != 2) {
         return new ErrorObj("wrong number of arguments. got: %d, want: %d\n", args.size(), 2);
@@ -142,8 +146,8 @@ Single *Builtins::atIndex(size_t index) const
 Builtins::Builtins()
 {
     builtins_.emplace("len", Single::alloc(len_b));
-    /*
     builtins_.emplace("first", new Single(first_b));
+    /*
     builtins_.emplace("last", new Single(last_b));
     builtins_.emplace("push", new Single(push_b));
     builtins_.emplace("rest", new Single(rest_b));

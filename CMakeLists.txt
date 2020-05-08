@@ -16,6 +16,7 @@
      object.hpp
      visitor.hpp
      ast.hpp
+     builtins.hpp
      env.hpp
      parser.hpp
     )
@@ -31,6 +32,7 @@
      env.cpp
      token.cpp
      repl.cpp
+     builtins.cpp
      )
  ADD_EXECUTABLE(monkey ${HEADERS} ${SOURCES})
 

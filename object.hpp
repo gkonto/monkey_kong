@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <iostream>
+#include <sstream>
 #include <string.h>
 #include <vector>
 #include "env.hpp"
@@ -99,6 +100,62 @@ struct Single
     template<typename... Args>
     static Single *alloc(Args... args);
     static void dealloc(Single *env);
+
+    std::string inspect() const {
+        if (type_ == INTEGER) {
+            return inspectInteger();
+        } else if (type_ == ARRAY) {
+            return inspectArray();
+        } else if (type_ == BOOLEAN) {
+            return inspectBoolean();
+        } else if (type_ == NUL) {
+            return "null";
+        } else if (type_ == RETURN) {
+            return data.obj.obj_->inspect();
+        } else if (type_ == ERROR) {
+            return inspectError();
+        } else if (type_ == FUNCTION) {
+            return inspectFunction();
+        } else if (type_ == STRING) {
+            return  inspectString();
+        } else if (type_ == BUILTIN) {
+            return  "builtin function";
+        } else if (type_ == ARRAY) {
+            return  inspectArray();
+        } else {
+            return "ERROR: Needs inspect()";
+        }
+    }
+
+    std::string inspectArray() const;
+
+    std::string inspectString() const {
+        std::stringstream ss;
+        ss << data.string.value_;
+        return ss.str();
+    }
+
+    std::string inspectFunction() const;
+        
+    std::string inspectInteger() const {
+        std::stringstream ss;
+        ss << data.integer.value_;
+        return ss.str();
+    }
+
+    std::string inspectError() const {
+        std::stringstream ss;
+        ss << "Error: ";
+        ss << data.error.msg_;
+        return ss.str();
+    }
+
+
+    std::string inspectBoolean() const {
+        std::stringstream ss;
+        ss << data.boolean.value_;
+        return ss.str();
+    }
 
     union {
         struct {

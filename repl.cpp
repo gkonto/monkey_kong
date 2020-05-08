@@ -39,14 +39,13 @@ void Repl::start(bool calc_t)
         Parser p(&lex);
         std::unique_ptr<Program> prog = p.parseProgram();
 
-        Evaluator evaluator(prog.get(), env);
-        Single *obj = evaluator.eval();
+        Single *obj = prog->eval(&env);
 
         auto end = high_resolution_clock::now();
 
         if (obj) {
-            std::cout << obj->data.integer.value_ << std::endl;
-            delete obj;
+            std::cout << obj->inspect() << std::endl;
+            obj->release();
         }
 
         if (calc_t) {

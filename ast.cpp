@@ -3,6 +3,7 @@
 #include "ast.hpp"
 #include "env.hpp"
 #include "visitor.hpp"
+#include "builtins.hpp"
 
 #ifdef NODISPATCH
 Single *Node::eval(Environment *s) {
