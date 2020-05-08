@@ -48,7 +48,6 @@ static Single *first_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t ar
 }
 
 
-/*
 static Single *last_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
     if (args_num != 1) {
@@ -64,11 +63,12 @@ static Single *last_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
     }
 
     if (args_num > 0) {
-        return args[args_num - 1];
+        return args[0]->data.array.elems_[args[0]->data.array.num_ - 1];
     }
 
     return &Model::null_o;
 }
+/*
 edo eimai kano autes tis callbacks. na ta ksanado
 
 static Single *rest_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
@@ -143,12 +143,13 @@ Single *Builtins::atIndex(size_t index) const
     return b;
 }
 
+//TODO create tests for all builtins and check for memory leaks
 Builtins::Builtins()
 {
     builtins_.emplace("len", Single::alloc(len_b));
     builtins_.emplace("first", new Single(first_b));
-    /*
     builtins_.emplace("last", new Single(last_b));
+    /*
     builtins_.emplace("push", new Single(push_b));
     builtins_.emplace("rest", new Single(rest_b));
     */
