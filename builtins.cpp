@@ -154,10 +154,10 @@ Single *Builtins::atIndex(size_t index) const
 Builtins::Builtins()
 {
     builtins_.emplace("len", Single::alloc(len_b));
-    builtins_.emplace("first", new Single(first_b));
-    builtins_.emplace("last", new Single(last_b));
-    builtins_.emplace("push", new Single(push_b));
-    builtins_.emplace("rest", new Single(rest_b));
+    builtins_.emplace("first", Single::alloc(first_b));
+    builtins_.emplace("last", Single::alloc(last_b));
+    builtins_.emplace("push", Single::alloc(push_b));
+    builtins_.emplace("rest", Single::alloc(rest_b));
 }
 
 Builtins::~Builtins()

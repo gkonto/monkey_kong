@@ -26,10 +26,7 @@ Parser::Parser(Lexer *l) : lexer_(l)
      registerPrefix(T_FUNCTION, std::bind(&Parser::parseFunctionLiteral, this));
      registerPrefix(T_STRING, std::bind(&Parser::parseStringLiteral, this));
      registerPrefix(T_LBRACKET, std::bind(&Parser::parseArrayLiteral, this));
-     /*
      registerPrefix(T_LBRACE,   std::bind(&Parser::parseHashLiteral, this));
-     */
-
 
      using std::placeholders::_1;
      registerInfix(T_PLUS, std::bind(&Parser::parseInfixExpression, this, _1));
@@ -59,6 +56,36 @@ Node *Parser::parseIndexExpression(Node *left)
 
     return exp;
 }
+
+
+Node *Parser::parseHashLiteral()
+{
+    HashLiteral *hash = new HashLiteral(cur_token_);
+
+    while (!peekTokenIs(T_RBRACE)) {
+        nextToken();
+        Node *key = parseExpression(PL_LOWEST);
+
+        if (!expectPeek(T_COLON)) {
+            return nullptr;
+        }
+
+        nextToken();
+        Node *value = parseExpression(PL_LOWEST);
+        hash->emplace(key, value);
+
+        if (!peekTokenIs(T_RBRACE) && !expectPeek(T_COMMA)) {
+            return nullptr;
+        }
+    }
+
+    if (!expectPeek(T_RBRACE)) {
+        return nullptr;
+    }
+
+    return hash;
+}
+
 
 
 

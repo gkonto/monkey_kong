@@ -71,6 +71,7 @@ class Parser
         Node *parseInfixExpression(Node *left);
         Node *parseFunctionLiteral();
         Node *parseBoolean();
+        Node *parseHashLiteral();
          BlockStatement *parseBlockStatement();
         Node *parseGroupedExpression();
         Node *parseIfExpression();

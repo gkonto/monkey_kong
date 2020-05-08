@@ -46,6 +46,9 @@ struct Tests
         tests_.emplace("TestParsingIndexExpression", new TestParsingIndexExpression);
         tests_.emplace("TestArrayLiterals", new TestArrayLiterals);
         tests_.emplace("TestArrayIndexExpressions", new TestArrayIndexExpressions);
+        tests_.emplace("TestParsingHashLiteral", new TestParsingHashLiteral);
+        tests_.emplace("TestParsingEmptyHashLiteral", new TestParsingEmptyHashLiteral);
+        tests_.emplace("TestParsingHashLiterallWithExpression", new TestParsingHashLiteralWithExpression);
     }
 
     ~Tests()

@@ -1368,5 +1368,107 @@ void TestArrayIndexExpressions::run_core(std::string input, void *expected)
 }
 
 
+void TestParsingHashLiteral::execute()
+{
+    std::string input("{\"one\": 1, \"two\":2, \"three\":3}");
+
+    std::unique_ptr<Program> program = parse(input);
+
+    ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>(program->operator[](0));
+    HashLiteral *hash = dynamic_cast<HashLiteral *>(stmt->expression());
+
+    if (!hash) {
+        errorf(input, "exp is not HashLiteral");
+        return;
+    }
+
+    size_t len = hash->size();
+    if (len != 3) {
+        errorf(input, "hash.pairs_ has wrong length. got: %d\n", len);
+        return;
+    }
+        
+    std::unordered_map<std::string, int> expected;
+    expected.emplace("one", 1);
+    expected.emplace("two", 2);
+    expected.emplace("three", 3);
+
+    for (auto &a : *hash) {
+        StringLiteral *literal = dynamic_cast<StringLiteral *>(a.first);
+        if (!literal) {
+            errorf(input, "key is not StringLiteral.");
+            return;
+        }
+
+        int expectedValue = expected[literal->asString()];
+        testIntegerLiteral(input, a.second, expectedValue);
+    }
+}
+
+
+void TestParsingEmptyHashLiteral::execute()
+{
+    std::string input("{}");
+    std::unique_ptr<Program> program = parse(input);
+
+    ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>(program->operator[](0));
+    HashLiteral *hash = dynamic_cast<HashLiteral *>(stmt->expression());
+
+    if (!hash) {
+        errorf(input, "exp is not HashLiteral");
+        return;
+    }
+    
+    size_t len = hash->size();
+    if (len != 0) {
+        errorf(input, "hash.Pairs has wrong length. got: %d", len);
+    }
+}
+
+
+void TestParsingHashLiteralWithExpression::execute()
+{
+    std::string input("{\"one\": 0 + 1, \"two\": 10 - 8, \"three\" : 15/5}");
+    std::unique_ptr<Program> program = parse(input);
+
+    ExpressionStatement *stmt = dynamic_cast<ExpressionStatement *>(program->operator[](0));
+    HashLiteral *hash = dynamic_cast<HashLiteral *>(stmt->expression());
+    if (!hash) {
+        errorf(input, "exp is not HashLiteral");
+        return;
+    }
+
+    size_t len = hash->size();
+    if (len != 3) {
+        errorf(input, "hash.pairs_ has wrong length");
+        return;
+    }
+    
+    
+    for (auto &a : *hash) {
+        StringLiteral *literal = dynamic_cast<StringLiteral *>(a.first);
+        if (!literal) {
+            errorf(input, "key is not StringLiteral");
+            continue;
+        }
+
+        std::string l(literal->asString());
+        if (!l.compare("one")) {
+            testInfixExpression(input, a.second, 0, "+", 1);
+        } else if (!l.compare("two")) {
+            testInfixExpression(input, a.second, 10, "-", 8);
+        } else if (!l.compare("three")) {
+            testInfixExpression(input, a.second, 15, "/", 5);
+        } else {
+            errorf(input, "No test function for key %s found", l.c_str());
+        }
+    }
+}
+
+
+
+
+
+
 
 

@@ -903,3 +903,23 @@ Single *IndexExpression::eval(Environment *s) {
 }
 
 
+std::string HashLiteral::asString() const
+{
+    std::string ret;
+    ret.append("{");
+    size_t i = 1;
+    size_t total = pairs_.size();
+
+    for (auto &a : pairs_) {
+        ret.append(a.first->asString() + ":" + a.second->asString());
+        if (i != total) {
+            ret.append(", ");
+        }
+        i++;
+    }
+    ret.append("}");
+
+    return ret;
+}
+
+

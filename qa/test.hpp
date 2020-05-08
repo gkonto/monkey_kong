@@ -430,6 +430,33 @@ class TestArrayIndexExpressions : public Test
 
 };
 
+struct TestParsingHashLiteral : public Test
+{
+    TestParsingHashLiteral() : Test("TestParsingHashLiteral") {}
+    void execute();
+};
+
+
+struct TestParsingEmptyHashLiteral : public Test
+{
+    TestParsingEmptyHashLiteral() 
+        : Test("TestParsingEmptyHashLiteral") {}
+    void execute();
+};
+
+
+struct TestParsingHashLiteralWithExpression : public Test
+{
+    TestParsingHashLiteralWithExpression() 
+        : Test("TestParsingHashLiteralWithExpression") {}
+    void execute();
+};
+
+
+
+
+
+
 
 
 

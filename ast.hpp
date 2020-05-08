@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "token.hpp"
 #include "object.hpp"
@@ -23,6 +24,7 @@ enum AstNodeType {
     AST_INFIXEXPRESSION,
     AST_ARRAYLITERAL,
     AST_PREFIXEXPRESSION,
+    AST_HASH,
     AST_BOOLEAN,
     AST_BLOCKSTATEMENT,
     AST_INDEXEXPRESSION,
@@ -394,6 +396,40 @@ class IndexExpression : public Node
         Token *tok_;
         Node *left_;
         Node *index_;
+};
+
+
+#include <iostream>
+class HashLiteral : public Node
+{
+    public:
+        using HashMap = std::map<Node *, Node *>;
+
+        explicit HashLiteral(Token *tok) : Node(AST_HASH), tok_(tok) {}
+        ~HashLiteral() {
+            for (auto &a : pairs_) {
+                delete a.first;
+                delete a.second;
+            }
+        }
+
+        std::string asString() const;
+        const std::string &tokenLiteral() const { return tok_->literal(); }
+        size_t size() const { return pairs_.size(); }
+        HashMap::const_iterator begin() const { return pairs_.begin(); }
+        HashMap::const_iterator end() const { return pairs_.end(); }
+        void emplace(Node *key, Node *value) {  pairs_.emplace(key, value); }
+
+
+        Single *eval(Environment *s) { 
+            std::cout << "voitheia" << std::endl; 
+            return nullptr;;
+        }
+
+        void accept(Visitor &v) {}
+    private:
+        Token *tok_;
+        HashMap pairs_;
 };
 
 
