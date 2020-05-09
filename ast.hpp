@@ -399,7 +399,6 @@ class IndexExpression : public Node
 };
 
 
-#include <iostream>
 class HashLiteral : public Node
 {
     public:
@@ -420,11 +419,7 @@ class HashLiteral : public Node
         HashMap::const_iterator end() const { return pairs_.end(); }
         void emplace(Node *key, Node *value) {  pairs_.emplace(key, value); }
 
-
-        Single *eval(Environment *s) { 
-            std::cout << "voitheia" << std::endl; 
-            return nullptr;;
-        }
+        Single *eval(Environment *s);
 
         void accept(Visitor &v) {}
     private:

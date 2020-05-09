@@ -17,7 +17,12 @@ class Identifier;
 class BlockStatement;
 class Environment;
 
+struct HashFunction;
+struct HashEqualFunction;
 struct SinglePool;
+
+using HashMap = std::unordered_map<Single *, Single *, HashFunction, HashEqualFunction>;
+
 extern std::unique_ptr<Pool<Single>> SingPool;
 
  #define OBJECT_TYPES\
@@ -30,7 +35,7 @@ extern std::unique_ptr<Pool<Single>> SingPool;
      X(STRING, "STRING")\
      X(BUILTIN, "BUILTIN")\
      X(ARRAY,   "ARRAY")\
-     X(HASH_KEY, "HASH_KEY")\
+     X(HASH, "HASH")\
      X(COMPILED_FUNCTION, "COMPILED_FUNCTION")\
      X(CLOSURE, "CLOSURE")\
      X(MAX, "MAX")
@@ -77,6 +82,13 @@ struct Single
         memcpy(data.array.elems_, elements, sizeof(Single *) * num);
         data.array.num_ = num;
     }
+    explicit Single(HashMap *pairs) 
+        : type_(HASH) {
+            std::cout << "GEIAGEIAGEIA"<< std::endl;
+        data.hash.pairs_ = pairs;
+    }
+
+
     explicit Single(std::vector<Identifier *> *parameters, 
             Environment *env, 
             BlockStatement *body)
@@ -122,12 +134,15 @@ struct Single
             return  "builtin function";
         } else if (type_ == ARRAY) {
             return  inspectArray();
+        } else if (type_ == HASH) {
+            return inspectHash();
         } else {
             return "ERROR: Needs inspect()";
         }
     }
 
     std::string inspectArray() const;
+    std::string inspectHash() const;
 
     std::string inspectString() const {
         std::stringstream ss;
@@ -149,7 +164,6 @@ struct Single
         ss << data.error.msg_;
         return ss.str();
     }
-
 
     std::string inspectBoolean() const {
         std::stringstream ss;
@@ -185,6 +199,9 @@ struct Single
             Single **elems_;
             int num_;
         } array;
+        struct {   
+            HashMap *pairs_;
+        } hash;
     } data;
     ObjType type_;
     char count_ = 0;
@@ -200,5 +217,23 @@ Single  *Single::alloc(Args... args) {
     return newSingle;
 }
 
+
+struct HashFunction {
+    size_t operator()(const Single *p) const {
+        std::stringstream ss;
+        ss << p->type_ << p->inspect();
+        std::hash<std::string> s_hash;
+        size_t val = s_hash(ss.str());
+        return val;
+    }
+};
+
+struct HashEqualFunction
+{
+    bool operator()(const Single *lhs, const Single *rhs) const
+    {
+        return lhs->type_ == rhs->type_ && lhs->inspect() == rhs->inspect();
+    }
+};
 
 #endif

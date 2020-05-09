@@ -452,6 +452,12 @@ struct TestParsingHashLiteralWithExpression : public Test
     void execute();
 };
 
+struct TestHashLiteral : public Test
+{
+    TestHashLiteral() : Test("TestHashLiteral") {}
+    void execute();
+};
+
 
 
 

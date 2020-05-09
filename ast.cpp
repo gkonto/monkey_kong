@@ -922,4 +922,33 @@ std::string HashLiteral::asString() const
     return ret;
 }
 
+static Single *evalHashLiteral(const HashLiteral *node, Environment *env) {
+    HashMap *pairs = new HashMap;
 
+    Single *hash = Single::alloc(pairs);
+
+    for (auto &a : *node) {
+        Single *key = a.first->eval(env);
+        if (key && key->type_ == ERROR) {
+            return key;
+        }
+        /*
+        hashKey, ok := key.(object.Hashable)
+        if !ok {
+        return newError("unusable as hash key: %s", key.Type())
+        }
+        */
+
+        Single *value = a.second->eval(env);
+        if (value && value->type_ == ERROR) {
+            return value;
+        }
+        pairs->emplace(key, value);
+    }
+
+    return hash;
+}
+
+Single *HashLiteral::eval(Environment *env) {
+    return evalHashLiteral(this, env);
+}

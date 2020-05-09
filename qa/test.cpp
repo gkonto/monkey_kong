@@ -1467,6 +1467,57 @@ void TestParsingHashLiteralWithExpression::execute()
 
 
 
+void TestHashLiteral::execute()
+{
+    std::string input("let two = \"two\";"
+                    "{"
+                        "\"one\": 10 - 9,"
+                        "two: 1 + 1,"
+                        "\"thr\" + \"ee\": 6 / 2,"
+                        "4: 4,"
+                        "true: 5,"
+                        "false: 6"
+                        "}");
+
+    Environment env;
+    Single *evaluated = eval(input, env);
+
+    if (evaluated->type_ != HASH) {
+        errorf(input, "Eval didn't return Hash");
+        return;
+    }
+
+    std::unordered_map<Single * , int, HashFunction, HashEqualFunction> expected;
+    expected.emplace(Single::alloc("one", STRING), 1);
+    expected.emplace(Single::alloc("two", STRING), 2);
+    expected.emplace(Single::alloc("three", STRING), 3);
+    expected.emplace(Single::alloc(4), 4);
+    expected.emplace(&Model::true_o, 5);
+    expected.emplace(&Model::false_o, 6);
+
+
+    HashMap &pair = *evaluated->data.hash.pairs_;
+    size_t s = pair.size();
+    if (s != expected.size()) {
+        errorf(input, "Hash has wrong num of pairs. got : %d, expected: %d", s, expected.size());
+        return;
+    }
+
+    for (auto &a : expected) {
+        Single *value = pair[a.first];
+        if (!value) {
+            errorf(input, "no pair for given key in Pairs. expected key: %s value: %d",
+                    a.first->inspect().c_str(), a.second);
+            continue;
+        }
+        testIntegerObject(input, value, a.second);
+    }
+
+    for (auto &a : expected) {
+        a.first->release();
+    }
+    evaluated->release();
+}
 
 
 

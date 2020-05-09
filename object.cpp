@@ -29,6 +29,14 @@ void Single::release() {
             if (data.array.num_) {
                 delete []data.array.elems_;
             }
+        } else if (type_ == HASH) {
+            if (data.hash.pairs_) {
+                for (auto &a : *data.hash.pairs_) {
+                    a.first->release();
+                    a.second->release();
+                }
+                delete data.hash.pairs_;
+            }
         }
 
         Single::dealloc(this);
@@ -82,6 +90,28 @@ std::string Single::inspectArray() const {
         }
     }
     ret.append("]");
+
+    return ret;
+}
+
+
+std::string Single::inspectHash() const {
+    std::string ret;
+    size_t i = 1;
+    size_t num = data.hash.pairs_->size();
+
+    ret.append("{");
+    for (auto &a : *data.hash.pairs_) {
+        ret.append(a.first->inspect());
+        ret.append(": ");
+        ret.append(a.second->inspect());
+
+        if (i != num) {
+            i++;
+            ret.append(", ");
+        }
+    }
+    ret.append("}");
 
     return ret;
 }
