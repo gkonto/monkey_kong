@@ -50,6 +50,7 @@ struct Tests
         tests_.emplace("TestParsingEmptyHashLiteral", new TestParsingEmptyHashLiteral);
         tests_.emplace("TestParsingHashLiterallWithExpression", new TestParsingHashLiteralWithExpression);
         tests_.emplace("TestHashLiteral", new TestHashLiteral);
+        tests_.emplace("TestHashIndexExpressions", new TestHashIndexExpressions);
     }
 
     ~Tests()

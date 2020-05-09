@@ -1025,10 +1025,8 @@ void TestErrorHandler::execute()
                 "return 1;"
             "}","unknown operator: BOOLEAN + BOOLEAN");
     run_core("foobar", "identifier not found: foobar");
-    /*
-    run_core("\"Hello\" - \"World\"", "unknown operator: OBJ_STRING - OBJ_STRING");
-    run_core("{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key: OBJ_FUNCTION");
-    */
+    run_core("\"Hello\" - \"World\"", "unknown operator: STRING - STRING");
+    run_core("{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key: FUNCTION");
 }
 
 
@@ -1521,5 +1519,31 @@ void TestHashLiteral::execute()
 
 
 
+void TestHashIndexExpressions::run_core(std::string input, int expected)
+{
+    Environment env;
+    Single *evaluated = eval(input, env);
+    testIntegerObject(input, evaluated, expected);
+    evaluated->release();
+}
+
+void TestHashIndexExpressions::run_core(std::string input)
+{
+    Environment env;
+    Single *evaluated = eval(input, env);
+    testNullObject(input, evaluated);
+    evaluated->release();
+}
+
+void TestHashIndexExpressions::execute()
+{
+    run_core("{\"foo\": 5}[\"foo\"]", 5);
+    run_core("{\"foo\": 5}[\"bar\"]");
+    run_core("let key = \"foo\"; {\"foo\": 5}[key]", 5);
+    run_core("{}[\"foo\"]");
+    run_core("{5: 5}[5]", 5);
+    run_core("{true: 5}[true]", 5);
+    run_core("{false: 5}[false]", 5);
+}
 
 

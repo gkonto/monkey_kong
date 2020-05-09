@@ -458,12 +458,16 @@ struct TestHashLiteral : public Test
     void execute();
 };
 
-
-
-
-
-
-
+class TestHashIndexExpressions : public Test
+{
+    public:
+        TestHashIndexExpressions() 
+            : Test("TestHashIndexExpressions") {}
+        void execute();
+    private:
+        void run_core(std::string input, int expected);
+        void run_core(std::string);
+};
 
 
 

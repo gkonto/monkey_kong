@@ -875,9 +875,39 @@ static Single *evalArrayIndexExpression(Single *left, Single *index) {
     return ret;
 }
 
+static Single *evalHashIndexExpression(Single *left, Single *index)
+{
+    ObjType type = index->type_;
+
+
+    if (type != INTEGER && type != STRING && type != BOOLEAN) {
+        char buffer[80];
+        sprintf(buffer, "unusable as hash key: %s", object_name[index->type_]);
+        Single *ret = Single::alloc(buffer);
+
+        left->release();
+        index->release();
+        return ret;
+    }
+
+    const HashMap &map = *left->data.hash.pairs_;
+    const auto &entry = map.find(index);
+    if (entry == map.end()) {
+        return &Model::null_o;
+    } else {
+        entry->second->retain();
+    }
+
+    return entry->second;
+}
+
+
+
 static Single *evalIndexExpression(Single *left, Single *index) {
     if (left->type_ == ARRAY && index->type_ == INTEGER) {
         return evalArrayIndexExpression(left, index);
+    } else if (left->type_ == HASH) {
+        return evalHashIndexExpression(left, index);
     } else {
         char buffer[80];
         sprintf(buffer, "index operator not supported: %s", object_name[left->type_]);

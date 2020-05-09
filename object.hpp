@@ -84,7 +84,6 @@ struct Single
     }
     explicit Single(HashMap *pairs) 
         : type_(HASH) {
-            std::cout << "GEIAGEIAGEIA"<< std::endl;
         data.hash.pairs_ = pairs;
     }
 
