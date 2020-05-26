@@ -6,23 +6,6 @@
 #include "symbols.hpp"
 
 
-Lexer::Lexer(const std::string &input) :
-    stream_(input)
-{
-}
-
-bool Lexer::currentIsLetter()
-{
-    return (isalpha(ch_) || ch_ == '=') ? true : false;
-}
-
-// Takes upcoming char without extracting it 
-// and updating ch_
-char Lexer::nextChar()
-{
-    return stream_.peek();
-}
-
 // Gives next character and advances the position 
 // in the input string
 void Lexer::readChar()
@@ -70,7 +53,6 @@ void Lexer::skipWhitespace()
 std::string Lexer::readString()
 {
     std::string ret;
-//    ret.append(1, ch_);
     readChar();
 
     while (ch_ != '"' && ch_ != 0) {
@@ -78,7 +60,6 @@ std::string Lexer::readString()
         readChar();
     }
 
- //   ret.append(1, ch_);
     readChar();
     stream_.unget();
 

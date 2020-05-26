@@ -10,20 +10,20 @@ struct Token;
 class Lexer
 {
     public:
-        explicit Lexer(const std::string &input);
+        explicit Lexer(const std::string &input)
+            : stream_(input) {}
+
         Token *nextToken();
         int position() { return stream_.tellg(); }
         int readPosition() { return stream_.tellg(); }
         char current() { return ch_; }
     private:
         void readChar();
-        char nextChar();
+        char nextChar() { return stream_.peek(); }
         std::string readIdentifier();
         std::string readNumber();
-        bool currentIsLetter();
-
+        bool currentIsLetter() { return isalpha(ch_) || ch_ == '='; }
         void skipWhitespace();
-
         std::string readString();
 
         std::stringstream stream_;
