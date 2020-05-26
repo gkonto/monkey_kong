@@ -60,6 +60,7 @@ std::string Lexer::readString()
     }
 
     stream_.unget();
+    readChar();
 
     return ret;
 }
@@ -135,7 +136,6 @@ Token *Lexer::nextToken()
             break;
         case '"':
             tok = Token::alloc(T_STRING, readString());
-            readChar();
             break;
         case 0  :
             tok = Token::alloc(T_EOF, "");
