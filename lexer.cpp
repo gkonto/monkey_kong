@@ -26,8 +26,7 @@ std::string Lexer::readNumber()
     }
     stream_.unget();
 
-    return ret;
-}
+    return ret; }
 
 std::string Lexer::readIdentifier()
 {
@@ -60,7 +59,6 @@ std::string Lexer::readString()
         readChar();
     }
 
-    readChar();
     stream_.unget();
 
     return ret;
@@ -137,6 +135,7 @@ Token *Lexer::nextToken()
             break;
         case '"':
             tok = Token::alloc(T_STRING, readString());
+            readChar();
             break;
         case 0  :
             tok = Token::alloc(T_EOF, "");
