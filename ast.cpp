@@ -4,83 +4,6 @@
 #include "env.hpp"
 #include "builtins.hpp"
 
-#ifdef NODISPATCH
-Single *Node::eval(Environment *s) {
-    Single *temp = nullptr;
-    switch (type_) {
-        case AST_PROGRAM: {
-            Program *p = static_cast<Program *>(this);
-            temp = p->evalProgram(s);
-            break;
-        }
-        case AST_IDENTIFIER: {
-            Identifier *p = static_cast<Identifier *>(this);
-            temp = p->evalIdentifier(s);
-            break;
-        }
-        case AST_LET: {
-            Let *p = static_cast<Let *>(this);
-            temp = p->evalLet(s);
-            break;
-        }
-        case AST_RETURN: {
-            Return *p = static_cast<Return *>(this);
-            temp = p->evalReturn(s);
-            break;
-        }
-        case AST_EXPRESSIONSTATEMENT: {
-            ExpressionStatement *p = static_cast<ExpressionStatement *>(this);
-            temp = p->evalExpressionStatement(s);
-            break;
-        }
-        case AST_INTEGERLITERAL: {
-            IntegerLiteral *p = static_cast<IntegerLiteral *>(this);
-            temp = p->evalIntegerLiteral(s);
-            break;
-        }
-        case AST_INFIXEXPRESSION: {
-            InfixExpression *p = static_cast<InfixExpression *>(this);
-            temp = p->evalInfixExpression(s);
-            break;
-        }
-        case AST_PREFIXEXPRESSION: {
-            PrefixExpression *p = static_cast<PrefixExpression *>(this);
-            temp = p->evalPrefixExpression(s);
-            break;
-        }
-        case AST_BOOLEAN: {
-            Boolean *p = static_cast<Boolean *>(this);
-            temp = p->evalBoolean(s);
-            break;
-        }
-        case AST_BLOCKSTATEMENT: {
-            BlockStatement *p = static_cast<BlockStatement *>(this);
-            temp = p->evalBlockStatement(s);
-            break;
-        }
-        case AST_IF: {
-            If *p = static_cast<If *>(this);
-            temp = p->evalIf(s);
-            break;
-        }
-        case AST_FUNCTIONLITERAL: {
-            FunctionLiteral *p = static_cast<FunctionLiteral *>(this);
-            temp = p->evalFunctionLiteral(s);
-            break;
-        }
-        case AST_CALLEXPRESSION: {
-            CallExpression *p = static_cast<CallExpression *>(this);
-            temp = p->evalCallExpression(s);
-            break;
-        }
-       default:
-            exit(1);
-    }
-    return temp;    
-}
-#endif
-
-
 bool isTruthy(Single *obj) {
     if (obj == &Model::null_o) {
         return false;
@@ -134,7 +57,7 @@ InfixExpression::~InfixExpression()
 }
 
 InfixExpression::InfixExpression(Token *tok, Node *lhs, Node *rhs)
-     : Node(AST_INFIXEXPRESSION), tok_(tok), lhs_(lhs), op_(tok->type()), rhs_(rhs)
+     : tok_(tok), lhs_(lhs), op_(tok->type()), rhs_(rhs)
  {
  }
 
@@ -346,15 +269,12 @@ std::string CallExpression::asString() const
  }
 
 
-Single *IntegerLiteral::evalIntegerLiteral(Environment *s) {
+Single *IntegerLiteral::eval(Environment *s) {
     return Single::alloc(value());
 }
 
-Single *IntegerLiteral::eval(Environment *s) {
-    return evalIntegerLiteral(s);
-}
 
-Single *Program::evalProgram(Environment *s) {
+Single *Program::eval(Environment *s) {
     Single *ret = nullptr;
     for (auto &stmt : statements()) {
         if (ret) ret->release();
@@ -374,11 +294,8 @@ Single *Program::evalProgram(Environment *s) {
     return ret;
 }
 
-Single *Program::eval(Environment *s) {
-    return evalProgram(s);
-}
 
-Single *Identifier::evalIdentifier(Environment *s) {
+Single *Identifier::eval(Environment *s) {
     const std::string &key = value();
     Single *val = s->get(key);
     if (val) {
@@ -397,15 +314,8 @@ Single *Identifier::evalIdentifier(Environment *s) {
     return Single::alloc(buffer);
 }
 
-Single *Identifier::eval(Environment *s) {
-   return evalIdentifier(s); 
-}
 
 Single *Let::eval(Environment *s) {
-    return evalLet(s);
-}
-
-Single *Let::evalLet(Environment *s) {
     Single *val = value()->eval(s);
     if (isError(val)) {
         return val;
@@ -416,10 +326,6 @@ Single *Let::evalLet(Environment *s) {
 
 
 Single *Return::eval(Environment *s) {
-    return evalReturn(s);
-}
-
-Single *Return::evalReturn(Environment *s) {
     Single *ret = value()->eval(s);
     if (isError(ret)) {
         return ret;
@@ -428,10 +334,6 @@ Single *Return::evalReturn(Environment *s) {
 }
 
 Single *ExpressionStatement::eval(Environment *s) {
-    return evalExpressionStatement(s);
-}
-
-Single *ExpressionStatement::evalExpressionStatement(Environment *s) {
     return expression()->eval(s);
 }
 
@@ -479,13 +381,7 @@ static Single *evalPrefixExpression_core(const std::string &op, Single *right) {
     return ret;
 }
 
-
-
 Single *PrefixExpression::eval(Environment *s) {
-    return evalPrefixExpression(s);
-}
-
-Single *PrefixExpression::evalPrefixExpression(Environment *s) {
     Single *r = right()->eval(s);
     if (isError(r)) {
         return r;
@@ -568,12 +464,7 @@ static Single *evalInfixExpression_core(TokenType op, Single *left, Single *righ
 }
 
 
-
 Single *InfixExpression::eval(Environment *s) {
-    return evalInfixExpression(s);
-}
-
-Single *InfixExpression::evalInfixExpression(Environment *s) {
     Single *l = lhs()->eval(s);
     if (isError(l)) {
         return l;
@@ -588,16 +479,11 @@ Single *InfixExpression::evalInfixExpression(Environment *s) {
 }
 
 
-
 Single *Boolean::eval(Environment *s) {
-    return evalBoolean(s);
-}
-
-Single *Boolean::evalBoolean(Environment *s) {
     return nativeBoolToSingObj(value());
 }
 
-Single *BlockStatement::evalBlockStatement(Environment *store) {
+Single *BlockStatement::eval(Environment *store) {
     Single *temp = nullptr;
     for (auto &s : statements()) {
         if (temp)  temp->release();
@@ -609,16 +495,8 @@ Single *BlockStatement::evalBlockStatement(Environment *store) {
     return temp;
 }
 
-Single *BlockStatement::eval(Environment *s) {
-    return evalBlockStatement(s);
-}
-
 
 Single *If::eval(Environment *s) {
-    return evalIf(s);
-}
-
-Single *If::evalIf(Environment *s) {
      Single *cond = condition()->eval(s);
     if (isError(cond)) {
         return cond;
@@ -638,11 +516,8 @@ Single *If::evalIf(Environment *s) {
 
 }
 
-Single *FunctionLiteral::eval(Environment *s) {
-    return evalFunctionLiteral(s);
-}
 
-Single *FunctionLiteral::evalFunctionLiteral(Environment *s) {
+Single *FunctionLiteral::eval(Environment *s) {
     std::vector<Identifier *> &params = parameters();
     BlockStatement *b = body();
     return Single::alloc(&params, s, b);
@@ -721,11 +596,8 @@ static Single *applyFunction(Single *fn, std::array<Single *, MAX_ARGS_NUM> &arg
 }
 
 
-Single *CallExpression::eval(Environment *s) {
-    return evalCallExpression(s);
-}
 
-Single *CallExpression::evalCallExpression(Environment *s) {
+Single *CallExpression::eval(Environment *s) {
     Single *fn = function()->eval(s);
     if (isError(fn)) {
         return fn;

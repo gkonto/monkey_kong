@@ -8,54 +8,24 @@
 #include "token.hpp"
 #include "object.hpp"
 
-//#define NODISPATCH
-
 class Token;
 class Visitor;
 
-enum AstNodeType {
-    AST_PROGRAM,
-    AST_IDENTIFIER,
-    AST_LET,
-    AST_RETURN,
-    AST_EXPRESSIONSTATEMENT,
-    AST_INTEGERLITERAL,
-    AST_INFIXEXPRESSION,
-    AST_ARRAYLITERAL,
-    AST_PREFIXEXPRESSION,
-    AST_HASH,
-    AST_BOOLEAN,
-    AST_BLOCKSTATEMENT,
-    AST_INDEXEXPRESSION,
-    AST_IF,
-    AST_FUNCTIONLITERAL,
-    AST_CALLEXPRESSION,
-    AST_STRINGLITERAL
+struct Node {
+  virtual ~Node() {}
+  virtual const std::string &tokenLiteral() const { return literal; } // Only for debugging and testing
+  virtual std::string asString() const = 0;
+  virtual Single *eval(Environment *s) = 0;
+  std::string literal = "No token node";
 };
 
-struct Node
-{
-    Node(AstNodeType type) : type_(type) {}
-    virtual ~Node() {}
-    virtual const std::string &tokenLiteral() const { return literal; }; // Only for debugging and testing
-    virtual std::string asString() const = 0;
-#ifdef NODISPATCH
-    Single *eval(Environment *s);
-#else
-    virtual Single *eval(Environment *s) = 0;
-#endif
-    std::string literal = "No token node";
-    AstNodeType type_;    
-};
 
 // Program is the root node of every AST
 // our parser produces.
 class Program : public Node
 {
     public:
-        Program() : Node(AST_PROGRAM) {}
-        ~Program() 
-        {
+        ~Program() {
             for (auto &stmt : statements_) {
                 delete stmt;
             }
@@ -69,7 +39,6 @@ class Program : public Node
         std::vector<Node *>::iterator begin() { return statements_.begin(); }
         std::vector<Node *>::iterator end() { return statements_.end(); }
         Single *eval(Environment *s);
-        Single *evalProgram(Environment *s);
     private:
         std::vector<Node *> statements_;
 };
@@ -79,14 +48,13 @@ class Identifier : public Node
 {
     public:
         explicit Identifier(Token *tok, const std::string &value)
-            : Node(AST_IDENTIFIER), tok_(tok), value_(value) {}
+            : tok_(tok), value_(value) {}
 
         ~Identifier();
         std::string asString() const;
         const std::string &tokenLiteral() const { return tok_->literal(); }
         const std::string &value() const { return value_; }
         Single *eval(Environment *s);
-        Single *evalIdentifier(Environment *s);
     private:
         Token *tok_;
         std::string value_;
@@ -97,7 +65,7 @@ class Let : public Node
 {
     public:
         explicit Let(Token *tok, Identifier *p_name = nullptr, Node *p_value = nullptr)
-            : Node(AST_LET), tok_(tok), name_(p_name), value_(p_value) {}
+            : tok_(tok), name_(p_name), value_(p_value) {}
 
         ~Let();
         std::string asString() const;
@@ -108,7 +76,6 @@ class Let : public Node
         Node *value() const { return value_; }
         void setValue(Node *exp) { value_ = exp; }
         Single *eval(Environment *s);
-        Single *evalLet(Environment *s);
     private:
         Token *tok_;
         Identifier *name_;   // the identifier's name
@@ -120,7 +87,7 @@ class Return : public Node
 {
     public:
         explicit Return(Token *tok, Node *exp) :
-            Node(AST_RETURN), token_(tok), returnValue_(exp) {}
+            token_(tok), returnValue_(exp) {}
         ~Return();
 
         std::string asString() const;
@@ -128,7 +95,6 @@ class Return : public Node
         void setReturnVal(Node *exp) { returnValue_ = exp; }
         Node *value() const { return returnValue_; }
         Single *eval(Environment *s);
-        Single *evalReturn(Environment *s);
     private:
         Token *token_; // The return statement
         Node *returnValue_;
@@ -138,7 +104,6 @@ class Return : public Node
 class ExpressionStatement : public Node
  {
      public:
-         ExpressionStatement() : Node(AST_EXPRESSIONSTATEMENT) {}
          ~ExpressionStatement()
          {
              if (expression_) delete expression_;
@@ -148,7 +113,6 @@ class ExpressionStatement : public Node
         Node *expression() const { return expression_; }
         void setExpression(Node *exp) { expression_ = exp; }
         Single *eval(Environment *s);
-        Single *evalExpressionStatement(Environment *s);
      private:
          Node *expression_;
  };
@@ -158,13 +122,12 @@ class ExpressionStatement : public Node
  {
      public:
          IntegerLiteral(Token *tok, int value) 
-             : Node(AST_INTEGERLITERAL), token_(tok), value_(value) {}
+             : token_(tok), value_(value) {}
 
          const std::string &tokenLiteral() const { return token_->literal(); }
          int value() const { return value_; }
          std::string asString() const;
         Single *eval(Environment *s);
-        Single *evalIntegerLiteral(Environment *s);
      private:
          Token *token_ = nullptr;
          int value_ = 0;
@@ -176,7 +139,7 @@ class ExpressionStatement : public Node
  {
      public:
          PrefixExpression(Token *tok) :
-             Node(AST_PREFIXEXPRESSION), operat_(tok->literal()), tok_(tok) {}
+             operat_(tok->literal()), tok_(tok) {}
          ~PrefixExpression();
 
          const std::string &tokenLiteral() const { return tok_->literal(); }
@@ -185,7 +148,6 @@ class ExpressionStatement : public Node
          Node *right() const { return right_; }
          void setRight(Node *exp) { right_ = exp; }
         Single *eval(Environment *s);
-        Single *evalPrefixExpression(Environment *s);
      private:
          std::string operat_;
          Token *tok_; // The prefix token (eg !)
@@ -205,7 +167,6 @@ class ExpressionStatement : public Node
          Node *rhs() const { return rhs_; }
          TokenType op() const { return op_; }
         Single *eval(Environment *s);
-        Single *evalInfixExpression(Environment *s);
      private:
          Token *tok_; // The operator token, e.g +
          Node *lhs_;
@@ -218,12 +179,11 @@ class ExpressionStatement : public Node
  {
      public:
          explicit Boolean(Token *tok, bool value)
-            : Node(AST_BOOLEAN), tok_(tok), value_(value) {}
+            : tok_(tok), value_(value) {}
          const std::string &tokenLiteral() const { return tok_->literal(); }
          bool value() const { return value_; }
          std::string asString() const { return tok_->literal(); }
         Single *eval(Environment *s);
-        Single *evalBoolean(Environment *s);
      private:
          Token *tok_;
          bool value_;
@@ -232,7 +192,7 @@ class ExpressionStatement : public Node
  class BlockStatement : public Node
  {
      public:
-         explicit BlockStatement(Token *tok) : Node(AST_BLOCKSTATEMENT), tok_(tok) {}
+         explicit BlockStatement(Token *tok) : tok_(tok) {}
          ~BlockStatement();
          std::string asString() const;
          const std::string &tokenLiteral() const { return tok_->literal(); }
@@ -241,7 +201,6 @@ class ExpressionStatement : public Node
          void emplace_back(Node *stmt) { return statements_.emplace_back(stmt); }
          const std::vector<Node *> &statements() const { return statements_; }
         Single *eval(Environment *s);
-        Single *evalBlockStatement(Environment *s);
      private:
          Token *tok_;
          std::vector<Node *> statements_;
@@ -251,7 +210,7 @@ class ExpressionStatement : public Node
  class If : public Node
  {
      public:
-         explicit If(Token *tok) : Node(AST_IF), tok_(tok) {}
+         explicit If(Token *tok) : tok_(tok) {}
          ~If() {
              if (consequence_) delete consequence_;
              if (alternative_) delete alternative_;
@@ -267,7 +226,7 @@ class ExpressionStatement : public Node
          BlockStatement *alternative() const { return alternative_; }
          void setAlternative(BlockStatement *alternative) { alternative_ = alternative; }
         Single *eval(Environment *s);
-        Single *evalIf(Environment *s);
+
      private:
          Token *tok_ = nullptr;
          Node *condition_ = nullptr;
@@ -279,7 +238,7 @@ class ExpressionStatement : public Node
  class FunctionLiteral : public Node
  {
      public:
-         explicit FunctionLiteral(Token *tok) : Node(AST_FUNCTIONLITERAL), tok_(tok) {}
+         explicit FunctionLiteral(Token *tok) : tok_(tok) {}
          ~FunctionLiteral();
          std::string asString() const;
          const std::string &tokenLiteral() const { return tok_->literal(); }
@@ -290,7 +249,6 @@ class ExpressionStatement : public Node
          std::vector<Identifier *> &parameters() { return parameters_; }
          size_t paramSize() const { return parameters_.size(); }
         Single *eval(Environment *s);
-        Single *evalFunctionLiteral(Environment *s);
      private:
          Token *tok_;
          std::vector<Identifier *> parameters_; //used by object if created
@@ -301,7 +259,7 @@ class ExpressionStatement : public Node
  class CallExpression : public Node
  {
      public:
-         explicit CallExpression(Token *tok, Node *fun) : Node(AST_CALLEXPRESSION), tok_(tok), function_(fun) {}
+         explicit CallExpression(Token *tok, Node *fun) : tok_(tok), function_(fun) {}
          ~CallExpression();
          std::string asString() const;
          const std::string &tokenLiteral() const { return tok_->literal(); }
@@ -311,7 +269,6 @@ class ExpressionStatement : public Node
          void setArguments(std::vector<Node *> args) { arguments_ = args; }
          const std::vector<Node *> &arguments() const { return arguments_; }
         Single *eval(Environment *s);
-        Single *evalCallExpression(Environment *s);
      private:
          Token *tok_;
          Node *function_;
@@ -323,7 +280,7 @@ class StringLiteral : public Node
 {
     public: 
         explicit StringLiteral(Token *tok) 
-            : Node(AST_STRINGLITERAL), value_(tok->literal()), tok_(tok) {}
+            : value_(tok->literal()), tok_(tok) {}
 
         std::string asString() const;
         const std::string &value() const { return value_; }
@@ -338,7 +295,7 @@ class ArrayLiteral : public Node
 {
     public:
         ArrayLiteral(Token *tok, std::vector<Node *> &elements)
-            : Node(AST_ARRAYLITERAL), elements_(elements), tok_(tok) {}
+            : elements_(elements), tok_(tok) {}
 
         ~ArrayLiteral();
         std::string asString() const;
@@ -356,7 +313,7 @@ class IndexExpression : public Node
 {
     public:
         IndexExpression(Token *tok, Node *left, Node *index = nullptr) 
-            : Node(AST_INDEXEXPRESSION), tok_(tok), left_(left), index_(index) {
+            : tok_(tok), left_(left), index_(index) {
 
         }
         ~IndexExpression() {
@@ -382,7 +339,7 @@ class HashLiteral : public Node
     public:
         using HashMap = std::map<Node *, Node *>;
 
-        explicit HashLiteral(Token *tok) : Node(AST_HASH), tok_(tok) {}
+        explicit HashLiteral(Token *tok) : tok_(tok) {}
         ~HashLiteral() {
             for (auto &a : pairs_) {
                 delete a.first;
