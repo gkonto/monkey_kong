@@ -22,7 +22,7 @@ static Single *len_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args
 
     Single *f = args[0];
     if (f->type_ == STRING) {
-        return Single::alloc(static_cast<int>(strlen(f->data.string.value_)));
+        return Single::alloc(static_cast<int>(strlen(f->data.s.value_)));
     } else if (f->type_ == ARRAY) {
         return Single::alloc(static_cast<int>(args_num));
     }
@@ -44,7 +44,7 @@ static Single *first_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t ar
     }
 
     if (args_num > 0) {
-        return args[0]->data.array.elems_[0];
+        return args[0]->data.a.elems_[0];
     }
 
     return &Model::null_o;
@@ -63,7 +63,7 @@ static Single *last_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
     }
 
     if (args_num > 0) {
-        return args[0]->data.array.elems_[args[0]->data.array.num_ - 1];
+        return args[0]->data.a.elems_[args[0]->data.a.num_ - 1];
     }
 
     return &Model::null_o;
@@ -82,9 +82,9 @@ static Single *rest_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
     }
 
     Single *arr = args[0];
-    size_t length = arr->data.array.num_;
+    size_t length = arr->data.a.num_;
     if (length > 0) {
-        return new Single(&arr->data.array.elems_[1], length - 1);
+        return new Single(&arr->data.a.elems_[1], length - 1);
     }
 
     return &Model::null_o;
@@ -102,13 +102,13 @@ static Single *push_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
         return Single::alloc(buffer);
     }
 
-    Single **arr = args[0]->data.array.elems_;
-    int elems_num = args[0]->data.array.num_;
+    Single **arr = args[0]->data.a.elems_;
+    int elems_num = args[0]->data.a.num_;
 
     void *new_arr = realloc(arr, (elems_num + 1) * sizeof(Single *));
-    args[0]->data.array.elems_ = static_cast<Single **>(new_arr);
-    args[0]->data.array.num_++;
-    args[0]->data.array.elems_[elems_num] = args[1];
+    args[0]->data.a.elems_ = static_cast<Single **>(new_arr);
+    args[0]->data.a.num_++;
+    args[0]->data.a.elems_[elems_num] = args[1];
     args[1]->retain();
 
     return args[0];

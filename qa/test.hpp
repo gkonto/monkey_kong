@@ -11,7 +11,7 @@
 class Token;
 class Node;
 class Program;
-class Single;
+struct Single;
 struct Test;
 class Environment;
 

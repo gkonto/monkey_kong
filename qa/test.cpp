@@ -812,8 +812,8 @@ void TestIntegerLiteralExpression::execute()
          return false;
      }
 
-     if (obj->data.integer.value_ != expected) {
-         errorf(input, "object value was wrong %d. got %d\n", expected, obj->data.integer.value_);
+     if (obj->data.i.value_ != expected) {
+         errorf(input, "object value was wrong %d. got %d\n", expected, obj->data.i.value_);
          return false;
      }
 
@@ -916,8 +916,8 @@ bool Test::testBooleanObject(const std::string &input, Single *obj, bool expecte
         return false;
     }
 
-    if (obj->data.boolean.value_ != expected) {
-        errorf(input, "object has wrong value. got=%d, want=%d\n", input.c_str(), obj->data.boolean.value_, expected);
+    if (obj->data.b.value_ != expected) {
+        errorf(input, "object has wrong value. got=%d, want=%d\n", input.c_str(), obj->data.b.value_, expected);
         return false;
     }
     return true;
@@ -1043,8 +1043,8 @@ void TestErrorHandler::run_core(std::string input, std::string expected_e)
         return;
     }
 
-    if (expected_e.compare(evaluated->data.error.msg_)) {
-        errorf(input, "wrong error message. Expected '%s', got '%s'\n", expected_e.c_str(), evaluated->data.error.msg_);
+    if (expected_e.compare(evaluated->data.e.msg_)) {
+        errorf(input, "wrong error message. Expected '%s', got '%s'\n", expected_e.c_str(), evaluated->data.e.msg_);
     }
     evaluated->release();
 }
@@ -1074,20 +1074,20 @@ void TestFunctionObject::run_core(std::string input)
         return;
     }
 
-    if (fn->data.function.parameters_->size() != 1) {
+    if (fn->data.f.params_->size() != 1) {
         errorf(input, "function has wrong parameters");
         return;
     }
 
-    const std::vector<Identifier *> &idents = *fn->data.function.parameters_;
+    const std::vector<Identifier *> &idents = *fn->data.f.params_;
     const std::string &val = idents[0]->value();
     if (val.compare("x")) {
         errorf(input, "parameter is not 'x'. got %s\n", val.c_str());
         return;
     }
     std::string expectedBody("(x + 2)");
-    const std::string &b = fn->data.function.body_->asString();
-    if (fn->data.function.body_->asString() != expectedBody) {
+    const std::string &b = fn->data.f.body_->asString();
+    if (fn->data.f.body_->asString() != expectedBody) {
         errorf(input, "body is not %s. got %s\n", expectedBody.c_str(), b.c_str());
         return;
     }
@@ -1198,8 +1198,8 @@ void TestStringLiteral::execute()
         errorf(input, "object is not string.got %s\n", object_name[evaluated->type_]);
         return;
     }
-    if (strcmp(evaluated->data.string.value_, "Hello World")) {
-        errorf(input, "String has wrong value. Expected %s, got %s\n", input.c_str(), evaluated->data.string.value_);
+    if (strcmp(evaluated->data.s.value_, "Hello World")) {
+        errorf(input, "String has wrong value. Expected %s, got %s\n", input.c_str(), evaluated->data.s.value_);
         return;
     }
     evaluated->release();
@@ -1218,8 +1218,8 @@ void TestStringConcatenation::execute()
         return;
     }
 
-    if (strcmp(evaluated->data.string.value_, "Hello World!")) {
-        errorf(input, "String has wrong value. got=%s, expected %s\n", evaluated->data.string.value_, "Hello World!");
+    if (strcmp(evaluated->data.s.value_, "Hello World!")) {
+        errorf(input, "String has wrong value. got=%s, expected %s\n", evaluated->data.s.value_, "Hello World!");
         return;
     }
     evaluated->release();
@@ -1244,8 +1244,8 @@ void TestBuiltinFunction::run_core(std::string input, std::string expected)
         errorf(input, "object is not ErrorObj");
         return;
     }
-    if (strcmp(evaluated->data.error.msg_, expected.c_str())) {
-        errorf(input, "wrong error message.\nexpected = %s, got %s\n", expected.c_str(), evaluated->data.error.msg_);
+    if (strcmp(evaluated->data.e.msg_, expected.c_str())) {
+        errorf(input, "wrong error message.\nexpected = %s, got %s\n", expected.c_str(), evaluated->data.e.msg_);
     }
 
     evaluated->release();
@@ -1322,14 +1322,14 @@ void TestArrayLiterals::execute()
         return;
     }
 
-    if (evaluated->data.array.num_ != 3) {
-        errorf(input, "array has wrong num of elements. got: %d, expected: 3", evaluated->data.array.num_);
+    if (evaluated->data.a.num_ != 3) {
+        errorf(input, "array has wrong num of elements. got: %d, expected: 3", evaluated->data.a.num_);
         return;
     }
 
-    testIntegerObject(input, evaluated->data.array.elems_[0], 1);
-    testIntegerObject(input, evaluated->data.array.elems_[1], 4);
-    testIntegerObject(input, evaluated->data.array.elems_[2], 6);
+    testIntegerObject(input, evaluated->data.a.elems_[0], 1);
+    testIntegerObject(input, evaluated->data.a.elems_[1], 4);
+    testIntegerObject(input, evaluated->data.a.elems_[2], 6);
 
     evaluated->release();
 }
@@ -1484,7 +1484,7 @@ void TestHashLiteral::execute()
         return;
     }
 
-    std::unordered_map<Single * , int, HashFunction, HashEqualFunction> expected;
+    std::unordered_map<Single * , int, HashFn, HashEqFn> expected;
     expected.emplace(Single::alloc("one", STRING), 1);
     expected.emplace(Single::alloc("two", STRING), 2);
     expected.emplace(Single::alloc("three", STRING), 3);

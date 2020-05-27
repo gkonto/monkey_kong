@@ -283,7 +283,7 @@ static Single *evalMinusPrefixOperatorExpression(Single *right) {
     sprintf(buffer, "unknown operator: -%s", object_name[right->type_]);
     return Single::alloc(buffer);
   }
-  return Single::alloc(-right->data.integer.value_);
+  return Single::alloc(-right->data.i.value_);
 }
 
 static Single *evalPrefixExpression_core(const string &op, Single *right) {
@@ -322,8 +322,8 @@ static Single *evalStringInfixExpression(TokenType op, Single *left,
   }
 
   char buffer[1024];
-  const char *l = left->data.string.value_;
-  const char *r = right->data.string.value_;
+  const char *l = left->data.s.value_;
+  const char *r = right->data.s.value_;
   strcpy(buffer, l);
   strcat(buffer, r);
   return Single::alloc(buffer, STRING);
@@ -332,40 +332,32 @@ static Single *evalStringInfixExpression(TokenType op, Single *left,
 static Single *evalIntegerInfixExpression(TokenType op, Single *left,
                                           Single *right) {
   // TODO remove all those compare with an array of function callbacks
-  Single *temp = nullptr;
+  Single *t = nullptr;
 
   if (op == T_PLUS) {
-    temp =
-        Single::alloc(left->data.integer.value_ + right->data.integer.value_);
+    t = Single::alloc(left->data.i.value_ + right->data.i.value_);
   } else if (op == T_MINUS) {
-    temp =
-        Single::alloc(left->data.integer.value_ - right->data.integer.value_);
+    t = Single::alloc(left->data.i.value_ - right->data.i.value_);
   } else if (op == T_ASTERISK) {
-    temp =
-        Single::alloc(left->data.integer.value_ * right->data.integer.value_);
+    t = Single::alloc(left->data.i.value_ * right->data.i.value_);
   } else if (op == T_SLASH) {
-    temp =
-        Single::alloc(left->data.integer.value_ / right->data.integer.value_);
+    t = Single::alloc(left->data.i.value_ / right->data.i.value_);
   } else if (op == T_LT) {
-    temp = nativeBoolToSingObj(left->data.integer.value_ <
-                               right->data.integer.value_);
+    t = nativeBoolToSingObj(left->data.i.value_ < right->data.i.value_);
   } else if (op == T_GT) {
-    temp = nativeBoolToSingObj(left->data.integer.value_ >
-                               right->data.integer.value_);
+    t = nativeBoolToSingObj(left->data.i.value_ > right->data.i.value_);
   } else if (op == T_EQ) {
-    temp = nativeBoolToSingObj(left->data.integer.value_ ==
-                               right->data.integer.value_);
+    t = nativeBoolToSingObj(left->data.i.value_ == right->data.i.value_);
   } else if (op == T_NOT_EQ) {
-    temp = nativeBoolToSingObj(left->data.integer.value_ !=
-                               right->data.integer.value_);
+    t = nativeBoolToSingObj(left->data.i.value_ != right->data.i.value_);
   } else {
     char buffer[80];
     sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
-    temp = Single::alloc(buffer);
+    t = Single::alloc(buffer);
   }
 
-  return temp;
+  return t;
 }
 
 static Single *evalInfixExpression_core(TokenType op, Single *left,
@@ -484,8 +476,8 @@ static bool evalExpressions(const vector<Node *> &args,
 Environment *extendFunctionEnv(Single *fn,
                                array<Single *, MAX_ARGS_NUM> &args) {
   Environment *env =
-      Environment::alloc(fn->data.function.env_); // FIXME deallocate?
-  vector<Identifier *> &params = *(fn->data.function.parameters_);
+      Environment::alloc(fn->data.f.env_); // FIXME deallocate?
+  vector<Identifier *> &params = *(fn->data.f.params_);
   for (size_t i = 0; i < params.size(); i++) {
     Identifier *iden = params[i];
     env->set(iden->value(), args[i]);
@@ -507,12 +499,12 @@ static Single *unwrapReturnValue(Single *val) {
 static Single *applyFunction(Single *fn, array<Single *, MAX_ARGS_NUM> &args,
                              size_t args_num) {
   if (fn->type_ == BUILTIN) {
-    return fn->data.builtin.f_(args, args_num);
+    return fn->data.bltn.f_(args, args_num);
   }
 
   if (fn->type_ == FUNCTION) {
     Environment *extended_env = extendFunctionEnv(fn, args);
-    Single *ret = fn->data.function.body_->eval(extended_env);
+    Single *ret = fn->data.f.body_->eval(extended_env);
 
     ret = unwrapReturnValue(ret);
     extended_env->release();
@@ -597,12 +589,12 @@ Single *ArrayLiteral::eval(Environment *s) {
 }
 
 static Single *evalArrayIndexExpression(Single *left, Single *index) {
-  int idx = index->data.integer.value_;
-  int max = left->data.array.num_ - 1;
+  int idx = index->data.i.value_;
+  int max = left->data.a.num_ - 1;
   if (idx < 0 || idx > max) {
     return &Model::null_o;
   }
-  Single *ret = left->data.array.elems_[idx];
+  Single *ret = left->data.a.elems_[idx];
   ret->retain();
   return ret;
 }

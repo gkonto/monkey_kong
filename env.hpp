@@ -7,7 +7,7 @@
 #include <memory>
 #include "pool.hpp"
 
-class Single;
+struct Single;
 class Environment;
 
 extern std::unique_ptr<Pool<Environment>> EnvPool;

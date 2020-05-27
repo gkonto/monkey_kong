@@ -7,7 +7,7 @@
 #include <array>
 #include "auxiliaries.hpp"
 
-class Single;
+struct Single;
 class CompSymbolTable;
 
 class Builtins
