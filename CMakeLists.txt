@@ -14,7 +14,6 @@
      pool.hpp
      symbols.hpp
      object.hpp
-     visitor.hpp
      ast.hpp
      builtins.hpp
      env.hpp
@@ -27,7 +26,6 @@
      lexer.cpp
      object.cpp
      symbols.cpp
-     visitor.cpp
      argparser.cpp
      env.cpp
      token.cpp

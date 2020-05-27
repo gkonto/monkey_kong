@@ -14,7 +14,6 @@
      ../lexer.hpp
      ../symbols.hpp
      ../object.hpp
-     ../visitor.hpp
      ../builtins.hpp
      ../ast.hpp
      ../parser.hpp
@@ -30,7 +29,6 @@
      ../builtins.cpp
      ../symbols.cpp
      ../ast.cpp
-     ../visitor.cpp
      ../parser.cpp
      ../env.cpp
      test.cpp

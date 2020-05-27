@@ -8,7 +8,6 @@
 #include "token.hpp"
 #include "object.hpp"
 
-//#define USEVISITOR
 //#define NODISPATCH
 
 class Token;
@@ -40,7 +39,6 @@ struct Node
     virtual ~Node() {}
     virtual const std::string &tokenLiteral() const { return literal; }; // Only for debugging and testing
     virtual std::string asString() const = 0;
-    virtual void accept(Visitor &) = 0;
 #ifdef NODISPATCH
     Single *eval(Environment *s);
 #else
@@ -70,7 +68,6 @@ class Program : public Node
         const std::vector<Node *> &statements() const { return statements_; }
         std::vector<Node *>::iterator begin() { return statements_.begin(); }
         std::vector<Node *>::iterator end() { return statements_.end(); }
-        virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalProgram(Environment *s);
     private:
@@ -88,7 +85,6 @@ class Identifier : public Node
         std::string asString() const;
         const std::string &tokenLiteral() const { return tok_->literal(); }
         const std::string &value() const { return value_; }
-        virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalIdentifier(Environment *s);
     private:
@@ -111,7 +107,6 @@ class Let : public Node
         const std::string &identName() const { return name_->value(); }
         Node *value() const { return value_; }
         void setValue(Node *exp) { value_ = exp; }
-        virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalLet(Environment *s);
     private:
@@ -132,7 +127,6 @@ class Return : public Node
         const std::string &tokenLiteral() const { return token_->literal(); }
         void setReturnVal(Node *exp) { returnValue_ = exp; }
         Node *value() const { return returnValue_; }
-        virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalReturn(Environment *s);
     private:
@@ -153,7 +147,6 @@ class ExpressionStatement : public Node
         std::string asString() const;
         Node *expression() const { return expression_; }
         void setExpression(Node *exp) { expression_ = exp; }
-        virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalExpressionStatement(Environment *s);
      private:
@@ -170,7 +163,6 @@ class ExpressionStatement : public Node
          const std::string &tokenLiteral() const { return token_->literal(); }
          int value() const { return value_; }
          std::string asString() const;
-         virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalIntegerLiteral(Environment *s);
      private:
@@ -192,7 +184,6 @@ class ExpressionStatement : public Node
          const std::string &operator_s() const { return operat_; }
          Node *right() const { return right_; }
          void setRight(Node *exp) { right_ = exp; }
-         virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalPrefixExpression(Environment *s);
      private:
@@ -213,7 +204,6 @@ class ExpressionStatement : public Node
          void setRhs(Node *rhs) { rhs_ = rhs; }
          Node *rhs() const { return rhs_; }
          TokenType op() const { return op_; }
-         virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalInfixExpression(Environment *s);
      private:
@@ -232,7 +222,6 @@ class ExpressionStatement : public Node
          const std::string &tokenLiteral() const { return tok_->literal(); }
          bool value() const { return value_; }
          std::string asString() const { return tok_->literal(); }
-        virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalBoolean(Environment *s);
      private:
@@ -251,7 +240,6 @@ class ExpressionStatement : public Node
          Node *operator[](std::size_t idx) const { return statements_[idx]; }
          void emplace_back(Node *stmt) { return statements_.emplace_back(stmt); }
          const std::vector<Node *> &statements() const { return statements_; }
-         virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalBlockStatement(Environment *s);
      private:
@@ -278,7 +266,6 @@ class ExpressionStatement : public Node
          void setConsequence(BlockStatement *consequence) { consequence_ = consequence; }
          BlockStatement *alternative() const { return alternative_; }
          void setAlternative(BlockStatement *alternative) { alternative_ = alternative; }
-         virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalIf(Environment *s);
      private:
@@ -302,7 +289,6 @@ class ExpressionStatement : public Node
          void setParameters(const std::vector<Identifier *> &parameters) { parameters_ = parameters; }
          std::vector<Identifier *> &parameters() { return parameters_; }
          size_t paramSize() const { return parameters_.size(); }
-        virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalFunctionLiteral(Environment *s);
      private:
@@ -324,7 +310,6 @@ class ExpressionStatement : public Node
          Node *argNum(std::size_t idx) const { return arguments_[idx]; }
          void setArguments(std::vector<Node *> args) { arguments_ = args; }
          const std::vector<Node *> &arguments() const { return arguments_; }
-        virtual void accept(Visitor &v);
         Single *eval(Environment *s);
         Single *evalCallExpression(Environment *s);
      private:
@@ -343,7 +328,6 @@ class StringLiteral : public Node
         std::string asString() const;
         const std::string &value() const { return value_; }
         Single *eval(Environment *s) { return Single::alloc(value_.c_str(), STRING); }
-        void accept(Visitor &v) {};
     private:
         std::string value_;
         Token *tok_;
@@ -362,11 +346,6 @@ class ArrayLiteral : public Node
         Node *at(size_t idx) const { return elements_.at(idx); }
         const std::vector<Node *> &elements() const { return elements_; }
         Single *eval(Environment *s);
-        void accept(Visitor &v) { 
-            std::cout << "ArrayLiteral::accept(): TODO" << std::endl;
-            exit(1);
-
-        }
     private:
         std::vector<Node *>elements_;
         Token *tok_;
@@ -391,7 +370,6 @@ class IndexExpression : public Node
         Node *left() const { return left_; }
         void setIndex(Node *index) { index_ = index; }
         Single *eval(Environment *s);
-        void accept(Visitor &v) {}
     private:
         Token *tok_;
         Node *left_;
@@ -418,10 +396,7 @@ class HashLiteral : public Node
         HashMap::const_iterator begin() const { return pairs_.begin(); }
         HashMap::const_iterator end() const { return pairs_.end(); }
         void emplace(Node *key, Node *value) {  pairs_.emplace(key, value); }
-
         Single *eval(Environment *s);
-
-        void accept(Visitor &v) {}
     private:
         Token *tok_;
         HashMap pairs_;

@@ -2,7 +2,6 @@
 #include <string.h>
 #include "ast.hpp"
 #include "env.hpp"
-#include "visitor.hpp"
 #include "builtins.hpp"
 
 #ifdef NODISPATCH
@@ -345,66 +344,6 @@ std::string CallExpression::asString() const
 
      return ret;
  }
-
-void IntegerLiteral::accept(Visitor &v)
-{
-    v.visitIntegerLiteral(this);
-}
-
-
-void Program::accept(Visitor &v)
-{
-    v.visitProgram(this);
-}
-
-void ExpressionStatement::accept(Visitor &v)
-{
-    v.visitExpressionStatement(this);
-}
-
-
-void Boolean::accept(Visitor &v)
-{
-    v.visitBoolean(this);
-}
-
-
-void PrefixExpression::accept(Visitor &v) {
-    v.visitPrefixExpression(this);
-}
-
-void InfixExpression::accept(Visitor &v) {
-    v.visitInfixExpression(this);
-}
-
-void If::accept(Visitor &v) {
-    v.visitIfExpression(this);
-}
-
-void BlockStatement::accept(Visitor &v) {
-    v.visitBlockStatement(this);
-}
-
-void Return::accept(Visitor &v) {
-    v.visitReturn(this);
-}
-
-void Let::accept(Visitor &v) {
-    v.visitLet(this);
-}
-
-
-void Identifier::accept(Visitor &v) {
-    v.visitIdentifier(this);
-}
-
-void FunctionLiteral::accept(Visitor &v) {
-    v.visitFunctionLiteral(this);
-}
-
-void CallExpression::accept(Visitor &v) {
-    v.visitCallExpression(this);
-}
 
 
 Single *IntegerLiteral::evalIntegerLiteral(Environment *s) {

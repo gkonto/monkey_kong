@@ -8,7 +8,6 @@
 #include <memory>
 #include "test.hpp"
 #include "../token.hpp"
-#include "../visitor.hpp"
 #include "../lexer.hpp"
 #include "../ast.hpp"
 #include "../parser.hpp"
