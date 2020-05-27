@@ -57,29 +57,30 @@ const char *const tok_names[] = {
 class Token;
 extern std::unique_ptr<Pool<Token>> TokenPool;
 
-extern int num_allocs;
-
 class Token
 {
     public:
-        explicit Token(TokenType type, const char *ch);
-        explicit Token(TokenType type, int ch);
-        explicit Token(TokenType type, std::string lit);
+        explicit Token(TokenType type, const char *ch)
+            : type_(type), literal_(std::string(ch)) {}
+
+        explicit Token(TokenType type, int ch)
+            : type_(type), literal_(std::string(1, ch)) {}
+
+        explicit Token(TokenType type, std::string lit)
+            : type_(type), literal_(lit) {}
+
         const std::string &literal() const { return literal_; }
         TokenType type() const { return type_; }
-        bool operator==(const Token &b) const;
-        ~Token()
-        {
-        }
+        bool operator==(const Token &b) const { return type_ == b.type_ && !literal_.compare(b.literal_); }
 
         template <typename... Args>
         static Token *alloc(Args ... args);
         static void dealloc(Token *tok);
-
     private:
         TokenType type_;
         std::string literal_;
 };
+
 
 template<typename... Args>
 Token *Token::alloc(Args ... args)
@@ -93,7 +94,5 @@ Token *Token::alloc(Args ... args)
     return new Token(std::forward<Args>(args)...);
 #endif
 }
-
-
 
 #endif
