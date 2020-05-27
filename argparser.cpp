@@ -20,10 +20,11 @@ CmdArg::CmdArg(const char *option, const char *desc, CmdArgCb cb)
              : arg_name_(option), arg_desc_(desc), cb_(cb) 
 {}
 
+
 CmdArg::CmdArg(const char *option, const char *desc, const set<string> &accepted, CmdArgCb cb)
-                    : arg_name_(option), arg_desc_(desc), optional_(new Optional(accepted)), cb_(cb)
-{
-}
+    : arg_name_(option), arg_desc_(desc), optional_(new Optional(accepted)), cb_(cb)
+{}
+
 
 CmdArg::~CmdArg()
 {
@@ -32,20 +33,6 @@ CmdArg::~CmdArg()
     }
 }
 
-bool CmdArg::hasOptions() const 
-{
-    return optional_ != nullptr; 
-}
-
-const string &CmdArg::option() const 
-{ 
-    return arg_name_; 
-}
-
-const string &CmdArg::description() const 
-{ 
-    return arg_desc_; 
-}
 
 const set<string> &CmdArg::accepted_vals() const 
 {
@@ -53,16 +40,11 @@ const set<string> &CmdArg::accepted_vals() const
 }
 
 
-bool CmdArg::hasCallback() const 
-{
-    return cb_ != nullptr; 
-}
-
-
 void CmdArg::exec_cb(const vector<string> &arg_opts, void *returned) const
 {
     if (!cb_) {
-        std::cout << "Argument: " << description() << "Missing callback!" << std::endl;
+        cout << "Argument: " << description() << "Missing callback!" << endl;
+        return;
     }
     cb_(*this, arg_opts, returned); 
 }

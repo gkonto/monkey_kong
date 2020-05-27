@@ -46,12 +46,12 @@ class CmdArg
 
         ~CmdArg();
         std::string decorate() const;
-        bool hasOptions() const;
-        const std::string &option() const;
-        const std::string &description() const;
+        bool hasOptions() const { return optional_ != nullptr; }
+        const std::string &option() const { return arg_name_; }
+        const std::string &description() const { return arg_desc_; }
         const std::set<std::string> &accepted_vals() const;
         const std::string &default_val() const;
-        bool hasCallback() const;
+        bool hasCallback() const { return cb_ != nullptr; }
         void exec_cb(const std::vector<std::string> &arg_opts, void *returned) const;
     private:
         std::string arg_name_; // 
