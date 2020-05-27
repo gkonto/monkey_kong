@@ -13,7 +13,7 @@ class SymbolTable
         static TokenType LookupIdent(const std::string &key);
 
     private:
-        SymbolTable();
+        SymbolTable() { initializeSymbols(); }
         void initializeSymbols();
         std::map<std::string, TokenType> keywords;
 };

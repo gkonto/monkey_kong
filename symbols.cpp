@@ -2,8 +2,6 @@
 #include "token.hpp"
 #include <iostream>
 
-
-
 TokenType SymbolTable::LookupIdent(const std::string &key)
 {
     SymbolTable &instance = getInstance();
@@ -16,6 +14,7 @@ TokenType SymbolTable::LookupIdent(const std::string &key)
     return T_IDENT;
 }
 
+
 void SymbolTable::initializeSymbols()
 {
     keywords.emplace("fn", T_FUNCTION);
@@ -25,13 +24,8 @@ void SymbolTable::initializeSymbols()
     keywords.emplace("if", T_IF);
     keywords.emplace("else", T_ELSE);
     keywords.emplace("return", T_RETURN);
-
 }
 
-SymbolTable::SymbolTable()
-{
-    initializeSymbols();
-}
 
 SymbolTable &SymbolTable::getInstance()
 {
