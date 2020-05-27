@@ -17,17 +17,11 @@ class Environment {
         Environment() = default;
         explicit Environment(Environment *outer) : outer_(outer) {}
         ~Environment();
-        Single *get(const std::string &key) const;
+        Single *get(const std::string &key);
         Single *set(const std::string &key, Single *entry);
         Environment *outer() const { return outer_; }
         void retain() { ++count_; }
-
-        void release() {
-            if (--count_ == 0) {
-                dealloc(this);
-            }
-        }
-
+        void release();
         void reset() { count_ = 0; }
 
         template <typename... Args>

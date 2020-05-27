@@ -4,11 +4,16 @@
 
 std::unique_ptr<Pool<Environment>> EnvPool = nullptr;
 
+void Environment::release() {
+    if (--count_ == 0) {
+        dealloc(this);
+    }
+}
+
 //FIXME code cleanup. Messy condition statements
-Single *Environment::get(const std::string &key) const
+Single *Environment::get(const std::string &key)
 {
     const auto &entry = store_.find(key);
-
     const auto &end = store_.end();
     if (outer_ && entry == end) {
         const auto &e = outer_->get(key);
