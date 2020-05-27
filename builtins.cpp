@@ -2,17 +2,23 @@
 #include "builtins.hpp"
 #include "object.hpp"
 #include "auxiliaries.hpp"
-//#include "compiler_symbol_table.hpp"
 
 using namespace std;
 
-static Single *len_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
-{
-    if (args_num != 1) {
+static Single *argNumCheck(int got, int expected) {
+    if (got != expected) {
         char buffer[80];
-        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 1);
+        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", got, expected);
         return Single::alloc(buffer);
     }
+
+    return nullptr;
+}
+
+static Single *len_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
+{
+    Single *err = argNumCheck(args_num, 1);
+    if (err) return err;
 
     Single *f = args[0];
     if (f->type_ == STRING) {
@@ -28,11 +34,8 @@ static Single *len_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args
 
 static Single *first_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
-    if (args_num != 1) {
-        char buffer[80];
-        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 1);
-        return Single::alloc(buffer);
-    }
+    Single *err = argNumCheck(args_num, 1);
+    if (err) return err;
 
     if (args[0]->type_ != ARRAY) {
         char buffer[80];
@@ -50,15 +53,12 @@ static Single *first_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t ar
 
 static Single *last_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
-    if (args_num != 1) {
-        char buffer[80];
-        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 1);
-        return Single::alloc(buffer);
-    }
+    Single *err = argNumCheck(args_num, 1);
+    if (err) return err;
 
     if (args[0]->type_ != ARRAY) {
         char buffer[80];
-        sprintf(buffer, "argument to 'last' must be ARRAY", args_num, 1);
+        sprintf(buffer, "argument to 'last' must be ARRAY");
         return Single::alloc(buffer);
     }
 
@@ -72,11 +72,8 @@ static Single *last_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
 
 static Single *rest_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
-    if (args_num != 1) {
-        char buffer[80];
-        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 1);
-        return Single::alloc(buffer);
-    }
+    Single *err = argNumCheck(args_num, 1);
+    if (err) return err;
 
     if (args[0]->type_ != ARRAY) {
         char buffer[80];
@@ -96,11 +93,8 @@ static Single *rest_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
 
 static Single *push_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num)
 {
-    if (args_num != 2) {
-        char buffer[80];
-        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", args_num, 2);
-        return Single::alloc(buffer);
-    }
+    Single *err = argNumCheck(args_num, 2);
+    if (err) return err;
 
     if (args[0]->type_ != ARRAY) {
         char buffer[80];
@@ -110,7 +104,6 @@ static Single *push_b(const std::array<Single *, MAX_ARGS_NUM> &args, size_t arg
 
     Single **arr = args[0]->data.array.elems_;
     int elems_num = args[0]->data.array.num_;
-
 
     void *new_arr = realloc(arr, (elems_num + 1) * sizeof(Single *));
     args[0]->data.array.elems_ = static_cast<Single **>(new_arr);
@@ -127,19 +120,6 @@ Builtins &Builtins::getInstance()
     static Builtins instance;
     return instance;
 }
-
-
-/*
-void Builtins::transferBuiltinsTo(class CompSymbolTable *table) const
-{
-    int i = 0;
-
-    for (const auto &a : builtins_) {
-        table->defineBuiltin(i, a.first);
-        ++i;
-    }
-}
-*/
 
 
 Single *Builtins::atIndex(size_t index) const
@@ -160,14 +140,6 @@ Builtins::Builtins()
     builtins_.emplace("rest", Single::alloc(rest_b));
 }
 
-Builtins::~Builtins()
-{
-    // DO NOT DEALLOCATE ANYTHING. These are in the pool 
-    // and will be deallocated last.
-    //for (auto &a : builtins_) {
-        //a.second->release();
-    //}
-}
 
 Single *Builtins::Get(const string &key)
 {

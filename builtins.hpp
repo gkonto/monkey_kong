@@ -15,11 +15,9 @@ class Builtins
     public:
         using Function = Single *(*)(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num);
         using container = std::map<std::string, Single *>;
-        ~Builtins();
 
         static Single *Get(const std::string &key);
         static Builtins &getInstance();
-        //void transferBuiltinsTo(class CompSymbolTable *table) const;
         Single *atIndex(size_t index) const;
     private:
         explicit Builtins();
