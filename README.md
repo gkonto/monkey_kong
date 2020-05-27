@@ -103,42 +103,6 @@ __QA mechanism compilation__
 * cd on the qa/ directory
 * follow the previous steps
 
-## QA mechanism examples
-* CheckFibonnacciTime
-* TestArrayIndexExpressions
-* TestBangOperator
-* TestBuiltinFunction
-* TestCallExpressionParsing
-* TestClosures
-* TestErrorHandler
-* TestEvalBooleanExpression
-* TestEvalIntegerExpression
-* TestEvalReturnStatements
-* TestFunctionApplication
-* TestFunctionLiteralParsing
-* TestFunctionObject
-* TestFunctionParametersParsing
-* TestHashIndexExpressions
-* TestHashLiteral
-* TestIdentifierExpression
-* TestIfElseExpressions
-* TestIfExpression
-* TestIntegerLiteralExpression
-* TestLetStatements
-* TestNextToken
-* TestOperatorPrecedenceParsing
-* TestParsingArrayLiteral
-* TestParsingEmptyHashLiteral
-* TestParsingHashLiteral
-* TestParsingHashLiterallWithExpression
-* TestParsingIndexExpression
-* TestParsingInfixExpressions
-* TestParsingPrefixExpression
-* TestPoolArena
-* TestReturnStatements
-* TestStringConcatenation
-* TestStringLiteral
-* TestStringLiteralExpression
 
 ## Authors
 
