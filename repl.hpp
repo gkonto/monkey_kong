@@ -17,13 +17,9 @@ class Repl
 };
 
 
-class InterpreterRepl : public Repl
+struct InterpreterRepl : public Repl
 {
-    public:
-        InterpreterRepl();
-        const char *type() const { return "Interpreter"; }
-
-    private:
+    const char *type() const { return "Interpreter"; }
 };
 
 

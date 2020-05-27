@@ -15,12 +15,20 @@
 using namespace std;
 using namespace std::chrono;
 
+
+namespace {
+    struct ReplOptions {
+        bool   time_   = false;
+    }; 
+}
+
+
 void Repl::greeting() const
 {
-    std::stringstream ss;
+    stringstream ss;
     cout << BOLD << "Hello" << "! ";
-    cout << "This is the Monkey Programming language " << CYAN << type() << RESET << "." << std::endl;
-    cout << BOLD << "Feel free to type in commands." << RESET << std::endl;
+    cout << "This is the Monkey Programming language " << CYAN << type() << RESET << "." << endl;
+    cout << BOLD << "Feel free to type in commands." << RESET << endl;
 }
 
 void Repl::start(bool calc_t)
@@ -35,37 +43,25 @@ void Repl::start(bool calc_t)
         getline(cin, input);
         // Produce program nodes
         auto start = high_resolution_clock::now();
+
         Lexer lex(input);
         Parser p(&lex);
-        std::unique_ptr<Program> prog = p.parseProgram();
+        unique_ptr<Program> prog = p.parseProgram();
 
         Single *obj = prog->eval(&env);
-
         auto end = high_resolution_clock::now();
 
         if (obj) {
-            std::cout << obj->inspect() << std::endl;
+            cout << obj->inspect() << endl;
             obj->release();
         }
 
         if (calc_t) {
             auto time_elapsed = duration_cast<milliseconds>(end - start);
-            cout << BOLD << endl << "time elapsed: " << time_elapsed.count() << " millisec" << RESET << std::endl;
+            cout << BOLD << endl << "time elapsed: " << time_elapsed.count() << " millisec" << RESET << endl;
         }
     }
 }
-
-
-InterpreterRepl::InterpreterRepl()
-{
-}
-
-
-struct ReplOptions
-{
-    bool   time_   = false;
-}; 
-// ~ReplOptions
 
 
 static void displayElapsedTimeArg(const CmdArg &arg, const vector<string> &user_option, void *r_opts)
@@ -83,7 +79,6 @@ int main(int argc, char **argv)
     a_parser.addArgument("-s", "Display elapsed time", displayElapsedTimeArg);
     a_parser.parse(&r_opts);
 
-    std::unique_ptr<InterpreterRepl> repl = make_unique<InterpreterRepl>();
+    unique_ptr<InterpreterRepl> repl = make_unique<InterpreterRepl>();
     repl->start(r_opts.time_);
-
 }
