@@ -7,7 +7,6 @@
 #include "repl.hpp"
 #include "ast.hpp"
 #include "env.hpp"
-#include "visitor.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "auxiliaries.hpp"
