@@ -1,36 +1,35 @@
  cmake_minimum_required(VERSION 2.8.7)
  PROJECT(monkey)
- #add_definitions("-O3 -g  -pg -ggdb -Wunreachable-code")
  add_definitions("-O3 -g -Wunreachable-code")
- #//set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3 -g")
- #set(CMAKE_CXX_FLAGS_RELEASE " -O3 -Wall -Wextra")
  set(CMAKE_CXX_STANDARD 14)
 
- INCLUDE_DIRECTORIES(..)
+ SET(ROOT_DIR ..)
+ INCLUDE_DIRECTORIES(${ROOT_DIR})
+
  set(HEADERS
-     ../argparser.hpp
-     ../auxiliaries.hpp
-     ../token.hpp
-     ../lexer.hpp
-     ../symbols.hpp
-     ../object.hpp
-     ../builtins.hpp
-     ../ast.hpp
-     ../parser.hpp
-     ../pool.hpp
-     ../env.hpp
+     ${ROOT_DIR}/argparser.hpp
+     ${ROOT_DIR}/auxiliaries.hpp
+     ${ROOT_DIR}/token.hpp
+     ${ROOT_DIR}/lexer.hpp
+     ${ROOT_DIR}/symbols.hpp
+     ${ROOT_DIR}/object.hpp
+     ${ROOT_DIR}/builtins.hpp
+     ${ROOT_DIR}/ast.hpp
+     ${ROOT_DIR}/parser.hpp
+     ${ROOT_DIR}/pool.hpp
+     ${ROOT_DIR}/env.hpp
      test.hpp
     )
  set(SOURCES
-     ../argparser.cpp
-     ../token.cpp
-     ../lexer.cpp
-     ../object.cpp
-     ../builtins.cpp
-     ../symbols.cpp
-     ../ast.cpp
-     ../parser.cpp
-     ../env.cpp
+     ${ROOT_DIR}/argparser.cpp
+     ${ROOT_DIR}/token.cpp
+     ${ROOT_DIR}/lexer.cpp
+     ${ROOT_DIR}/object.cpp
+     ${ROOT_DIR}/builtins.cpp
+     ${ROOT_DIR}/symbols.cpp
+     ${ROOT_DIR}/ast.cpp
+     ${ROOT_DIR}/parser.cpp
+     ${ROOT_DIR}/env.cpp
      test.cpp
      main.cpp
      )

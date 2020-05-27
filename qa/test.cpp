@@ -7,13 +7,13 @@
 #include <stdarg.h>
 #include <memory>
 #include "test.hpp"
-#include "../token.hpp"
-#include "../lexer.hpp"
-#include "../ast.hpp"
-#include "../parser.hpp"
-#include "../env.hpp"
-#include "../pool.hpp"
-#include "../object.hpp"
+#include "token.hpp"
+#include "lexer.hpp"
+#include "ast.hpp"
+#include "parser.hpp"
+#include "env.hpp"
+#include "pool.hpp"
+#include "object.hpp"
 
 using namespace std;
 using namespace std::chrono;

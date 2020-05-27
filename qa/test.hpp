@@ -6,7 +6,7 @@
 #include <vector>
 #include <memory>
 
-#include "../ast.hpp"
+#include "ast.hpp"
 
 class Token;
 class Node;
