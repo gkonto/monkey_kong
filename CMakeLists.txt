@@ -1,6 +1,7 @@
  cmake_minimum_required(VERSION 2.8.7)
  PROJECT(monkey)
- add_definitions("-Wall -Wextra -ggdb -O3 -Wunreachable-code")
+ #add_definitions("-Wall -Wextra -ggdb -O0 -Wunreachable-code")
+ add_definitions("-Wall -Wextra -O3 -Wunreachable-code")
  set(CMAKE_CXX_STANDARD 14)
 
  set(HEADERS

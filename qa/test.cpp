@@ -1074,20 +1074,20 @@ void TestFunctionObject::run_core(std::string input)
         return;
     }
 
-    if (fn->data.f.params_->size() != 1) {
+    if (fn->data.f.func_->parameters_.size() != 1) {
         errorf(input, "function has wrong parameters");
         return;
     }
 
-    const std::vector<Identifier *> &idents = *fn->data.f.params_;
+    const std::vector<Identifier *> &idents = fn->data.f.func_->parameters_;
     const std::string &val = idents[0]->value();
     if (val.compare("x")) {
         errorf(input, "parameter is not 'x'. got %s\n", val.c_str());
         return;
     }
     std::string expectedBody("(x + 2)");
-    const std::string &b = fn->data.f.body_->asString();
-    if (fn->data.f.body_->asString() != expectedBody) {
+    const std::string &b = fn->data.f.func_->body_->asString();
+    if (fn->data.f.func_->body_->asString() != expectedBody) {
         errorf(input, "body is not %s. got %s\n", expectedBody.c_str(), b.c_str());
         return;
     }

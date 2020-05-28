@@ -16,6 +16,7 @@ class Null;
 class Identifier;
 class BlockStatement;
 class Environment;
+class FunctionImpl;
 
 struct HashFn;
 struct HashEqFn;
@@ -65,8 +66,7 @@ struct Single {
   explicit Single() : type_(NUL) {}
   explicit Single(const char *msg, ObjType type);
   explicit Single(Single **elements, int num);
-  explicit Single(std::vector<Identifier *> *p, Environment *e,
-                  BlockStatement *b);
+  explicit Single(FunctionImpl *f, Environment *e);
   // ~CONSTRUCTORS
 
   void retain() { ++count_; }
@@ -96,8 +96,7 @@ struct Single {
       char *msg_;
     } e; // Error
     struct {
-      std::vector<Identifier *> *params_;
-      BlockStatement *body_;
+        FunctionImpl *func_;
       Environment *env_;
     } f; // function
     struct {

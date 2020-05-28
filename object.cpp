@@ -27,6 +27,7 @@ void Single::release() {
       free(data.e.msg_);
     } else if (type_ == FUNCTION) {
       data.f.env_->release();
+      data.f.func_->release();
     } else if (type_ == ARRAY) {
       if (data.a.num_) {
         delete[] data.a.elems_;
@@ -60,9 +61,9 @@ string Single::inspectFunction() const {
   ret.append("(");
 
   size_t i = 1;
-  size_t num = data.f.params_->size();
+  size_t num = data.f.func_->parameters_.size();
 
-  for (auto &a : *data.f.params_) {
+  for (auto &a : data.f.func_->parameters_) {
     ret.append(a->asString());
     if (i != num) {
       i++;
@@ -70,7 +71,7 @@ string Single::inspectFunction() const {
     }
   }
   ret.append(") {\n");
-  ret.append(data.f.body_->asString());
+  ret.append(data.f.func_->body_->asString());
   ret.append("\n}");
 
   return ret;
@@ -177,11 +178,10 @@ Single::Single(Single **elements, int num) : type_(ARRAY) {
   data.a.num_ = num;
 }
 
-Single::Single(std::vector<Identifier *> *p, Environment *e, BlockStatement *b)
-    : type_(FUNCTION) {
-  data.f.params_ = p;
-  data.f.body_ = b;
+Single::Single(FunctionImpl *f, Environment *e) : type_(FUNCTION) {
+  data.f.func_ = f;
   data.f.env_ = e;
+  f->retain();
   e->retain();
 }
 

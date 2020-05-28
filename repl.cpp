@@ -60,6 +60,8 @@ void Repl::start(bool calc_t)
             cout << BOLD << endl << "time elapsed: " << time_elapsed.count() << " millisec" << RESET << endl;
         }
     }
+
+    std::cout << "Getting out" << std::endl;
 }
 
 

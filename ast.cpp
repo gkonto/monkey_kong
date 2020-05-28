@@ -129,7 +129,8 @@ BlockStatement::~BlockStatement() {
   }
 }
 
-FunctionLiteral::~FunctionLiteral() {
+
+FunctionImpl::~FunctionImpl() {
   for (auto &param : parameters_) {
     delete param;
   }
@@ -157,15 +158,15 @@ string FunctionLiteral::asString() const {
   ret.append("(");
 
   size_t i = 1;
-  for (auto &a : parameters_) {
+  for (auto &a : f_->parameters_) {
     ret.append(a->asString());
-    if (i != parameters_.size()) {
+    if (i != f_->parameters_.size()) {
       ret.append(", ");
     }
     i++;
   }
   ret.append(") ");
-  ret.append(body_->asString());
+  ret.append(f_->body_->asString());
 
   return ret;
 }
@@ -384,23 +385,25 @@ static Single *evalInfixExpression_core(TokenType op, Single *left,
     temp = Single::alloc(buffer);
   }
 
-  if (temp) {
-    left->release();
-    right->release();
-  }
   return temp;
 }
 
 Single *InfixExpression::eval(Environment *s) {
   Single *l = lhs()->eval(s);
+
   if (isError(l)) {
     return l;
   }
+
   Single *r = rhs()->eval(s);
   if (isError(r)) {
     return r;
   }
+
   Single *ret = evalInfixExpression_core(op(), l, r);
+
+  l->release();
+  r->release();
 
   return ret;
 }
@@ -439,10 +442,10 @@ Single *If::eval(Environment *s) {
   return ret;
 }
 
+
 Single *FunctionLiteral::eval(Environment *s) {
-  vector<Identifier *> &params = parameters();
-  BlockStatement *b = body();
-  return Single::alloc(&params, s, b);
+    FunctionImpl *i = impl();
+  return Single::alloc(i, s);
 }
 
 static bool evalExpressions(const vector<Node *> &args,
@@ -476,8 +479,8 @@ static bool evalExpressions(const vector<Node *> &args,
 Environment *extendFunctionEnv(Single *fn,
                                array<Single *, MAX_ARGS_NUM> &args) {
   Environment *env =
-      Environment::alloc(fn->data.f.env_); // FIXME deallocate?
-  vector<Identifier *> &params = *(fn->data.f.params_);
+      Environment::alloc(fn->data.f.env_);
+  const vector<Identifier *> &params = fn->data.f.func_->parameters_;
   for (size_t i = 0; i < params.size(); i++) {
     Identifier *iden = params[i];
     env->set(iden->value(), args[i]);
@@ -504,7 +507,7 @@ static Single *applyFunction(Single *fn, array<Single *, MAX_ARGS_NUM> &args,
 
   if (fn->type_ == FUNCTION) {
     Environment *extended_env = extendFunctionEnv(fn, args);
-    Single *ret = fn->data.f.body_->eval(extended_env);
+    Single *ret = fn->data.f.func_->body_->eval(extended_env);
 
     ret = unwrapReturnValue(ret);
     extended_env->release();

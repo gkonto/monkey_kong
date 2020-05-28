@@ -215,25 +215,40 @@ private:
   BlockStatement *alternative_ = nullptr;
 };
 
+struct FunctionImpl {
+    ~FunctionImpl();
+    void release() {
+        if (--use_count_ == 0) {
+            delete this;
+        }
+    }
+
+    void retain() { use_count_++; }
+
+    std::vector<Identifier *> parameters_; // used by object if created
+    BlockStatement *body_ = nullptr;       // used by object if created
+    int use_count_ = 1;
+};
+
 
 class FunctionLiteral : public Node {
 public:
   explicit FunctionLiteral(Token *tok) : tok_(tok) {}
-  ~FunctionLiteral();
+  ~FunctionLiteral() { f_->release(); }
   std::string asString() const;
   const std::string &tokenLiteral() const { return tok_->literal(); }
-  Identifier *param(std::size_t idx) const { return parameters_[idx]; }
-  void setBody(BlockStatement *body) { body_ = body; }
-  BlockStatement *body() const { return body_; }
-  void setParameters(const std::vector<Identifier *> &p) { parameters_ = p; }
-  std::vector<Identifier *> &parameters() { return parameters_; }
-  size_t paramSize() const { return parameters_.size(); }
+  Identifier *param(std::size_t idx) const { return f_->parameters_[idx]; }
+  void setBody(BlockStatement *body) { f_->body_ = body; }
+  BlockStatement *body() const { return f_->body_; }
+  void setParameters(const std::vector<Identifier *> &p) { f_->parameters_ = p; }
+  const std::vector<Identifier *> &parameters() { return f_->parameters_; }
+  size_t paramSize() const { return f_->parameters_.size(); }
   Single *eval(Environment *s);
+  FunctionImpl *impl() const { return f_; }
 
 private:
   Token *tok_;
-  std::vector<Identifier *> parameters_; // used by object if created
-  BlockStatement *body_ = nullptr;       // used by object if created
+  FunctionImpl *f_ = new FunctionImpl;
 };
 
 
