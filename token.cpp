@@ -5,18 +5,20 @@ std::unique_ptr<Pool<Token>> TokenPool = nullptr;
 
 void Token::dealloc(Token *tok)
 {
-    if (!tok) return;
+    if (!tok)
+        return;
 
 #ifdef USE_POOL
     assert(TokenPool);
-    if (TokenPool) {
+    if (TokenPool)
+    {
         TokenPool->free(tok);
-    } else {
+    }
+    else
+    {
         delete tok;
     }
 #else
     delete tok;
 #endif
 }
-
-

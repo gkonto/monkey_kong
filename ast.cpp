@@ -6,53 +6,69 @@
 
 using namespace std;
 
-bool isTruthy(Single *obj) {
-  if (obj == &Model::null_o) {
+bool isTruthy(Object *obj)
+{
+  if (obj == &Model::null_o)
+  {
     return false;
-  } else if (obj == &Model::true_o) {
+  }
+  else if (obj == &Model::true_o)
+  {
     return true;
-  } else if (obj == &Model::false_o) {
+  }
+  else if (obj == &Model::false_o)
+  {
     return false;
-  } else {
+  }
+  else
+  {
     return true;
   }
 }
 
-static bool isError(Single *val) {
-  if (val) {
+static bool isError(Object *val)
+{
+  if (val)
+  {
     return val->type_ == ERROR;
   }
   return false;
 }
 
-static Single *nativeBoolToSingObj(bool input) {
+static Object *nativeBoolToSingObj(bool input)
+{
   return input ? &Model::true_o : &Model::false_o;
 }
 
-Let::~Let() {
+Let::~Let()
+{
   if (name_)
     delete name_;
   if (value_)
     delete value_;
 }
 
-PrefixExpression::~PrefixExpression() {
+PrefixExpression::~PrefixExpression()
+{
   if (right_)
     delete right_;
 }
 
-InfixExpression::~InfixExpression() {
+InfixExpression::~InfixExpression()
+{
   delete lhs_;
   delete rhs_;
 }
 
-string InfixExpression::asString() const {
+string InfixExpression::asString() const
+{
   string ret;
 
   ret.append("(");
   ret.append(lhs_->asString());
   ret.append(" " + string(tok_names[op_]) + " ");
-  if (rhs_) {
+  if (rhs_)
+  {
     ret.append(rhs_->asString());
   }
   ret.append(")");
@@ -60,12 +76,14 @@ string InfixExpression::asString() const {
   return ret;
 }
 
-string PrefixExpression::asString() const {
+string PrefixExpression::asString() const
+{
   string ret;
 
   ret.append("(");
   ret.append(operat_);
-  if (right_) {
+  if (right_)
+  {
     ret.append(right_->asString());
   }
   ret.append(")");
@@ -73,19 +91,22 @@ string PrefixExpression::asString() const {
   return ret;
 }
 
-Return::~Return() {
+Return::~Return()
+{
   if (returnValue_)
     delete returnValue_;
 }
 
-string Let::asString() const {
+string Let::asString() const
+{
   string ret;
   ret.append(tokenLiteral());
   ret.append(" ");
   ret.append(name_->asString());
   ret.append(" = ");
 
-  if (value_) { // TODO remove condition in the future
+  if (value_)
+  { // TODO remove condition in the future
     ret.append(value_->asString());
   }
 
@@ -94,17 +115,20 @@ string Let::asString() const {
   return ret;
 }
 
-string IntegerLiteral::asString() const {
+string IntegerLiteral::asString() const
+{
   stringstream ss;
   ss << value_;
   return ss.str();
 }
 
-string Return::asString() const {
+string Return::asString() const
+{
   string ret;
   ret.append(tokenLiteral() + " ");
 
-  if (returnValue_) { // TODO remove condition in the future
+  if (returnValue_)
+  { // TODO remove condition in the future
     ret.append(returnValue_->asString());
   }
 
@@ -113,38 +137,45 @@ string Return::asString() const {
   return ret;
 }
 
-string Program::asString() const {
+string Program::asString() const
+{
   string ret;
 
-  for (auto &a : statements_) {
+  for (auto &a : statements_)
+  {
     ret.append(a->asString());
   }
 
   return ret;
 }
 
-BlockStatement::~BlockStatement() {
-  for (auto &stmt : statements_) {
+BlockStatement::~BlockStatement()
+{
+  for (auto &stmt : statements_)
+  {
     delete stmt;
   }
 }
 
-
-FunctionImpl::~FunctionImpl() {
-  for (auto &param : parameters_) {
+FunctionImpl::~FunctionImpl()
+{
+  for (auto &param : parameters_)
+  {
     delete param;
   }
   delete body_;
 }
 
-string If::asString() const {
+string If::asString() const
+{
   string ret;
   ret.append("if");
   ret.append(condition_->asString());
   ret.append(" ");
   ret.append(consequence_->asString());
 
-  if (alternative_) {
+  if (alternative_)
+  {
     ret.append("else ");
     ret.append(alternative_->asString());
   }
@@ -152,15 +183,18 @@ string If::asString() const {
   return ret;
 }
 
-string FunctionLiteral::asString() const {
+string FunctionLiteral::asString() const
+{
   string ret;
   ret.append(tokenLiteral());
   ret.append("(");
 
   size_t i = 1;
-  for (auto &a : f_->parameters_) {
+  for (auto &a : f_->parameters_)
+  {
     ret.append(a->asString());
-    if (i != f_->parameters_.size()) {
+    if (i != f_->parameters_.size())
+    {
       ret.append(", ");
     }
     i++;
@@ -171,24 +205,29 @@ string FunctionLiteral::asString() const {
   return ret;
 }
 
-string BlockStatement::asString() const {
+string BlockStatement::asString() const
+{
   string ret;
 
-  for (auto &a : statements_) {
+  for (auto &a : statements_)
+  {
     ret.append(a->asString());
   }
 
   return ret;
 }
 
-CallExpression::~CallExpression() {
-  for (auto &arg : arguments_) {
+CallExpression::~CallExpression()
+{
+  for (auto &arg : arguments_)
+  {
     delete arg;
   }
   delete function_;
 }
 
-string CallExpression::asString() const {
+string CallExpression::asString() const
+{
   string ret;
   vector<string> args;
 
@@ -196,9 +235,11 @@ string CallExpression::asString() const {
   ret.append("(");
 
   size_t i = 1;
-  for (auto &a : arguments_) {
+  for (auto &a : arguments_)
+  {
     ret.append(a->asString());
-    if (i != arguments_.size()) {
+    if (i != arguments_.size())
+    {
       ret.append(", ");
     }
     i++;
@@ -208,118 +249,149 @@ string CallExpression::asString() const {
   return ret;
 }
 
-
-Single *Program::eval(Environment *s) {
-  Single *ret = nullptr;
-  for (auto &stmt : statements()) {
+Object *Program::eval(Environment *s)
+{
+  Object *ret = nullptr;
+  for (auto &stmt : statements())
+  {
     if (ret)
       ret->release();
 
     ret = stmt->eval(s);
-    if (ret && ret->type_ == RETURN) {
-      Single *o = ret->data.obj.obj_;
+    if (ret && ret->type_ == RETURN)
+    {
+      Object *o = ret->data.obj.obj_;
       ret->release();
 
       return o;
     }
 
-    if (ret && ret->type_ == ERROR) {
+    if (ret && ret->type_ == ERROR)
+    {
       return ret;
     }
   }
   return ret;
 }
 
-Single *Identifier::eval(Environment *s) {
+Object *Identifier::eval(Environment *s)
+{
   const string &key = value();
-  Single *val = s->get(key);
-  if (val) {
+  Object *val = s->get(key);
+  if (val)
+  {
     val->retain();
     return val;
   }
 
   val = Builtins::Get(key);
-  if (val) {
+  if (val)
+  {
     val->retain();
     return val;
   }
 
   char buffer[80];
   sprintf(buffer, "identifier not found: %s", key.c_str());
-  return Single::alloc(buffer);
+  return Object::alloc(buffer);
 }
 
-Single *Let::eval(Environment *s) {
-  Single *val = value()->eval(s);
-  if (isError(val)) {
+Object *Let::eval(Environment *s)
+{
+  Object *val = value()->eval(s);
+  if (isError(val))
+  {
     return val;
   }
   s->set(name()->value(), val);
   return val;
 }
 
-Single *Return::eval(Environment *s) {
-  Single *ret = value()->eval(s);
-  if (isError(ret)) {
+Object *Return::eval(Environment *s)
+{
+  Object *ret = value()->eval(s);
+  if (isError(ret))
+  {
     return ret;
   }
-  return Single::alloc(ret);
+  return Object::alloc(ret);
 }
 
-static Single *evalBangOperatorExpression(Single *right) {
-  if (right == &Model::true_o) {
+static Object *evalBangOperatorExpression(Object *right)
+{
+  if (right == &Model::true_o)
+  {
     return &Model::false_o;
-  } else if (right == &Model::false_o) {
+  }
+  else if (right == &Model::false_o)
+  {
     return &Model::true_o;
-  } else if (right == &Model::null_o) {
+  }
+  else if (right == &Model::null_o)
+  {
     return &Model::null_o;
-  } else {
+  }
+  else
+  {
     return &Model::false_o;
   }
 }
 
-static Single *evalMinusPrefixOperatorExpression(Single *right) {
-  if (right->type_ != INTEGER) {
+static Object *evalMinusPrefixOperatorExpression(Object *right)
+{
+  if (right->type_ != INTEGER)
+  {
     char buffer[80];
     sprintf(buffer, "unknown operator: -%s", object_name[right->type_]);
-    return Single::alloc(buffer);
+    return Object::alloc(buffer);
   }
-  return Single::alloc(-right->data.i.value_);
+  return Object::alloc(-right->data.i.value_);
 }
 
-static Single *evalPrefixExpression_core(const string &op, Single *right) {
-  Single *ret = nullptr;
-  if (!op.compare("!")) {
+static Object *evalPrefixExpression_core(const string &op, Object *right)
+{
+  Object *ret = nullptr;
+  if (!op.compare("!"))
+  {
     ret = evalBangOperatorExpression(right);
-  } else if (!op.compare("-")) {
+  }
+  else if (!op.compare("-"))
+  {
     ret = evalMinusPrefixOperatorExpression(right);
-  } else {
+  }
+  else
+  {
     char buffer[80];
     sprintf(buffer, "unknown operator: %s%s", op.c_str(),
             object_name[right->type_]);
-    ret = Single::alloc(buffer);
+    ret = Object::alloc(buffer);
   }
-  if (right) {
+  if (right)
+  {
     right->release();
   }
   return ret;
 }
 
-Single *PrefixExpression::eval(Environment *s) {
-  Single *r = right()->eval(s);
-  if (isError(r)) {
+Object *PrefixExpression::eval(Environment *s)
+{
+  Object *r = right()->eval(s);
+  if (isError(r))
+  {
     return r;
   }
   return evalPrefixExpression_core(operator_s(), r);
 }
 
-static Single *evalStringInfixExpression(TokenType op, Single *left,
-                                         Single *right) {
-  if (op != T_PLUS) {
+static Object *evalStringInfixExpression(TokenType op, Object *left,
+                                         Object *right)
+{
+  if (op != T_PLUS)
+  {
     char buffer[80];
     sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
-    return Single::alloc(buffer);
+    return Object::alloc(buffer);
   }
 
   char buffer[1024];
@@ -327,80 +399,112 @@ static Single *evalStringInfixExpression(TokenType op, Single *left,
   const char *r = right->data.s.value_;
   strcpy(buffer, l);
   strcat(buffer, r);
-  return Single::alloc(buffer, STRING);
+  return Object::alloc(buffer, STRING);
 }
 
-static Single *evalIntegerInfixExpression(TokenType op, Single *left,
-                                          Single *right) {
+static Object *evalIntegerInfixExpression(TokenType op, Object *left,
+                                          Object *right)
+{
   // TODO remove all those compare with an array of function callbacks
-  Single *t = nullptr;
+  Object *t = nullptr;
 
-  if (op == T_PLUS) {
-    t = Single::alloc(left->data.i.value_ + right->data.i.value_);
-  } else if (op == T_MINUS) {
-    t = Single::alloc(left->data.i.value_ - right->data.i.value_);
-  } else if (op == T_ASTERISK) {
-    t = Single::alloc(left->data.i.value_ * right->data.i.value_);
-  } else if (op == T_SLASH) {
-    t = Single::alloc(left->data.i.value_ / right->data.i.value_);
-  } else if (op == T_LT) {
+  if (op == T_PLUS)
+  {
+    t = Object::alloc(left->data.i.value_ + right->data.i.value_);
+  }
+  else if (op == T_MINUS)
+  {
+    t = Object::alloc(left->data.i.value_ - right->data.i.value_);
+  }
+  else if (op == T_ASTERISK)
+  {
+    t = Object::alloc(left->data.i.value_ * right->data.i.value_);
+  }
+  else if (op == T_SLASH)
+  {
+    t = Object::alloc(left->data.i.value_ / right->data.i.value_);
+  }
+  else if (op == T_LT)
+  {
     t = nativeBoolToSingObj(left->data.i.value_ < right->data.i.value_);
-  } else if (op == T_GT) {
+  }
+  else if (op == T_GT)
+  {
     t = nativeBoolToSingObj(left->data.i.value_ > right->data.i.value_);
-  } else if (op == T_EQ) {
+  }
+  else if (op == T_EQ)
+  {
     t = nativeBoolToSingObj(left->data.i.value_ == right->data.i.value_);
-  } else if (op == T_NOT_EQ) {
+  }
+  else if (op == T_NOT_EQ)
+  {
     t = nativeBoolToSingObj(left->data.i.value_ != right->data.i.value_);
-  } else {
+  }
+  else
+  {
     char buffer[80];
     sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
-    t = Single::alloc(buffer);
+    t = Object::alloc(buffer);
   }
 
   return t;
 }
 
-static Single *evalInfixExpression_core(TokenType op, Single *left,
-                                        Single *right) {
-  Single *temp = nullptr;
-  if (left->type_ == INTEGER && right->type_ == INTEGER) {
+static Object *evalInfixExpression_core(TokenType op, Object *left,
+                                        Object *right)
+{
+  Object *temp = nullptr;
+  if (left->type_ == INTEGER && right->type_ == INTEGER)
+  {
     temp = evalIntegerInfixExpression(op, left, right);
-
-  } else if (op == T_EQ) {
+  }
+  else if (op == T_EQ)
+  {
     temp = nativeBoolToSingObj(left == right);
-  } else if (op == T_NOT_EQ) {
+  }
+  else if (op == T_NOT_EQ)
+  {
     temp = nativeBoolToSingObj(left != right);
-  } else if (left->type_ != right->type_) {
+  }
+  else if (left->type_ != right->type_)
+  {
     char buffer[80];
     sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
-    temp = Single::alloc(buffer);
-  } else if (left->type_ == STRING) {
+    temp = Object::alloc(buffer);
+  }
+  else if (left->type_ == STRING)
+  {
     temp = evalStringInfixExpression(op, left, right);
-  } else {
+  }
+  else
+  {
     char buffer[80];
     sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
-    temp = Single::alloc(buffer);
+    temp = Object::alloc(buffer);
   }
 
   return temp;
 }
 
-Single *InfixExpression::eval(Environment *s) {
-  Single *l = lhs()->eval(s);
+Object *InfixExpression::eval(Environment *s)
+{
+  Object *l = lhs()->eval(s);
 
-  if (isError(l)) {
+  if (isError(l))
+  {
     return l;
   }
 
-  Single *r = rhs()->eval(s);
-  if (isError(r)) {
+  Object *r = rhs()->eval(s);
+  if (isError(r))
+  {
     return r;
   }
 
-  Single *ret = evalInfixExpression_core(op(), l, r);
+  Object *ret = evalInfixExpression_core(op(), l, r);
 
   l->release();
   r->release();
@@ -408,33 +512,43 @@ Single *InfixExpression::eval(Environment *s) {
   return ret;
 }
 
-Single *Boolean::eval(Environment *s) { return nativeBoolToSingObj(value()); }
+Object *Boolean::eval(Environment *s) { return nativeBoolToSingObj(value()); }
 
-Single *BlockStatement::eval(Environment *store) {
-  Single *temp = nullptr;
-  for (auto &s : statements()) {
+Object *BlockStatement::eval(Environment *store)
+{
+  Object *temp = nullptr;
+  for (auto &s : statements())
+  {
     if (temp)
       temp->release();
     temp = s->eval(store);
-    if (temp && (temp->type_ == RETURN || temp->type_ == ERROR)) {
+    if (temp && (temp->type_ == RETURN || temp->type_ == ERROR))
+    {
       return temp;
     }
   }
   return temp;
 }
 
-Single *If::eval(Environment *s) {
-  Single *cond = condition()->eval(s);
-  if (isError(cond)) {
+Object *If::eval(Environment *s)
+{
+  Object *cond = condition()->eval(s);
+  if (isError(cond))
+  {
     return cond;
   }
 
-  Single *ret = nullptr;
-  if (isTruthy(cond)) {
+  Object *ret = nullptr;
+  if (isTruthy(cond))
+  {
     ret = consequence()->eval(s);
-  } else if (alternative()) {
+  }
+  else if (alternative())
+  {
     ret = alternative()->eval(s);
-  } else {
+  }
+  else
+  {
     ret = &Model::null_o;
   }
 
@@ -442,29 +556,33 @@ Single *If::eval(Environment *s) {
   return ret;
 }
 
-
-Single *FunctionLiteral::eval(Environment *s) {
-    FunctionImpl *i = impl();
-  return Single::alloc(i, s);
+Object *FunctionLiteral::eval(Environment *s)
+{
+  FunctionImpl *i = impl();
+  return Object::alloc(i, s);
 }
 
 static bool evalExpressions(const vector<Node *> &args,
-                            array<Single *, MAX_ARGS_NUM> &arg_to_return,
-                            Environment *s) {
+                            array<Object *, MAX_ARGS_NUM> &arg_to_return,
+                            Environment *s)
+{
 
   size_t numArgs = args.size();
 
-  if (numArgs > MAX_ARGS_NUM) {
+  if (numArgs > MAX_ARGS_NUM)
+  {
     char buffer[80];
     sprintf(buffer, "Cannot support more than 25 args in a function");
-    Single *err = Single::alloc(buffer);
+    Object *err = Object::alloc(buffer);
     arg_to_return[0] = err;
     return true;
   }
 
-  for (size_t i = 0; i < numArgs; i++) {
-    Single *evaluated = args[i]->eval(s);
-    if (isError(evaluated)) {
+  for (size_t i = 0; i < numArgs; i++)
+  {
+    Object *evaluated = args[i]->eval(s);
+    if (isError(evaluated))
+    {
       // FIXME! mem leak here! Needs release osa mpikan sto arg_to_return prin
       // ftaso edo.
       arg_to_return[0] = evaluated;
@@ -476,12 +594,14 @@ static bool evalExpressions(const vector<Node *> &args,
   return false;
 }
 
-Environment *extendFunctionEnv(Single *fn,
-                               array<Single *, MAX_ARGS_NUM> &args) {
+Environment *extendFunctionEnv(Object *fn,
+                               array<Object *, MAX_ARGS_NUM> &args)
+{
   Environment *env =
       Environment::alloc(fn->data.f.env_);
   const vector<Identifier *> &params = fn->data.f.func_->parameters_;
-  for (size_t i = 0; i < params.size(); i++) {
+  for (size_t i = 0; i < params.size(); i++)
+  {
     Identifier *iden = params[i];
     env->set(iden->value(), args[i]);
   }
@@ -490,24 +610,29 @@ Environment *extendFunctionEnv(Single *fn,
 }
 
 // OK
-static Single *unwrapReturnValue(Single *val) {
-  if (val->type_ != RETURN) {
+static Object *unwrapReturnValue(Object *val)
+{
+  if (val->type_ != RETURN)
+  {
     return val;
   }
-  Single *result = val->data.obj.obj_;
+  Object *result = val->data.obj.obj_;
   val->release();
   return result;
 }
 
-static Single *applyFunction(Single *fn, array<Single *, MAX_ARGS_NUM> &args,
-                             size_t args_num) {
-  if (fn->type_ == BUILTIN) {
+static Object *applyFunction(Object *fn, array<Object *, MAX_ARGS_NUM> &args,
+                             size_t args_num)
+{
+  if (fn->type_ == BUILTIN)
+  {
     return fn->data.bltn.f_(args, args_num);
   }
 
-  if (fn->type_ == FUNCTION) {
+  if (fn->type_ == FUNCTION)
+  {
     Environment *extended_env = extendFunctionEnv(fn, args);
-    Single *ret = fn->data.f.func_->body_->eval(extended_env);
+    Object *ret = fn->data.f.func_->body_->eval(extended_env);
 
     ret = unwrapReturnValue(ret);
     extended_env->release();
@@ -516,23 +641,27 @@ static Single *applyFunction(Single *fn, array<Single *, MAX_ARGS_NUM> &args,
 
   char buffer[80];
   sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
-  return Single::alloc(buffer);
+  return Object::alloc(buffer);
 }
 
-Single *CallExpression::eval(Environment *s) {
-  Single *fn = function()->eval(s);
-  if (isError(fn)) {
+Object *CallExpression::eval(Environment *s)
+{
+  Object *fn = function()->eval(s);
+  if (isError(fn))
+  {
     return fn;
   }
-  array<Single *, MAX_ARGS_NUM> applied_args;
+  array<Object *, MAX_ARGS_NUM> applied_args;
   const vector<Node *> &args = arguments();
   bool isError = evalExpressions(args, applied_args, s);
-  if (isError) {
+  if (isError)
+  {
     return applied_args[0];
   }
   // delete fn
-  Single *ret = applyFunction(fn, applied_args, args.size());
-  for (size_t i = 0; i < size(); i++) {
+  Object *ret = applyFunction(fn, applied_args, args.size());
+  for (size_t i = 0; i < size(); i++)
+  {
     applied_args[i]->release();
   }
   fn->release();
@@ -541,7 +670,8 @@ Single *CallExpression::eval(Environment *s) {
 
 string StringLiteral::asString() const { return tok_->literal(); }
 
-string ArrayLiteral::asString() const {
+string ArrayLiteral::asString() const
+{
   string ret;
 
   ret.append("[");
@@ -550,9 +680,11 @@ string ArrayLiteral::asString() const {
   // I should not add comma in the last argument.
   size_t i = 1;
   size_t total = elements_.size();
-  for (auto &a : elements_) {
+  for (auto &a : elements_)
+  {
     ret.append(a->asString());
-    if (i != total) {
+    if (i != total)
+    {
       ret.append(", ");
     }
     i++;
@@ -562,13 +694,16 @@ string ArrayLiteral::asString() const {
   return ret;
 }
 
-ArrayLiteral::~ArrayLiteral() {
-  for (auto &a : elements_) {
+ArrayLiteral::~ArrayLiteral()
+{
+  for (auto &a : elements_)
+  {
     delete a;
   }
 }
 
-string IndexExpression::asString() const {
+string IndexExpression::asString() const
+{
   string ret;
 
   ret.append("(");
@@ -580,35 +715,41 @@ string IndexExpression::asString() const {
   return ret;
 }
 
-Single *ArrayLiteral::eval(Environment *s) {
-  array<Single *, MAX_ARGS_NUM>
+Object *ArrayLiteral::eval(Environment *s)
+{
+  array<Object *, MAX_ARGS_NUM>
       eval_elems_; // TODO fix me. This must be a vector;
   const vector<Node *> &elems = elements();
   bool isError = evalExpressions(elems, eval_elems_, s);
-  if (isError) {
+  if (isError)
+  {
     return eval_elems_[0];
   }
-  return Single::alloc(&eval_elems_[0], elems.size());
+  return Object::alloc(&eval_elems_[0], elems.size());
 }
 
-static Single *evalArrayIndexExpression(Single *left, Single *index) {
+static Object *evalArrayIndexExpression(Object *left, Object *index)
+{
   int idx = index->data.i.value_;
   int max = left->data.a.num_ - 1;
-  if (idx < 0 || idx > max) {
+  if (idx < 0 || idx > max)
+  {
     return &Model::null_o;
   }
-  Single *ret = left->data.a.elems_[idx];
+  Object *ret = left->data.a.elems_[idx];
   ret->retain();
   return ret;
 }
 
-static Single *evalHashIndexExpression(Single *left, Single *index) {
+static Object *evalHashIndexExpression(Object *left, Object *index)
+{
   ObjType type = index->type_;
 
-  if (type != INTEGER && type != STRING && type != BOOLEAN) {
+  if (type != INTEGER && type != STRING && type != BOOLEAN)
+  {
     char buffer[80];
     sprintf(buffer, "unusable as hash key: %s", object_name[index->type_]);
-    Single *ret = Single::alloc(buffer);
+    Object *ret = Object::alloc(buffer);
 
     left->release();
     index->release();
@@ -617,54 +758,69 @@ static Single *evalHashIndexExpression(Single *left, Single *index) {
 
   const HashMap &map = *left->data.hash.pairs_;
   const auto &entry = map.find(index);
-  if (entry == map.end()) {
+  if (entry == map.end())
+  {
     return &Model::null_o;
-  } else {
+  }
+  else
+  {
     entry->second->retain();
   }
 
   return entry->second;
 }
 
-static Single *evalIndexExpression(Single *left, Single *index) {
-  if (left->type_ == ARRAY && index->type_ == INTEGER) {
+static Object *evalIndexExpression(Object *left, Object *index)
+{
+  if (left->type_ == ARRAY && index->type_ == INTEGER)
+  {
     return evalArrayIndexExpression(left, index);
-  } else if (left->type_ == HASH) {
+  }
+  else if (left->type_ == HASH)
+  {
     return evalHashIndexExpression(left, index);
-  } else {
+  }
+  else
+  {
     char buffer[80];
     sprintf(buffer, "index operator not supported: %s",
             object_name[left->type_]);
-    return Single::alloc(buffer);
+    return Object::alloc(buffer);
   }
 }
 
-Single *IndexExpression::eval(Environment *s) {
-  Single *l = left()->eval(s);
-  if (l->type_ == ERROR) {
+Object *IndexExpression::eval(Environment *s)
+{
+  Object *l = left()->eval(s);
+  if (l->type_ == ERROR)
+  {
     return l;
   }
-  Single *i = index()->eval(s);
-  if (i->type_ == ERROR) {
+  Object *i = index()->eval(s);
+  if (i->type_ == ERROR)
+  {
     return i;
   }
 
-  Single *ret = evalIndexExpression(l, i);
+  Object *ret = evalIndexExpression(l, i);
   l->release();
   i->release();
 
   return ret;
 }
 
-string HashLiteral::asString() const {
+string HashLiteral::asString() const
+{
   string ret;
   ret.append("{");
   size_t i = 1;
   size_t total = pairs_.size();
 
-  for (auto &a : pairs_) {
+  for (auto &a : pairs_)
+  {
     ret.append(a.first->asString() + ":" + a.second->asString());
-    if (i != total) {
+    if (i != total)
+    {
       ret.append(", ");
     }
     i++;
@@ -674,19 +830,23 @@ string HashLiteral::asString() const {
   return ret;
 }
 
-static Single *evalHashLiteral(const HashLiteral *node, Environment *env) {
+static Object *evalHashLiteral(const HashLiteral *node, Environment *env)
+{
   HashMap *pairs = new HashMap;
 
-  Single *hash = Single::alloc(pairs);
+  Object *hash = Object::alloc(pairs);
 
-  for (auto &a : *node) {
-    Single *key = a.first->eval(env);
-    if (key && key->type_ == ERROR) {
+  for (auto &a : *node)
+  {
+    Object *key = a.first->eval(env);
+    if (key && key->type_ == ERROR)
+    {
       return key;
     }
 
-    Single *value = a.second->eval(env);
-    if (value && value->type_ == ERROR) {
+    Object *value = a.second->eval(env);
+    if (value && value->type_ == ERROR)
+    {
       return value;
     }
     pairs->emplace(key, value);
@@ -695,11 +855,13 @@ static Single *evalHashLiteral(const HashLiteral *node, Environment *env) {
   return hash;
 }
 
-Single *HashLiteral::eval(Environment *env) {
+Object *HashLiteral::eval(Environment *env)
+{
   return evalHashLiteral(this, env);
 }
 
-If::~If() {
+If::~If()
+{
   if (consequence_)
     delete consequence_;
   if (alternative_)
@@ -708,28 +870,35 @@ If::~If() {
     delete condition_;
 }
 
-IndexExpression::~IndexExpression() {
-    delete left_;
-    if (index_) {
-      delete index_;
-    }
+IndexExpression::~IndexExpression()
+{
+  delete left_;
+  if (index_)
+  {
+    delete index_;
+  }
 }
 
-HashLiteral::~HashLiteral() {
-    for (auto &a : pairs_) {
-      delete a.first;
-      delete a.second;
-    }
+HashLiteral::~HashLiteral()
+{
+  for (auto &a : pairs_)
+  {
+    delete a.first;
+    delete a.second;
+  }
 }
 
-Program::~Program() {
-    for (auto &stmt : statements_) {
-      delete stmt;
-    }
-    TokenPool.reset();
+Program::~Program()
+{
+  for (auto &stmt : statements_)
+  {
+    delete stmt;
+  }
+  TokenPool.reset();
 }
 
-ExpressionStatement::~ExpressionStatement() {
-    if (expression_)
-      delete expression_;
+ExpressionStatement::~ExpressionStatement()
+{
+  if (expression_)
+    delete expression_;
 }

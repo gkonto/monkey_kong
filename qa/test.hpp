@@ -6,12 +6,12 @@
 #include <vector>
 #include <memory>
 
-#include "ast.hpp"
+#include "../ast.hpp"
 
 class Token;
 class Node;
 class Program;
-struct Single;
+struct Object;
 struct Test;
 class Environment;
 
@@ -19,7 +19,7 @@ struct Test
 {
     Test(std::string name) : name_(name) {}
     virtual ~Test() {};
-    Single *eval(const std::string &input, Environment &env);
+    Object *eval(const std::string &input, Environment &env);
     std::string report_errors() const;
     virtual void execute() = 0;
     void errorf(std::string input_case, const char *fmt, ...);
@@ -36,9 +36,9 @@ struct Test
     template<typename T>
     bool testInfixExpression(const std::string &input, Node *exp, T lhs, const std::string &op, T rhs);
 
-    bool testIntegerObject(const std::string &input, Single *obj, int expected);
-    bool testBooleanObject(const std::string &input, Single *obj, bool expected);
-    bool testNullObject(const std::string &input, Single *obj);
+    bool testIntegerObject(const std::string &input, Object *obj, int expected);
+    bool testBooleanObject(const std::string &input, Object *obj, bool expected);
+    bool testNullObject(const std::string &input, Object *obj);
   //
     std::vector<std::string> errors_;
     std::string name_;

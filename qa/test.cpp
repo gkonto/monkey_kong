@@ -797,7 +797,7 @@ void TestIntegerLiteralExpression::execute()
  }
 
 
- bool Test::testIntegerObject(const std::string &input, Single *obj, int expected)
+ bool Test::testIntegerObject(const std::string &input, Object *obj, int expected)
  {
      if (!obj) {
          errorf(input, "Evaluated obj is nullptr\n");
@@ -821,7 +821,7 @@ void TestIntegerLiteralExpression::execute()
  }
 
 
-Single *Test::eval(const std::string &input, Environment &env)
+Object *Test::eval(const std::string &input, Environment &env)
 {
      Lexer l(input);
      Parser p(&l);
@@ -831,7 +831,7 @@ Single *Test::eval(const std::string &input, Environment &env)
      Evaluator evaluator(program.get(), &env);
      Single *ret = evaluator.eval();
 #else
-     Single *ret = program->eval(&env);
+     Object *ret = program->eval(&env);
 #endif
      return ret;
 }
@@ -839,7 +839,7 @@ Single *Test::eval(const std::string &input, Environment &env)
 void TestEvalIntegerExpression::run_core(std::string input, int expected)
  {
      Environment env;
-     Single *evaluated = eval(input, env);
+     Object *evaluated = eval(input, env);
      testIntegerObject(input, evaluated, expected);
      evaluated->release();
  }
@@ -896,13 +896,13 @@ void TestEvalBooleanExpression::execute()
 void TestEvalBooleanExpression::run_core(std::string input, bool expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testBooleanObject(input, evaluated, expected);
     evaluated->release();
 }
 
 
-bool Test::testBooleanObject(const std::string &input, Single *obj, bool expected)
+bool Test::testBooleanObject(const std::string &input, Object *obj, bool expected)
 {
     if (!obj) {
         errorf(input, "Evaluated obj is nullptr\n");
@@ -937,7 +937,7 @@ void TestBangOperator::execute()
 void TestBangOperator::run_core(std::string input, bool expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testBooleanObject(input, evaluated, expected);
     evaluated->release();
 }
@@ -956,7 +956,7 @@ void TestIfElseExpressions::execute()
 }
 
 
-bool Test::testNullObject(const std::string &input, Single *obj)
+bool Test::testNullObject(const std::string &input, Object *obj)
 {
     if (obj != &Model::null_o) {
         errorf(input, "object is not NULL.");
@@ -969,14 +969,14 @@ bool Test::testNullObject(const std::string &input, Single *obj)
 void TestIfElseExpressions::run_core(std::string input)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testNullObject(input, evaluated);
 }
 
 void TestIfElseExpressions::run_core(std::string input, int expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
     evaluated->release();
 }
@@ -1001,7 +1001,7 @@ void TestEvalReturnStatements::execute()
 void TestEvalReturnStatements::run_core(std::string input, int expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
     evaluated->release();
 }
@@ -1032,7 +1032,7 @@ void TestErrorHandler::execute()
 void TestErrorHandler::run_core(std::string input, std::string expected_e)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     if (!evaluated) {
         errorf(input, "evaluted object is nullptr\n");
         return;
@@ -1067,7 +1067,7 @@ void TestFunctionObject::run_core(std::string input)
      Evaluator evaluator(program.get(), &env);
      Single *fn = evaluator.eval();
 #else
-     Single *fn = program->eval(&env);
+     Object *fn = program->eval(&env);
 #endif
     if (!fn->type_) {
         errorf(input, "object  is not Function\n");
@@ -1099,7 +1099,7 @@ void TestFunctionObject::run_core(std::string input)
 void TestFunctionApplication::run_core(std::string input, int expected)
 {
     Environment env;
-    Single *ret = eval(input, env);
+    Object *ret = eval(input, env);
     testIntegerObject(input, ret, expected);
     ret->release();
 }
@@ -1137,7 +1137,7 @@ void CheckFibonacciTime::execute() {
     Evaluator evaluator(program.get(), &env);
     Single *ret = evaluator.eval();
 #else
-    Single *ret = nullptr;
+    Object *ret = nullptr;
     ret = program->eval(&env);
 
 #endif
@@ -1163,7 +1163,7 @@ void TestClosures::execute()
                         "addTwo(2);");
 
     Environment env;
-    Single *ret = eval(input, env);
+    Object *ret = eval(input, env);
     testIntegerObject(input, ret, 4);
     ret->release();
 }
@@ -1193,7 +1193,7 @@ void TestStringLiteral::execute()
 {
     std::string input("\"Hello World\"");
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     if (evaluated->type_ != STRING) {
         errorf(input, "object is not string.got %s\n", object_name[evaluated->type_]);
         return;
@@ -1211,7 +1211,7 @@ void TestStringConcatenation::execute()
     std::string input("\"Hello\" + \" \" + \"World!\"");
 
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
 
     if (evaluated->type_ != STRING) {
         errorf(input, "object is not String.got = %s\n", object_name[evaluated->type_]);
@@ -1238,7 +1238,7 @@ void TestBuiltinFunction::execute()
 void TestBuiltinFunction::run_core(std::string input, std::string expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
 
     if (evaluated->type_ != ERROR) {
         errorf(input, "object is not ErrorObj");
@@ -1254,7 +1254,7 @@ void TestBuiltinFunction::run_core(std::string input, std::string expected)
 void TestBuiltinFunction::run_core(std::string input, int expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
     evaluated->release();
 }
@@ -1316,7 +1316,7 @@ void TestArrayLiterals::execute()
     std::string input("[1, 2 * 2, 3 + 3]");
 
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     if (evaluated->type_ != ARRAY) {
         errorf(input, "object is not ArrayObj");
         return;
@@ -1351,7 +1351,7 @@ void TestArrayIndexExpressions::execute()
 void TestArrayIndexExpressions::run_core(std::string input, int expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
     evaluated->release();
 }
@@ -1359,7 +1359,7 @@ void TestArrayIndexExpressions::run_core(std::string input, int expected)
 void TestArrayIndexExpressions::run_core(std::string input, void *expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testNullObject(input, evaluated);
     evaluated->release();
 }
@@ -1477,18 +1477,18 @@ void TestHashLiteral::execute()
                         "}");
 
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
 
     if (evaluated->type_ != HASH) {
         errorf(input, "Eval didn't return Hash");
         return;
     }
 
-    std::unordered_map<Single * , int, HashFn, HashEqFn> expected;
-    expected.emplace(Single::alloc("one", STRING), 1);
-    expected.emplace(Single::alloc("two", STRING), 2);
-    expected.emplace(Single::alloc("three", STRING), 3);
-    expected.emplace(Single::alloc(4), 4);
+    std::unordered_map<Object * , int, HashFn, HashEqFn> expected;
+    expected.emplace(Object::alloc("one", STRING), 1);
+    expected.emplace(Object::alloc("two", STRING), 2);
+    expected.emplace(Object::alloc("three", STRING), 3);
+    expected.emplace(Object::alloc(4), 4);
     expected.emplace(&Model::true_o, 5);
     expected.emplace(&Model::false_o, 6);
 
@@ -1501,7 +1501,7 @@ void TestHashLiteral::execute()
     }
 
     for (auto &a : expected) {
-        Single *value = pair[a.first];
+        Object *value = pair[a.first];
         if (!value) {
             errorf(input, "no pair for given key in Pairs. expected key: %s value: %d",
                     a.first->inspect().c_str(), a.second);
@@ -1521,7 +1521,7 @@ void TestHashLiteral::execute()
 void TestHashIndexExpressions::run_core(std::string input, int expected)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testIntegerObject(input, evaluated, expected);
     evaluated->release();
 }
@@ -1529,7 +1529,7 @@ void TestHashIndexExpressions::run_core(std::string input, int expected)
 void TestHashIndexExpressions::run_core(std::string input)
 {
     Environment env;
-    Single *evaluated = eval(input, env);
+    Object *evaluated = eval(input, env);
     testNullObject(input, evaluated);
     evaluated->release();
 }

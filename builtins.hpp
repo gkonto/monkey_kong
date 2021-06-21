@@ -7,22 +7,22 @@
 #include <array>
 #include "auxiliaries.hpp"
 
-struct Single;
+struct Object;
 class CompSymbolTable;
 
 class Builtins
 {
-    public:
-        using Function = Single *(*)(const std::array<Single *, MAX_ARGS_NUM> &args, size_t args_num);
-        using container = std::map<std::string, Single *>;
+public:
+    using Function = Object *(*)(const std::array<Object *, MAX_ARGS_NUM> &args, size_t args_num);
+    using container = std::map<std::string, Object *>;
 
-        static Single *Get(const std::string &key);
-        static Builtins &getInstance();
-        Single *atIndex(size_t index) const;
-    private:
-        explicit Builtins();
-        container builtins_;
+    static Object *Get(const std::string &key);
+    static Builtins &getInstance();
+    Object *atIndex(size_t index) const;
+
+private:
+    explicit Builtins();
+    container builtins_;
 };
-
 
 #endif

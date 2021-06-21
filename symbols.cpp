@@ -7,13 +7,13 @@ TokenType SymbolTable::LookupIdent(const std::string &key)
     SymbolTable &instance = getInstance();
     auto val = instance.keywords.find(key);
 
-    if (val != instance.keywords.end()) {
+    if (val != instance.keywords.end())
+    {
         return val->second;
     }
 
     return T_IDENT;
 }
-
 
 void SymbolTable::initializeSymbols()
 {
@@ -25,7 +25,6 @@ void SymbolTable::initializeSymbols()
     keywords.emplace("else", T_ELSE);
     keywords.emplace("return", T_RETURN);
 }
-
 
 SymbolTable &SymbolTable::getInstance()
 {

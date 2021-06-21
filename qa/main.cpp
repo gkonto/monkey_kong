@@ -1,8 +1,8 @@
 #include <iostream>
 #include <map>
-#include "argparser.hpp"
-#include "auxiliaries.hpp"
-#include "token.hpp"
+#include "../argparser.hpp"
+#include "../auxiliaries.hpp"
+#include "../token.hpp"
 #include "test.hpp"
 
 using namespace std;

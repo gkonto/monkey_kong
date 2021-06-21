@@ -8,15 +8,14 @@
 
 class SymbolTable
 {
-    public:
-        static SymbolTable &getInstance();
-        static TokenType LookupIdent(const std::string &key);
+public:
+    static SymbolTable &getInstance();
+    static TokenType LookupIdent(const std::string &key);
 
-    private:
-        SymbolTable() { initializeSymbols(); }
-        void initializeSymbols();
-        std::map<std::string, TokenType> keywords;
+private:
+    SymbolTable() { initializeSymbols(); }
+    void initializeSymbols();
+    std::map<std::string, TokenType> keywords;
 };
-
 
 #endif

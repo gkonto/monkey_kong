@@ -18,49 +18,48 @@ using CmdArgCb = std::function<void(const class CmdArg &, const std::vector<std:
 
 class ArgParser
 {
-    public:
-        explicit ArgParser(std::string name, int argc, char **argv);
-        ~ArgParser();
-        void addArgument(const char *option, 
-                const char *description,
-                const std::set<std::string> &opt_vals, 
-                CmdArgCb cb);
+public:
+    explicit ArgParser(std::string name, int argc, char **argv);
+    ~ArgParser();
+    void addArgument(const char *option,
+                     const char *description,
+                     const std::set<std::string> &opt_vals,
+                     CmdArgCb cb);
 
-        void addArgument(const char *option, const char *description, CmdArgCb cb);
-        void parse(void *returned);
-    private:
-        void displayHelpMessage() const;
+    void addArgument(const char *option, const char *description, CmdArgCb cb);
+    void parse(void *returned);
 
-        std::unordered_map<std::string, class CmdArg *> accepted_args_; // accepted arguments
-        std::vector<std::string> input_args_; // user's input arguments
-        std::string parser_desc_; //ArgParser's displaying label when --help is selected
+private:
+    void displayHelpMessage() const;
+
+    std::unordered_map<std::string, class CmdArg *> accepted_args_; // accepted arguments
+    std::vector<std::string> input_args_;                           // user's input arguments
+    std::string parser_desc_;                                       //ArgParser's displaying label when --help is selected
 };
 //~ArgParser
 
-
 class CmdArg
 {
-    public:
-        explicit CmdArg(const char *option, const char *desc, CmdArgCb cb);
-        explicit CmdArg(const char *option, const char *desc, const std::set<std::string> &accepted, CmdArgCb cb);
+public:
+    explicit CmdArg(const char *option, const char *desc, CmdArgCb cb);
+    explicit CmdArg(const char *option, const char *desc, const std::set<std::string> &accepted, CmdArgCb cb);
 
-        ~CmdArg();
-        std::string decorate() const;
-        bool hasOptions() const { return optional_ != nullptr; }
-        const std::string &option() const { return arg_name_; }
-        const std::string &description() const { return arg_desc_; }
-        const std::set<std::string> &accepted_vals() const;
-        const std::string &default_val() const;
-        bool hasCallback() const { return cb_ != nullptr; }
-        void exec_cb(const std::vector<std::string> &arg_opts, void *returned) const;
-    private:
-        std::string arg_name_; // 
-        std::string arg_desc_;   // 
-        Optional *optional_ = nullptr;
+    ~CmdArg();
+    std::string decorate() const;
+    bool hasOptions() const { return optional_ != nullptr; }
+    const std::string &option() const { return arg_name_; }
+    const std::string &description() const { return arg_desc_; }
+    const std::set<std::string> &accepted_vals() const;
+    const std::string &default_val() const;
+    bool hasCallback() const { return cb_ != nullptr; }
+    void exec_cb(const std::vector<std::string> &arg_opts, void *returned) const;
 
-        CmdArgCb cb_;
+private:
+    std::string arg_name_; //
+    std::string arg_desc_; //
+    Optional *optional_ = nullptr;
+
+    CmdArgCb cb_;
 };
-
-
 
 #endif
