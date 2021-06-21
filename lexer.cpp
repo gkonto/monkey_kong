@@ -155,7 +155,7 @@ Token *Lexer::nextToken()
         if (currentIsLetter())
         {
             std::string val(readIdentifier());
-            tok = Token::alloc(SymbolTable::LookupIdent(val), val);
+            tok = Token::alloc(LookupIdentifier(val), val);
         }
         else if (isdigit(ch_))
         {
