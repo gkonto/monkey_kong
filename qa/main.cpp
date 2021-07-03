@@ -13,6 +13,8 @@ struct Tests
 {
     Tests()
     {
+        tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
+/*
         tests_.emplace("TestPoolArena", new TestPoolArena);
         tests_.emplace("TestNextToken", new TestNextToken);
         tests_.emplace("TestLetStatements", new TestLetStatements);
@@ -36,7 +38,6 @@ struct Tests
         tests_.emplace("TestErrorHandler", new TestErrorHandler);
         tests_.emplace("TestFunctionObject", new TestFunctionObject);
         tests_.emplace("TestFunctionApplication", new TestFunctionApplication);
-        tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
         tests_.emplace("TestClosures", new TestClosures);
         tests_.emplace("TestStringLiteralExpression", new TestStringLiteralExpression);
         tests_.emplace("TestStringLiteral", new TestStringLiteral);
@@ -51,6 +52,7 @@ struct Tests
         tests_.emplace("TestParsingHashLiterallWithExpression", new TestParsingHashLiteralWithExpression);
         tests_.emplace("TestHashLiteral", new TestHashLiteral);
         tests_.emplace("TestHashIndexExpressions", new TestHashIndexExpressions);
+    */
     }
 
     ~Tests()

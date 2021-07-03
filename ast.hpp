@@ -19,6 +19,7 @@ struct Node
   } // Only for debugging and testing
   virtual std::string asString() const = 0;
   virtual Object *eval(Environment *s) = 0;
+  virtual void display(int depth) const = 0;
   std::string literal = "Node";
 };
 
@@ -37,6 +38,8 @@ public:
   std::vector<Node *>::iterator end() { return statements_.end(); }
   Object *eval(Environment *s);
 
+  void display(int depth) const;
+
 private:
   std::vector<Node *> statements_;
 };
@@ -51,6 +54,7 @@ public:
   const std::string &tokenLiteral() const { return tok_->literal(); }
   const std::string &value() const { return value_; }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   Token *tok_;
@@ -72,7 +76,7 @@ public:
   Node *value() const { return value_; }
   void setValue(Node *exp) { value_ = exp; }
   Object *eval(Environment *s);
-
+  void display(int depth) const;
 private:
   Token *tok_;
   Identifier *name_; // the identifier's name
@@ -90,7 +94,7 @@ public:
   void setReturnVal(Node *exp) { returnValue_ = exp; }
   Node *value() const { return returnValue_; }
   Object *eval(Environment *s);
-
+  void display(int depth) const;
 private:
   Token *token_; // The return statement
   Node *returnValue_;
@@ -104,6 +108,7 @@ public:
   Node *expression() const { return expression_; }
   void setExpression(Node *exp) { expression_ = exp; }
   Object *eval(Environment *s) { return expression_->eval(s); }
+  void display(int depth) const;
 
 private:
   Node *expression_;
@@ -118,6 +123,7 @@ public:
   int value() const { return value_; }
   std::string asString() const;
   Object *eval(Environment *s) { return Object::alloc(value()); }
+  void display(int depth) const;
 
 private:
   Token *token_ = nullptr;
@@ -136,6 +142,7 @@ public:
   Node *right() const { return right_; }
   void setRight(Node *exp) { right_ = exp; }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   std::string operat_;
@@ -156,6 +163,7 @@ public:
   Node *rhs() const { return rhs_; }
   TokenType op() const { return op_; }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   Token *tok_; // The operator token, e.g +
@@ -172,6 +180,7 @@ public:
   bool value() const { return value_; }
   std::string asString() const { return tok_->literal(); }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   Token *tok_;
@@ -190,6 +199,7 @@ public:
   void emplace_back(Node *stmt) { return statements_.emplace_back(stmt); }
   const std::vector<Node *> &statements() const { return statements_; }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   Token *tok_;
@@ -211,6 +221,7 @@ public:
   BlockStatement *alternative() const { return alternative_; }
   void setAlternative(BlockStatement *a) { alternative_ = a; }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   Token *tok_ = nullptr;
@@ -252,6 +263,7 @@ public:
   size_t paramSize() const { return f_->parameters_.size(); }
   Object *eval(Environment *s);
   FunctionImpl *impl() const { return f_; }
+  void display(int depth) const;
 
 private:
   Token *tok_;
@@ -271,6 +283,7 @@ public:
   void setArguments(std::vector<Node *> args) { arguments_ = args; }
   const std::vector<Node *> &arguments() const { return arguments_; }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   Token *tok_;
@@ -285,6 +298,7 @@ public:
   std::string asString() const;
   const std::string &value() const { return value_; }
   Object *eval(Environment *s) { return Object::alloc(value_.c_str(), STRING); }
+  void display(int depth) const;
 
 private:
   std::string value_;
@@ -303,6 +317,7 @@ public:
   Node *at(size_t idx) const { return elements_.at(idx); }
   const std::vector<Node *> &elements() const { return elements_; }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   std::vector<Node *> elements_;
@@ -320,6 +335,7 @@ public:
   Node *left() const { return left_; }
   void setIndex(Node *index) { index_ = index; }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   Token *tok_;
@@ -342,6 +358,7 @@ public:
   HashMap::const_iterator end() const { return pairs_.cend(); }
   void emplace(Node *key, Node *value) { pairs_.emplace(key, value); }
   Object *eval(Environment *s);
+  void display(int depth) const;
 
 private:
   Token *tok_;

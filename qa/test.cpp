@@ -1181,6 +1181,9 @@ void CheckFibonacciTime::execute()
     Single *ret = evaluator.eval();
 #else
     Object *ret = nullptr;
+    std::cout << std::endl;
+    std::cout << program->asString() << std::endl;
+    program->display(0);
     ret = program->eval(&env);
 
 #endif

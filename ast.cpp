@@ -902,3 +902,156 @@ ExpressionStatement::~ExpressionStatement()
   if (expression_)
     delete expression_;
 }
+
+
+void Program::display(int depth) const
+{
+  std::cout << std::endl;
+  std::cout << "-Program(array of Nodes)" << std::endl;
+  ++depth;
+  for (auto p : statements_) {
+    p->display(depth);
+  }
+}
+
+void Identifier::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-Identifier(string)" << std::endl;
+  std::cout << indent << "Value: " << value_ << std::endl;
+}
+
+void Let::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-Let(name, value)" << std::endl;
+  name_->display(++depth);
+  value_->display(depth);
+}
+
+void Return::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-Return(Node)" << std::endl;
+  returnValue_->display(++depth);
+}
+
+void ExpressionStatement::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-ExpressionStatement(Expression)" << std::endl;
+  expression_->display(++depth);
+}
+
+void IntegerLiteral::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-IntegerLiteral(integer)" << std::endl;
+  std::cout << indent << value_ << std::endl;
+}
+
+void PrefixExpression::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-PrefixExpression(operat, Right)" << std::endl;
+  std::cout << indent << operat_ << std::endl;
+  right_->display(++depth);
+}
+
+void InfixExpression::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-InfixExpression(lhs, rhs)" << std::endl;
+  ++depth;
+  lhs_->display(depth);
+  rhs_->display(depth);
+}
+
+void Boolean::display(int depth) const
+{
+  string indent(depth, '\t');
+    std::cout << indent << "-Boolean(value)" << std::endl;
+    std::cout << depth << value_ << std::endl;
+}
+
+void BlockStatement::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-BlockStatement(Statement array)" << std::endl;
+  ++depth;
+  for (auto a : statements_) {
+    a->display(depth);
+  }
+}
+
+void If::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-If(Consequent, Alternative)" << std::endl;
+  ++depth;
+  consequence_->display(depth);
+  alternative_->display(depth);
+}
+
+void FunctionLiteral::display(int depth) const
+{
+  string indent(depth, '\t');
+  size_t numOfParams = f_->parameters_.size();
+  std::cout << indent << "-FunctionLiteral(Parameters[" << numOfParams << "], Body)" << std::endl;
+  ++depth;
+  for (auto a : f_->parameters_) {
+    a->display(depth);
+  }
+  f_->body_->display(depth);
+}
+
+void CallExpression::display(int depth) const
+{
+  string indent(depth, '\t');
+  size_t numOfParams = arguments_.size();
+  std::cout << indent << "-CallExpression(Arguments[" << numOfParams << "], Function)" << std::endl;
+  ++depth;
+  for (auto a : arguments_) {
+    a->display(depth);
+  }
+  function_->display(depth);
+}
+
+void StringLiteral::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-StringLiteral(value)" << std::endl;
+  std::cout << indent << value_ << std::endl;
+}
+
+void ArrayLiteral::display(int depth) const
+{
+  string indent(depth, '\t');
+  size_t numOfVals = elements_.size();
+  std::cout << indent << "-ArrayLiteral[" << numOfVals << "]" << std::endl;
+  ++depth;
+  for (auto a : elements_) {
+    a->display(depth);
+  }
+}
+
+void IndexExpression::display(int depth) const
+{
+  string indent(depth, '\t');
+  std::cout << indent << "-IndexExpression(Left, Right)" << std::endl;
+  ++depth;
+  left_->display(depth);
+  index_->display(depth);
+}
+
+void HashLiteral::display(int depth) const
+{
+    string indent(depth, '\t');
+    std::cout << indent << "HashLiteral" << std::endl;
+    ++depth;
+    for (auto p : pairs_) {
+      p.first->display(depth);
+      p.second->display(depth);
+      std::cout << "======" << std::endl;
+    }
+}
