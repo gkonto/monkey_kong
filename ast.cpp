@@ -987,8 +987,9 @@ void BlockStatement::display(int depth) const
 void If::display(int depth) const
 {
   string indent(depth, '\t');
-  std::cout << indent << "-If(Consequent, Alternative)" << std::endl;
+  std::cout << indent << "-If(Condition, Consequent, Alternative)" << std::endl;
   ++depth;
+  condition_->display(depth);
   consequence_->display(depth);
   alternative_->display(depth);
 }

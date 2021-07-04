@@ -1,6 +1,6 @@
  cmake_minimum_required(VERSION 2.8.7)
  PROJECT(monkey)
- add_definitions("-O3 -g -Wunreachable-code")
+ add_definitions("-O0 -g -Wunreachable-code")
  set(CMAKE_CXX_STANDARD 14)
 
  SET(ROOT_DIR ..)
