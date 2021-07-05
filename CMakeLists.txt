@@ -16,6 +16,7 @@
      builtins.hpp
      env.hpp
      parser.hpp
+     visitor.hpp
     )
 
  set(SOURCES

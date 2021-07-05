@@ -18,6 +18,7 @@
      ${ROOT_DIR}/parser.hpp
      ${ROOT_DIR}/pool.hpp
      ${ROOT_DIR}/env.hpp
+     ${ROOT_DIR}/visitor.hpp
      test.hpp
     )
  set(SOURCES

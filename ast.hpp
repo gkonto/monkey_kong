@@ -7,8 +7,10 @@
 
 #include "object.hpp"
 #include "token.hpp"
+#include "visitor.hpp"
 
 class Token;
+class Visitor;
 
 struct Node
 {
@@ -20,6 +22,7 @@ struct Node
   virtual std::string asString() const = 0;
   virtual Object *eval(Environment *s) = 0;
   virtual void display(int depth) const = 0;
+  virtual void accept(Visitor *visitor) = 0;
   std::string literal = "Node";
 };
 
@@ -38,6 +41,10 @@ public:
   std::vector<Node *>::iterator end() { return statements_.end(); }
   Object *eval(Environment *s);
 
+  void accept(Visitor *visitor) {
+    visitor->visitProgram(this);
+  }
+
   void display(int depth) const;
 
 private:
@@ -55,6 +62,10 @@ public:
   const std::string &value() const { return value_; }
   Object *eval(Environment *s);
   void display(int depth) const;
+  
+  void accept(Visitor *visitor) {
+    visitor->visitIdentifier(this);
+  }
 
 private:
   Token *tok_;
@@ -77,6 +88,9 @@ public:
   void setValue(Node *exp) { value_ = exp; }
   Object *eval(Environment *s);
   void display(int depth) const;
+  void accept(Visitor *visitor) {
+    visitor->visitLet(this);
+  }
 private:
   Token *tok_;
   Identifier *name_; // the identifier's name
@@ -95,6 +109,9 @@ public:
   Node *value() const { return returnValue_; }
   Object *eval(Environment *s);
   void display(int depth) const;
+  void accept(Visitor *visitor) {
+    visitor->visitReturn(this);
+  }
 private:
   Token *token_; // The return statement
   Node *returnValue_;
@@ -109,7 +126,9 @@ public:
   void setExpression(Node *exp) { expression_ = exp; }
   Object *eval(Environment *s) { return expression_->eval(s); }
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitExpressionStatement(this);
+  }
 private:
   Node *expression_;
 };
@@ -124,7 +143,9 @@ public:
   std::string asString() const;
   Object *eval(Environment *s) { return Object::alloc(value()); }
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitIntegerLiteral(this);
+  }
 private:
   Token *token_ = nullptr;
   int value_ = 0;
@@ -143,7 +164,9 @@ public:
   void setRight(Node *exp) { right_ = exp; }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitPrefixExpression(this);
+  }
 private:
   std::string operat_;
   Token *tok_; // The prefix token (eg !)
@@ -164,7 +187,9 @@ public:
   TokenType op() const { return op_; }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitInfixExpression(this);
+  }
 private:
   Token *tok_; // The operator token, e.g +
   Node *lhs_;
@@ -181,7 +206,9 @@ public:
   std::string asString() const { return tok_->literal(); }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitBoolean(this);
+  }
 private:
   Token *tok_;
   bool value_;
@@ -200,7 +227,9 @@ public:
   const std::vector<Node *> &statements() const { return statements_; }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitBlockStatement(this);
+  }
 private:
   Token *tok_;
   std::vector<Node *> statements_;
@@ -222,7 +251,9 @@ public:
   void setAlternative(BlockStatement *a) { alternative_ = a; }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitIf(this);
+  }
 private:
   Token *tok_ = nullptr;
   Node *condition_ = nullptr;
@@ -264,7 +295,9 @@ public:
   Object *eval(Environment *s);
   FunctionImpl *impl() const { return f_; }
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitFunctionLiteral(this);
+  }
 private:
   Token *tok_;
   FunctionImpl *f_ = new FunctionImpl;
@@ -284,7 +317,9 @@ public:
   const std::vector<Node *> &arguments() const { return arguments_; }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitCallExpression(this);
+  }
 private:
   Token *tok_;
   Node *function_;
@@ -299,7 +334,9 @@ public:
   const std::string &value() const { return value_; }
   Object *eval(Environment *s) { return Object::alloc(value_.c_str(), STRING); }
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitStringLiteral(this);
+  }
 private:
   std::string value_;
   Token *tok_;
@@ -318,7 +355,9 @@ public:
   const std::vector<Node *> &elements() const { return elements_; }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitArrayLiteral(this);
+  }
 private:
   std::vector<Node *> elements_;
   Token *tok_;
@@ -336,7 +375,9 @@ public:
   void setIndex(Node *index) { index_ = index; }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor) {
+    visitor->visitIndexExpression(this);
+  }
 private:
   Token *tok_;
   Node *left_;
@@ -359,7 +400,9 @@ public:
   void emplace(Node *key, Node *value) { pairs_.emplace(key, value); }
   Object *eval(Environment *s);
   void display(int depth) const;
-
+  void accept(Visitor *visitor)  {
+    visitor->visitHashLiteral(this);
+  }
 private:
   Token *tok_;
   HashMap pairs_;
