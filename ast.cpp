@@ -276,13 +276,14 @@ Object *Program::eval(Environment *s)
 
 Object *Identifier::eval(Environment *s)
 {
-  const string &key = value();
-  Object *val = s->get(key);
+  Object *val = s->get(this);
   if (val)
   {
     val->retain();
     return val;
   }
+  
+  const string &key = value();
 
   val = Builtins::Get(key);
   if (val)
@@ -594,18 +595,11 @@ static bool evalExpressions(const vector<Node *> &args,
   return false;
 }
 
-Environment *extendFunctionEnv(Object *fn,
+FunctionEnvironment *extendFunctionEnv(Object *fn,
                                array<Object *, MAX_ARGS_NUM> &args)
 {
-  Environment *env =
-      Environment::alloc(fn->data.f.env_);
   const vector<Identifier *> &params = fn->data.f.func_->parameters_;
-  for (size_t i = 0; i < params.size(); i++)
-  {
-    Identifier *iden = params[i];
-    env->set(iden->value(), args[i]);
-  }
-
+  FunctionEnvironment *env = new FunctionEnvironment(fn->data.f.env_, params.size(), args);
   return env;
 }
 
@@ -919,6 +913,7 @@ void Identifier::display(int depth) const
   string indent(depth, '\t');
   std::cout << indent << "-Identifier(string)" << std::endl;
   std::cout << indent << "Value: " << value_ << std::endl;
+  std::cout << indent << "VariableNumber: " << index_ << std::endl;
 }
 
 void Let::display(int depth) const

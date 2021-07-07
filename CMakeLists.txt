@@ -31,6 +31,7 @@
      token.cpp
      repl.cpp
      builtins.cpp
+     visitor.cpp
      )
  ADD_EXECUTABLE(monkey ${HEADERS} ${SOURCES})
 

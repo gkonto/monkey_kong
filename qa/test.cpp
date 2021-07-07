@@ -14,6 +14,7 @@
 #include "env.hpp"
 #include "pool.hpp"
 #include "object.hpp"
+#include "visitor.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -1181,9 +1182,11 @@ void CheckFibonacciTime::execute()
     Single *ret = evaluator.eval();
 #else
     Object *ret = nullptr;
-    std::cout << std::endl;
-    std::cout << program->asString() << std::endl;
-    program->display(0);
+    //std::cout << std::endl;
+    //std::cout << program->asString() << std::endl;
+    VariableNumberingVisitor vnv;
+    program->accept(&vnv);
+    //program->display(0);
     ret = program->eval(&env);
 
 #endif

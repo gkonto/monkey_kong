@@ -62,6 +62,8 @@ public:
   const std::string &value() const { return value_; }
   Object *eval(Environment *s);
   void display(int depth) const;
+  void setIndex(int i) { index_ = i; }
+  int index() const { return index_; }
   
   void accept(Visitor *visitor) {
     visitor->visitIdentifier(this);
@@ -70,6 +72,7 @@ public:
 private:
   Token *tok_;
   std::string value_;
+  int index_ = -1;
 };
 
 class Let : public Node

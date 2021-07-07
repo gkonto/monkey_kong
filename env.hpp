@@ -5,10 +5,13 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <vector>
 #include "pool.hpp"
+#include "auxiliaries.hpp"
 
 struct Object;
 class Environment;
+class Identifier;
 
 extern std::unique_ptr<Pool<Environment>> EnvPool;
 
@@ -17,35 +20,34 @@ class Environment
 public:
     Environment() = default;
     explicit Environment(Environment *outer) : outer_(outer) {}
-    ~Environment();
-    Object *get(const std::string &key);
+    virtual ~Environment();
+    //Object *get(const std::string &key);
     Object *set(const std::string &key, Object *entry);
+    virtual Object *get(Identifier *key) const;
     Environment *outer() const { return outer_; }
     void retain() { ++count_; }
     void release();
     void reset() { count_ = 0; }
 
-    template <typename... Args>
-    static Environment *alloc(Args... args);
-    static void dealloc(Environment *env);
-
-private:
+protected:
+    Object *get_core(const std::string &key) const;
     int count_ = 1;
     std::map<std::string, Object *> store_;
     Environment *outer_ = nullptr;
 };
 
-template <typename... Args>
-Environment *Environment::alloc(Args... args)
+class FunctionEnvironment : public Environment
 {
-    if (!EnvPool)
-    {
-        EnvPool = std::make_unique<Pool<Environment>>(10);
-    }
-    Environment *newEnv = EnvPool->alloc(std::forward<Args>(args)...);
-    newEnv->reset();
-    newEnv->retain();
-    return newEnv;
-}
+    public:
+        explicit FunctionEnvironment(Environment *outer, size_t num_args, const std::array<Object *, MAX_ARGS_NUM> &args) :
+         Environment(outer), args_values_(args.begin(), args.begin() + num_args) {}
+
+        Object *get(Identifier *key) const;
+
+    private:
+        std::vector<Object *> args_values_;
+};
+
+
 
 #endif
