@@ -13,7 +13,7 @@ struct Tests
 {
     Tests()
     {
-        //tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
+        tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
 
         tests_.emplace("TestPoolArena", new TestPoolArena);
         tests_.emplace("TestNextToken", new TestNextToken);
