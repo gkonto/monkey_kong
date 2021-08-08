@@ -1132,8 +1132,8 @@ void TestFunctionObject::run_core(std::string input)
         return;
     }
     std::string expectedBody("(x + 2)");
-    const std::string &b = fn->data.f.func_->body_->asString();
-    if (fn->data.f.func_->body_->asString() != expectedBody)
+    const std::string &b = fn->data.f.func_->body()->asString();
+    if (b != expectedBody)
     {
         errorf(input, "body is not %s. got %s\n", expectedBody.c_str(), b.c_str());
         return;

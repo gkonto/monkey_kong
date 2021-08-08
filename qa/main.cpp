@@ -13,8 +13,8 @@ struct Tests
 {
     Tests()
     {
-        tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
-/*
+        //tests_.emplace("CheckFibonacciTime", new CheckFibonacciTime);
+
         tests_.emplace("TestPoolArena", new TestPoolArena);
         tests_.emplace("TestNextToken", new TestNextToken);
         tests_.emplace("TestLetStatements", new TestLetStatements);
@@ -52,7 +52,6 @@ struct Tests
         tests_.emplace("TestParsingHashLiterallWithExpression", new TestParsingHashLiteralWithExpression);
         tests_.emplace("TestHashLiteral", new TestHashLiteral);
         tests_.emplace("TestHashIndexExpressions", new TestHashIndexExpressions);
-    */
     }
 
     ~Tests()
