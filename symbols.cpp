@@ -52,7 +52,7 @@ SymbolTableVec &SymbolTableVec::getInstance()
 TokenType SymbolTableVec::LookupIdent(const std::string &key)
 {
     SymbolTableVec &instance = getInstance();
-    auto size = distance(begin(instance.m_keywords), end(instance.m_keywords));
+    size_t size = distance(begin(instance.m_keywords), end(instance.m_keywords));
     for (size_t i = 0; i < size; ++i)
     {
         if (!key.compare(instance.m_keywords[i]))
