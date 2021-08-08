@@ -190,17 +190,17 @@ string FunctionLiteral::asString() const
   ret.append("(");
 
   size_t i = 1;
-  for (auto &a : f_->parameters_)
+  for (auto &a : f_->parameters())
   {
     ret.append(a->asString());
-    if (i != f_->parameters_.size())
+    if (i != f_->parameters().size())
     {
       ret.append(", ");
     }
     i++;
   }
   ret.append(") ");
-  ret.append(f_->body_->asString());
+  ret.append(f_->body()->asString());
 
   return ret;
 }
@@ -293,7 +293,7 @@ Object *Identifier::eval(Environment *s)
   }
 
   char buffer[80];
-  sprintf(buffer, "identifier not found: %s", key.c_str());
+  sprintf_s(buffer, "identifier not found: %s", key.c_str());
   return Object::alloc(buffer);
 }
 
@@ -343,7 +343,7 @@ static Object *evalMinusPrefixOperatorExpression(Object *right)
   if (right->type_ != INTEGER)
   {
     char buffer[80];
-    sprintf(buffer, "unknown operator: -%s", object_name[right->type_]);
+    sprintf_s(buffer, "unknown operator: -%s", object_name[right->type_]);
     return Object::alloc(buffer);
   }
   return Object::alloc(-right->data.i.value_);
@@ -363,7 +363,7 @@ static Object *evalPrefixExpression_core(const string &op, Object *right)
   else
   {
     char buffer[80];
-    sprintf(buffer, "unknown operator: %s%s", op.c_str(),
+    sprintf_s(buffer, "unknown operator: %s%s", op.c_str(),
             object_name[right->type_]);
     ret = Object::alloc(buffer);
   }
@@ -390,7 +390,7 @@ static Object *evalStringInfixExpression(TokenType op, Object *left,
   if (op != T_PLUS)
   {
     char buffer[80];
-    sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_],
+    sprintf_s(buffer, "unknown operator: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
     return Object::alloc(buffer);
   }
@@ -398,8 +398,8 @@ static Object *evalStringInfixExpression(TokenType op, Object *left,
   char buffer[1024];
   const char *l = left->data.s.value_;
   const char *r = right->data.s.value_;
-  strcpy(buffer, l);
-  strcat(buffer, r);
+  strcpy_s(buffer, l);
+  strcat_s(buffer, r);
   return Object::alloc(buffer, STRING);
 }
 
@@ -444,7 +444,7 @@ static Object *evalIntegerInfixExpression(TokenType op, Object *left,
   else
   {
     char buffer[80];
-    sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_],
+    sprintf_s(buffer, "unknown operator: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
     t = Object::alloc(buffer);
   }
@@ -471,7 +471,7 @@ static Object *evalInfixExpression_core(TokenType op, Object *left,
   else if (left->type_ != right->type_)
   {
     char buffer[80];
-    sprintf(buffer, "type mismatch: %s %s %s", object_name[left->type_],
+    sprintf_s(buffer, "type mismatch: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
     temp = Object::alloc(buffer);
   }
@@ -482,7 +482,7 @@ static Object *evalInfixExpression_core(TokenType op, Object *left,
   else
   {
     char buffer[80];
-    sprintf(buffer, "unknown operator: %s %s %s", object_name[left->type_],
+    sprintf_s(buffer, "unknown operator: %s %s %s", object_name[left->type_],
             tok_names[op], object_name[right->type_]);
     temp = Object::alloc(buffer);
   }
@@ -573,7 +573,7 @@ static bool evalExpressions(const vector<Node *> &args,
   if (numArgs > MAX_ARGS_NUM)
   {
     char buffer[80];
-    sprintf(buffer, "Cannot support more than 25 args in a function");
+    sprintf_s(buffer, "Cannot support more than 25 args in a function");
     Object *err = Object::alloc(buffer);
     arg_to_return[0] = err;
     return true;
@@ -598,7 +598,7 @@ static bool evalExpressions(const vector<Node *> &args,
 FunctionEnvironment *extendFunctionEnv(Object *fn,
                                array<Object *, MAX_ARGS_NUM> &args)
 {
-  const vector<Identifier *> &params = fn->data.f.func_->parameters_;
+  const vector<Identifier *> &params = fn->data.f.func_->parameters();
   FunctionEnvironment *env = new FunctionEnvironment(fn->data.f.env_, params.size(), args);
   return env;
 }
@@ -626,7 +626,7 @@ static Object *applyFunction(Object *fn, array<Object *, MAX_ARGS_NUM> &args,
   if (fn->type_ == FUNCTION)
   {
     Environment *extended_env = extendFunctionEnv(fn, args);
-    Object *ret = fn->data.f.func_->body_->eval(extended_env);
+    Object *ret = fn->data.f.func_->body()->eval(extended_env);
 
     ret = unwrapReturnValue(ret);
     extended_env->release();
@@ -634,7 +634,7 @@ static Object *applyFunction(Object *fn, array<Object *, MAX_ARGS_NUM> &args,
   }
 
   char buffer[80];
-  sprintf(buffer, "not a function: %s\n", object_name[fn->type_]);
+  sprintf_s(buffer, "not a function: %s\n", object_name[fn->type_]);
   return Object::alloc(buffer);
 }
 
@@ -742,7 +742,7 @@ static Object *evalHashIndexExpression(Object *left, Object *index)
   if (type != INTEGER && type != STRING && type != BOOLEAN)
   {
     char buffer[80];
-    sprintf(buffer, "unusable as hash key: %s", object_name[index->type_]);
+    sprintf_s(buffer, "unusable as hash key: %s", object_name[index->type_]);
     Object *ret = Object::alloc(buffer);
 
     left->release();
@@ -777,7 +777,7 @@ static Object *evalIndexExpression(Object *left, Object *index)
   else
   {
     char buffer[80];
-    sprintf(buffer, "index operator not supported: %s",
+    sprintf_s(buffer, "index operator not supported: %s",
             object_name[left->type_]);
     return Object::alloc(buffer);
   }
@@ -992,13 +992,13 @@ void If::display(int depth) const
 void FunctionLiteral::display(int depth) const
 {
   string indent(depth, '\t');
-  size_t numOfParams = f_->parameters_.size();
+  size_t numOfParams = f_->parameters().size();
   std::cout << indent << "-FunctionLiteral(Parameters[" << numOfParams << "], Body)" << std::endl;
   ++depth;
-  for (auto a : f_->parameters_) {
+  for (auto a : f_->parameters()) {
     a->display(depth);
   }
-  f_->body_->display(depth);
+  f_->body()->display(depth);
 }
 
 void CallExpression::display(int depth) const

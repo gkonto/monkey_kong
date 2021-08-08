@@ -6,11 +6,15 @@
 
 using namespace std;
 
-struct Optional
+class Optional
 {
+public:
     explicit Optional(const set<string> &accepted)
         : accepted_vals_(accepted) {}
 
+    const set<string>& acceptedVals() const { return accepted_vals_; }
+
+private:
     set<string> accepted_vals_;
 };
 //~Optional
@@ -35,7 +39,7 @@ CmdArg::~CmdArg()
 
 const set<string> &CmdArg::accepted_vals() const
 {
-    return optional_->accepted_vals_;
+    return optional_->acceptedVals();
 }
 
 void CmdArg::exec_cb(const vector<string> &arg_opts, void *returned) const

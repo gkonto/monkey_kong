@@ -3,8 +3,9 @@
 
 #include <string>
 #include <sstream>
+#include <istream>
 
-struct Token;
+class Token;
 
 // FIXME Does not support doubles!
 class Lexer
@@ -14,8 +15,8 @@ public:
         : stream_(input) {}
 
     Token *nextToken();
-    int position() { return stream_.tellg(); }
-    int readPosition() { return stream_.tellg(); }
+    std::streampos position() { return stream_.tellg(); }
+    std::streampos readPosition() { return stream_.tellg(); }
     char current() { return ch_; }
 
 private:
@@ -31,4 +32,4 @@ private:
     int ch_ = ' '; // Currect char under examination
 };
 
-#endif
+#endif LEXER_HPP

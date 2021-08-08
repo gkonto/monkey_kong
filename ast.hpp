@@ -12,17 +12,20 @@
 class Token;
 class Visitor;
 
-struct Node
+class Node
 {
+public:
   virtual ~Node() {}
   virtual const std::string &tokenLiteral() const
   {
     return literal;
   } // Only for debugging and testing
+
   virtual std::string asString() const = 0;
   virtual Object *eval(Environment *s) = 0;
   virtual void display(int depth) const = 0;
   virtual void accept(Visitor *visitor) = 0;
+protected:
   std::string literal = "Node";
 };
 
@@ -62,8 +65,8 @@ public:
   const std::string &value() const { return value_; }
   Object *eval(Environment *s);
   void display(int depth) const;
-  void setIndex(int i) { index_ = i; }
-  int index() const { return index_; }
+  void setIndex(size_t i) { index_ = i; }
+  size_t index() const { return index_; }
   
   void accept(Visitor *visitor) {
     visitor->visitIdentifier(this);
@@ -72,7 +75,7 @@ public:
 private:
   Token *tok_;
   std::string value_;
-  int index_ = -1;
+  size_t index_ = -1;
 };
 
 class Let : public Node
@@ -172,8 +175,8 @@ public:
   }
 private:
   std::string operat_;
-  Token *tok_; // The prefix token (eg !)
-  Node *right_;
+  Token *tok_  = nullptr; // The prefix token (eg !)
+  Node *right_ = nullptr;
 };
 
 class InfixExpression : public Node
@@ -264,8 +267,9 @@ private:
   BlockStatement *alternative_ = nullptr;
 };
 
-struct FunctionImpl
+class FunctionImpl
 {
+public:
   ~FunctionImpl();
   void release()
   {
@@ -277,6 +281,13 @@ struct FunctionImpl
 
   void retain() { use_count_++; }
 
+  const std::vector<Identifier*>& parameters() const { return parameters_; }
+  void setParameters(const std::vector<Identifier*>& params) { parameters_ = params; }
+  BlockStatement* body() const { return body_; }
+  void setBody(BlockStatement* b) { body_ = b; }
+  size_t paramsSize() const { return parameters_.size(); }
+
+private:
   std::vector<Identifier *> parameters_; // used by object if created
   BlockStatement *body_ = nullptr;       // used by object if created
   int use_count_ = 1;
@@ -289,12 +300,12 @@ public:
   ~FunctionLiteral() { f_->release(); }
   std::string asString() const;
   const std::string &tokenLiteral() const { return tok_->literal(); }
-  Identifier *param(std::size_t idx) const { return f_->parameters_[idx]; }
-  void setBody(BlockStatement *body) { f_->body_ = body; }
-  BlockStatement *body() const { return f_->body_; }
-  void setParameters(const std::vector<Identifier *> &p) { f_->parameters_ = p; }
-  const std::vector<Identifier *> &parameters() { return f_->parameters_; }
-  size_t paramSize() const { return f_->parameters_.size(); }
+  Identifier *param(std::size_t idx) const { return f_->parameters()[idx]; }
+  void setBody(BlockStatement* body) { f_->setBody(body); }
+  BlockStatement *body() const { return f_->body(); }
+  void setParameters(const std::vector<Identifier*>& p) { f_->setParameters(p); }
+  const std::vector<Identifier *> &parameters() { return f_->parameters(); }
+  size_t paramSize() const { return f_->paramsSize(); }
   Object *eval(Environment *s);
   FunctionImpl *impl() const { return f_; }
   void display(int depth) const;

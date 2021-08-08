@@ -35,3 +35,7 @@
 #build
 build/
 build_rel
+
+
+#Visual studio
+.vs/

@@ -1118,13 +1118,13 @@ void TestFunctionObject::run_core(std::string input)
         return;
     }
 
-    if (fn->data.f.func_->parameters_.size() != 1)
+    if (fn->data.f.func_->parameters().size() != 1)
     {
         errorf(input, "function has wrong parameters");
         return;
     }
 
-    const std::vector<Identifier *> &idents = fn->data.f.func_->parameters_;
+    const std::vector<Identifier *> &idents = fn->data.f.func_->parameters();
     const std::string &val = idents[0]->value();
     if (val.compare("x"))
     {

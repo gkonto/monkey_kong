@@ -5,12 +5,12 @@
 
 using namespace std;
 
-static Object *argNumCheck(int got, int expected)
+static Object *argNumCheck(size_t got, int expected)
 {
     if (got != expected)
     {
         char buffer[80];
-        sprintf(buffer, "wrong number of arguments. got: %d, want: %d", got, expected);
+        sprintf_s(buffer, "wrong number of arguments. got: %zu, want: %d", got, expected);
         return Object::alloc(buffer);
     }
 
@@ -34,7 +34,7 @@ static Object *len_b(const std::array<Object *, MAX_ARGS_NUM> &args, size_t args
     }
 
     char buffer[80];
-    sprintf(buffer, "argument to 'len' not supported. got %s\n", object_name[f->type_]);
+    sprintf_s(buffer, "argument to 'len' not supported. got %s\n", object_name[f->type_]);
     return Object::alloc(buffer);
 }
 
@@ -47,7 +47,7 @@ static Object *first_b(const std::array<Object *, MAX_ARGS_NUM> &args, size_t ar
     if (args[0]->type_ != ARRAY)
     {
         char buffer[80];
-        sprintf(buffer, "argument to 'first' must be ARRAY");
+        sprintf_s(buffer, "argument to 'first' must be ARRAY");
         return Object::alloc(buffer);
     }
 
@@ -68,7 +68,7 @@ static Object *last_b(const std::array<Object *, MAX_ARGS_NUM> &args, size_t arg
     if (args[0]->type_ != ARRAY)
     {
         char buffer[80];
-        sprintf(buffer, "argument to 'last' must be ARRAY");
+        sprintf_s(buffer, "argument to 'last' must be ARRAY");
         return Object::alloc(buffer);
     }
 
@@ -89,12 +89,12 @@ static Object *rest_b(const std::array<Object *, MAX_ARGS_NUM> &args, size_t arg
     if (args[0]->type_ != ARRAY)
     {
         char buffer[80];
-        sprintf(buffer, "argument to 'rest' must be ARRAY");
+        sprintf_s(buffer, "argument to 'rest' must be ARRAY");
         return Object::alloc(buffer);
     }
 
     Object *arr = args[0];
-    size_t length = arr->data.a.num_;
+    int length = arr->data.a.num_;
     if (length > 0)
     {
         return new Object(&arr->data.a.elems_[1], length - 1);
@@ -112,7 +112,7 @@ static Object *push_b(const std::array<Object *, MAX_ARGS_NUM> &args, size_t arg
     if (args[0]->type_ != ARRAY)
     {
         char buffer[80];
-        sprintf(buffer, "argument to 'push' must be ARRAY");
+        sprintf_s(buffer, "argument to 'push' must be ARRAY");
         return Object::alloc(buffer);
     }
 

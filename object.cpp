@@ -78,9 +78,9 @@ string Object::inspectFunction() const
   ret.append("(");
 
   size_t i = 1;
-  size_t num = data.f.func_->parameters_.size();
+  size_t num = data.f.func_->parameters().size();
 
-  for (auto &a : data.f.func_->parameters_)
+  for (auto &a : data.f.func_->parameters())
   {
     ret.append(a->asString());
     if (i != num)
@@ -90,7 +90,7 @@ string Object::inspectFunction() const
     }
   }
   ret.append(") {\n");
-  ret.append(data.f.func_->body_->asString());
+  ret.append(data.f.func_->body()->asString());
   ret.append("\n}");
 
   return ret;

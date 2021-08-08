@@ -38,7 +38,7 @@ Object *Environment::get(Identifier *iden) const
 
 Object *FunctionEnvironment::get(Identifier *key) const
 {
-    int index = key->index();
+    size_t index = key->index();
     if (index != -1) {
         return args_values_[index];
     } else {

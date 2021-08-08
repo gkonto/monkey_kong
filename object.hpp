@@ -68,7 +68,7 @@ struct Object
   explicit Object(char *msg) : type_(ERROR) { data.e.msg_ = strdup(msg); }
   explicit Object(HashMap *pairs) : type_(HASH) { data.hash.pairs_ = pairs; }
   explicit Object(Builtins::Function f) : type_(BUILTIN) { data.bltn.f_ = f; }
-  explicit Object() : type_(NUL) {}
+  Object() = default;
   explicit Object(const char *msg, ObjType type);
   explicit Object(Object **elements, int num);
   explicit Object(FunctionImpl *f, Environment *e);
@@ -129,7 +129,7 @@ struct Object
       HashMap *pairs_;
     } hash; // Hash
   } data;
-  ObjType type_;
+  ObjType type_ = NUL;
   char count_ = 0;
 };
 

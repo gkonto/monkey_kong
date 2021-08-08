@@ -1,8 +1,17 @@
  cmake_minimum_required(VERSION 2.8.7)
  PROJECT(monkey)
  #add_definitions("-Wall -Wextra -ggdb -O0 -Wunreachable-code")
- add_definitions("-Wall -Wextra -O3 -Wunreachable-code")
- set(CMAKE_CXX_STANDARD 14)
+ # Set default compile flags for GCC
+
+#if(CMAKE_COMPILER_IS_GNUCXX)
+#   message(STATUS "GCC detected, adding compile flags")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
+#endif(CMAKE_COMPILER_IS_GNUCXX)
+ 
+
+ #specify the C++ standard
+ set(CMAKE_CXX_STANDARD 11)
+ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
  set(HEADERS
      token.hpp

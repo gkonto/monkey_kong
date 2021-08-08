@@ -15,7 +15,7 @@ void VariableNumberingVisitor::visitIdentifier(Identifier *p)
 {
     if (!params_) return;
 
-    for (auto i = 0; i < params_->size(); ++i) {
+    for (size_t i = 0; i < params_->size(); ++i) {
         if (!p->value().compare(params_->at(i)->value())) {
             p->setIndex(i);
         }
